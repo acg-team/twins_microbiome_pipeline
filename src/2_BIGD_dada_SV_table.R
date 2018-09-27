@@ -5,9 +5,10 @@
 # https://github.com/benjjneb/dada2/tree/master/R
 
 ##### 0: load the necessary packages and set path #####   
-project_path <- "~/Projects_R/TWINS"
+project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
-source("load_initialize.R")
+source("src/load_initialize.R")
+
 packageVersion("dada2")
 
 
@@ -40,7 +41,7 @@ for (idx in seq_along(fnFs)){
 ### QUALITY: ##############
 # check FastQC plots for quality 
 # some of them are in bad quality #3
-ii <- seq(from=10,to=15,by=1)  #length(fnFs)
+ii <- seq(from=20,to=25,by=1)  #length(fnFs)
 for(i in ii) {
  print(plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i])))
  print(plotQualityProfile(fnRs[i]) + ggtitle(paste("Rev:", sample.names[i])))

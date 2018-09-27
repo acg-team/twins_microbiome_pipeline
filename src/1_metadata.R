@@ -13,7 +13,7 @@ setwd(project_path)
 source("src/load_initialize.R")
 
 #####: Extract metadata desription information from different files
-metadata.raw <- read.table(file.path(data_path,"PRJEB13747.txt"))
+metadata.raw <- read.table(file.path(metadata_path,"PRJEB13747.txt"))
 
 # initialize vectors of different features
 age_vector     <- c()
@@ -65,7 +65,7 @@ df.metadata <- data.frame(
 df.metadata.ordered <- df.metadata[ order(df.metadata["family_id"]), ]
 
 # cache to disk to avoid downloading again
-save(df.metadata, df.metadata.ordered, file=file.path(result_path, "metadata.RData")) 
+save(df.metadata, df.metadata.ordered, file=file.path(metadata_path, "metadata.RData")) 
 
 # export to human readable format
 write.table(df.metadata, file.path(result_path,"metadata.csv"), sep=",")
