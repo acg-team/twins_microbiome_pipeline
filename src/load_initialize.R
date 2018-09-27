@@ -24,11 +24,11 @@ set.seed(100)
 
 #########################################################################
 
-data_path    <- file.path(project_path, "TwinUK")
-filt_path    <- file.path(data_path, "Filtered")
-result_path  <- file.path(project_path, "Result")
+data_path    <- file.path(project_path, "/data/raw")
+filt_path    <- file.path(data_path, "/data/processed")
+result_path  <- file.path(project_path, "/reports")
 rdp_path     <- file.path(project_path, "RDP")
-silva_path   <- file.path(project_path, "SILVA")
+silva_path   <- file.path(project_path, "/data/metadata")
 
 
 

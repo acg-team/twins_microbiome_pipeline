@@ -8,9 +8,9 @@ require(XML)
 require(tictoc)
 
 # create a path variable to access data and processed-filtered data
-project_path <- "~/Projects_R/TWINS"
+project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
-source("load_initialize.R")
+source("src/load_initialize.R")
 
 #####: Extract metadata desription information from different files
 metadata.raw <- read.table(file.path(data_path,"PRJEB13747.txt"))
