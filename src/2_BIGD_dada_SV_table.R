@@ -1,8 +1,10 @@
-# @Alex, distinguish UK Twins data
+# @Alex
+############# Step 2 #################
 # Create a joint SV table for all samples together (analogous to OTU table)
 # 
 # https://www.bioconductor.org/packages/devel/bioc/vignettes/dada2/inst/doc/dada2-intro.html
 # https://github.com/benjjneb/dada2/tree/master/R
+
 
 ##### 0: load the necessary packages and set path #####   
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
@@ -43,8 +45,8 @@ for (idx in seq_along(fnFs)){
 # some of them are in bad quality #3
 ii <- seq(from=20,to=25,by=1)  #length(fnFs)
 for(i in ii) {
- print(plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i])))
- print(plotQualityProfile(fnRs[i]) + ggtitle(paste("Rev:", sample.names[i])))
+ print(dada2::plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i])))
+ print(dada2::plotQualityProfile(fnRs[i]) + ggtitle(paste("Rev:", sample.names[i])))
 }
 
 

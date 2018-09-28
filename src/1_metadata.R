@@ -1,11 +1,12 @@
 # @Alex
+#################### Step 1 ###################
 # LOAD metadate of all samples from
 #http://www.ebi.ac.uk/ena/data/view/PRJEB13747
-# and put it into a file
+# and save it into a file
 
-install.packages("tictoc")
-require(XML)
-require(tictoc)
+# it is only neccesary to run it once, then files will be cached on disk
+library(httr)
+
 
 # create a path variable to access data and processed-filtered data
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
@@ -31,7 +32,8 @@ for (sample_idx in 2:sample_number){
   # construct url
   # http://www.ebi.ac.uk/ena/data/view/ERS1131064&display=xml&download=xml&filename=ERS1131064.xml
   xml.url <- paste("http://www.ebi.ac.uk/ena/data/view/", metadata.raw[sample_idx,"V3"], "&display=xml&download=xml&filename=",metadata.raw[sample_idx,"V3"],".xml", sep="" )
-  xmldata <- xmlParse(xml.url)
+  #xmldata <- xmlParse(xml.url)
+  xmldata <- xmlParse(rawToChar(GET(xml.url)$content))
   
   collection_date <- xmlValue(  getNodeSet(xmldata,'//SAMPLE/SAMPLE_ATTRIBUTES/SAMPLE_ATTRIBUTE[TAG="collection_date"]/VALUE')[[1]] )
   age       <- xmlValue(  getNodeSet(xmldata,'//SAMPLE/SAMPLE_ATTRIBUTES/SAMPLE_ATTRIBUTE[TAG="host age"]/VALUE')[[1]] )
