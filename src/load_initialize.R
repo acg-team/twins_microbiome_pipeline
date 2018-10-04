@@ -24,8 +24,15 @@ set.seed(100)
 
 #########################################################################
 
+# TODO create if they dont exists
+#if(!file_test("-d", filt_path)) dir.create(result_path)
+#if(!file_test("-d", filt_path)) dir.create(filt_path)  # create filetered folder
+
 data_path    <- file.path(project_path, "data/raw")
-filt_path    <- file.path(data_path, "data/processed")
+filt_path <- file.path(project_path, "data/raw/filtered")
+processed_path    <- file.path(project_path, "data/processed")
+models_path    <- file.path(project_path, "models")
+
 result_path  <- file.path(project_path, "reports")
 rdp_path     <- file.path(project_path, "RDP")
 metadata_path   <- file.path(project_path, "data/metadata")

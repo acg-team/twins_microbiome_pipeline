@@ -12,6 +12,7 @@ setwd(project_path)
 source("src/load_initialize.R")
 
 packageVersion("dada2")
+QUALITY_THRESHOLD <- 15
 
 
 ###### 1: Files preparation / Quality check ########################
@@ -43,7 +44,7 @@ for (idx in seq_along(fnFs)){
 ### QUALITY: ##############
 # check FastQC plots for quality 
 # some of them are in bad quality #3
-ii <- seq(from=20,to=25,by=1)  #length(fnFs)
+ii <- seq(from=40,to=45,by=1)  #length(fnFs)
 for(i in ii) {
  print(dada2::plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i])))
  print(dada2::plotQualityProfile(fnRs[i]) + ggtitle(paste("Rev:", sample.names[i])))
@@ -54,7 +55,7 @@ for(i in ii) {
 # trim and put into filtered folder
 # https://github.com/benjjneb/dada2/tree/master/R
 
-if(!file_test("-d", filt_path)) dir.create(filt_path)  # create filetered folder
+
 filtFs <- file.path(filt_path, basename(fnFs))  # names for filtered forwards reads
 filtRs <- file.path(filt_path, basename(fnRs))  # names for filtered reverse reads
 
@@ -77,7 +78,7 @@ for(i in seq_along(fnFs)) {
   dada2::filterAndTrim( fwd=fnFs[[i]],     filt=filtFs[[i]],
                         rev=fnRs[[i]], filt.rev=filtRs[[i]],
                         #trimLeft=c(3,3), truncLen=c(247,247), 
-                        maxEE=2, truncQ=11, maxN=0, rm.phix=TRUE,
+                        maxEE=2, truncQ=QUALITY_THRESHOLD, maxN=0, rm.phix=TRUE,
                         compress=TRUE, verbose=TRUE, multithread=TRUE
   )
 }
@@ -111,14 +112,14 @@ toc() # 9806.114 sec
 ## plot error rates for control
 plotErrors(errF)
 plotErrors(errR)
-save(errF, errR, file=file.path(result_path, "dada_err_data.RData")) 
+save(errF, errR, file=file.path(models_path, "dada_err_data.RData")) 
 
-
-mergers <- list()
-counter <- 0
 
 ### Big Data dada2 pipeline
 # do it in a loop because we have a huge dataset (BigData workflow)
+mergers <- list()
+counter <- 0
+
 tic()
 for (sam in sample.names) {
   tic()
@@ -137,25 +138,25 @@ for (sam in sample.names) {
   counter <- counter+1
   cat(counter, "...", sam, " Done.\n")
   cat("---------- \n")
-  save(mergers, file=file.path(result_path, "mergers.RData")) 
+  save(mergers, file=file.path(models_path, "mergers.RData")) 
 }
-print("Total time:")
+print("Total time of sample inference:")
 toc()
 
 
 
 ### SEQTAB: constructs a sequence table (analogous to an OTU table) from the list of samples.
+tic()
 seqtab.all <- dada2::makeSequenceTable(mergers, orderBy = "abundance")
+print("Total time of makeSequenceTable:")
+toc()
 
 ### remove chimeras ----
 seqtab <- dada2::removeBimeraDenovo(seqtab.all, verbose = TRUE)
+save(seqtab, file=file.path(models_path, "seqtab_q15.RData")) 
 
-################## SAVE Intermediate results ##############
-if(!file_test("-d", filt_path)) dir.create(result_path)
-
-
-save(seqtab, file=file.path(result_path, "seqtab.RData")) 
+### Extract sample names and save them separatelly (for futher Python data analysis)
 seqtab.samples.names = rownames(seqtab)
-save(seqtab.samples.names, file=file.path(result_path, "seqtab_snames.RData")) 
+save(seqtab.samples.names, file=file.path(models_path, "seqtab_snames_q15.RData")) 
 
 
