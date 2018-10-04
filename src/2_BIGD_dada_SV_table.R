@@ -138,7 +138,7 @@ for (sam in sample.names) {
   counter <- counter+1
   cat(counter, "...", sam, " Done.\n")
   cat("---------- \n")
-  save(mergers, file=file.path(models_path, "mergers.RData")) 
+  save(mergers, file=file.path(models_path, "mergers_q15.RData")) 
 }
 print("Total time of sample inference:")
 toc()
