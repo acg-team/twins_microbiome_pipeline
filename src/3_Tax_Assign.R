@@ -3,6 +3,8 @@
 # http://benjjneb.github.io/dada2/assign.html
 # http://benjjneb.github.io/dada2/tutorial.html
 
+# TODO: it is told that silva assignment is not very accurate, please check
+
 
 #### init: load packages and set path
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
@@ -12,7 +14,6 @@ source("src/load_initialize.R")
 #########################################################################
 
 ### LOAD PREVIOUS DATA
-load(file=file.path(models_path, "mergers_g15.RData")) 
 load(file=file.path(models_path, "seqtab_q15.RData")) 
 
 
@@ -22,7 +23,10 @@ load(file=file.path(models_path, "seqtab_q15.RData"))
 
 tic()
 #ref_fasta <- file.path(rdp_path, "rdp_train_set_14.fa.gz")
+
+# TODO what is the dufference btw training and assignment?
 ref_fasta <- file.path(metadata_path, "silva_nr_v128_train_set.fa.gz")
+#ref_fasta <- file.path(metadata_path, "silva_species_assignment_v128.fa.gz")
 taxtab <- dada2::assignTaxonomy(seqtab, refFasta = ref_fasta)
 colnames(taxtab) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 unname(taxtab)
@@ -35,5 +39,5 @@ toc()
 # so we can combine for each sample a table with taxa names and abanduncies
 # see Exploratoty_Analysys file
 
-save(taxtab, file=file.path(result_path, "taxtab_g15.RData")) 
+save(taxtab, file=file.path(models_path, "taxtab_g15.RData")) 
 
