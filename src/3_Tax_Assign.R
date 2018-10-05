@@ -12,8 +12,8 @@ source("src/load_initialize.R")
 #########################################################################
 
 ### LOAD PREVIOUS DATA
-load(file=file.path(models_path, "mergers_g15.RData")) 
-load(file=file.path(models_path, "seqtab_q15.RData")) 
+load(file=file.path(models_path, mergers.file)) 
+load(file=file.path(models_path, seqtab.file)) 
 
 
 ###### 1: ASSIGN TAXONOMY ########################
@@ -35,5 +35,5 @@ toc()
 # so we can combine for each sample a table with taxa names and abanduncies
 # see Exploratoty_Analysys file
 
-save(taxtab, file=file.path(result_path, "taxtab_g15.RData")) 
+save(taxtab, file=file.path(result_path, taxtab.file)) 
 
