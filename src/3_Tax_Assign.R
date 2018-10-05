@@ -3,6 +3,8 @@
 # http://benjjneb.github.io/dada2/assign.html
 # http://benjjneb.github.io/dada2/tutorial.html
 
+# TODO: it is told that silva assignment is not very accurate, please check
+
 
 #### init: load packages and set path
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
@@ -22,7 +24,10 @@ load(file=file.path(models_path, seqtab.file))
 
 tic()
 #ref_fasta <- file.path(rdp_path, "rdp_train_set_14.fa.gz")
+
+# TODO what is the dufference btw training and assignment?
 ref_fasta <- file.path(metadata_path, "silva_nr_v128_train_set.fa.gz")
+#ref_fasta <- file.path(metadata_path, "silva_species_assignment_v128.fa.gz")
 taxtab <- dada2::assignTaxonomy(seqtab, refFasta = ref_fasta)
 colnames(taxtab) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 unname(taxtab)
@@ -36,4 +41,5 @@ toc()
 # see Exploratoty_Analysys file
 
 save(taxtab, file=file.path(result_path, taxtab.file)) 
+
 
