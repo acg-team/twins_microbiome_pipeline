@@ -1,3 +1,6 @@
+#### INFER A PHYLOGENY TREE ( beta diversity?)
+##############################################
+
 #### init: load packages and set path
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
@@ -11,25 +14,31 @@ load(file=file.path(models_path, taxtab.file))
 ######## Simple Phylogeny (MSA then NJ)  #######
 #####  MSA 
 seqs <- dada2::getSequences(seqtab)
-names(seqs) <- seqs # This propagates to the tip labels of the tree
+names(seqs) <- seqtab.samples.names # This propagates to the tip labels of the tree
 
-alignment <- DECIPHER::AlignSeqs(Biostrings::DNAStringSet(seqs), anchor=NA)
+#msa package provides a unified R/Bioconductor interface to MSA: ClustalW, ClustalOmega, and Muscle
+mult <- msa::msa(seqs, method="ClustalW", type="dna", order="input")
 
-#### Construct tree 
+
+########## Construct tree 
 ### NOTE: if we use seqtab, this is not a tree of species but a tree of sequence variants!
 
+## Option 1: GTR tree
 tic()
-# neibor join tree
-phang.align <- phangorn::phyDat(as(alignment, "matrix"), type="DNA")
+# infer a guide tree
+phang.align <- as.phangorn::phyDat(mult, type="DNA", names=seqtab.samples.names)
 dm <- dist.ml(phang.align)
 treeNJ <- phangorn::NJ(dm) # Note, tip order != sequence order
 fit = phangorn::pml(treeNJ, data=phang.align)
 
-######  GTR tree
-fitGTR <- update(fit, k=4, inv=0.2)
+## infer a  GTR tree
+fitGTR <- update(fit, k=4, inv=0.2)  #???
 fitGTR <- optim.pml(fitGTR, model="GTR", optInv=TRUE, optGamma=TRUE,
                     rearrangement = "stochastic", control = pml.control(trace = 0))
 toc()
+#########################
 
-save(fitGTR,treeNJ, file=file.path(models_path, "fitGTR.RData")) 
+
+# save the tree to file
+save(fitGTR, file=file.path(models_path, treeGTR.file)) 
 

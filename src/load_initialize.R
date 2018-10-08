@@ -1,7 +1,7 @@
 ##### 0: load the necessary packages #####   
 
-.cran_packages <- c("ggplot2", "gridExtra", "ShortRead", "XML", "tictoc", "MASS", "phangorn ")
-.bioc_packages <- c("ShortRead", "devtools", "dada2", "phyloseq", "DECIPHER", "phangorn")
+.cran_packages <- c("ggplot2", "gridExtra", "ShortRead", "XML", "tictoc", "MASS", "phangorn")
+.bioc_packages <- c("ShortRead", "devtools", "dada2", "phyloseq", "msa")
 
 .inst <- .cran_packages %in% installed.packages()
 if(any(!.inst)) {
@@ -48,4 +48,5 @@ mergers.file <- "mergers_q15.RData"
 seqtab.file <- "seqtab_q15.RData"
 seqtab.snames.file <- "seqtab_snames_q15.RData"
 taxtab.file <- "taxtab_g15.RData"
+treeGTR.file <- "fitGTR_g15.RData"
 
