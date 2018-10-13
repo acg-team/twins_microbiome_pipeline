@@ -67,7 +67,7 @@ df.metadata <- data.frame(
 df.metadata.ordered <- df.metadata[ order(df.metadata["family_id"]), ]
 
 # cache to disk to avoid downloading again
-save(df.metadata, df.metadata.ordered, file=file.path(metadata_path, "metadata.RData")) 
+save(df.metadata, df.metadata.ordered, file=file.path(metadata_path, metadata.file)) 
 
 # export to human readable format
 write.table(df.metadata, file.path(result_path,"metadata.csv"), sep=",")

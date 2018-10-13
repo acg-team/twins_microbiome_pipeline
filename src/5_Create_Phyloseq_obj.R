@@ -7,10 +7,11 @@ setwd(project_path)
 source("src/load_initialize.R")
 
 ### LOAD PREVIOUS DATA
+load(file=file.path(metadata_path, metadata.file))
 load(file=file.path(result_path, seqtab.file)) 
 load(file=file.path(models_path, seqtab.snames.file)) 
 load(file=file.path(models_path, taxtab.file))
-load(file=file.path(result_path, treeGTR.file)) 
+load(file=file.path(models_path, treeGTR_2.file)) 
 
 #########################################################################
 
@@ -21,14 +22,16 @@ rownames(samdf) <- samdf$SampleID
 all(rownames(seqtab) %in% samdf$SampleID) # TRUE
 all(rownames(seqtab) %in% rownames(samdf)) # TRUE
 
-tic()
-ps <- phyloseq(tax_table(taxtab), sample_data(samdf),
-               otu_table(seqtab, taxa_are_rows = FALSE), phy_tree(fitGTR$tree))
-toc()
+ps <- phyloseq::phyloseq(tax_table(taxtab), 
+               sample_data(samdf),
+               otu_table(seqtab, taxa_are_rows = FALSE), 
+               phy_tree(fitGTR$tree)
+               )
 
-save(ps, file=file.path(result_path, "ps.RData")) 
+save(ps, file=file.path(models_path, phyloseq.file)) 
 
 
+##### Phyloseq TODO here
 
 # melt all sequences of one taxa to one abundance
 # https://github.com/joey711/phyloseq/issues/418

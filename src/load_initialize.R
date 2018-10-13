@@ -1,6 +1,6 @@
 ##### 0: load the necessary packages #####   
 
-.cran_packages <- c("ggplot2", "gridExtra", "ShortRead", "XML", "tictoc", "MASS", "phangorn")
+.cran_packages <- c("ggplot2", "gridExtra", "ShortRead", "XML", "tictoc", "MASS", "ape", "phangorn")
 .bioc_packages <- c("ShortRead", "devtools", "dada2", "phyloseq", "msa")
 
 .inst <- .cran_packages %in% installed.packages()
@@ -43,10 +43,13 @@ metadata_path   <- file.path(project_path, "data/metadata")
 # TODO: set trimming parameters in a single dataset (tuple?)
 
 # file names for intermediare results
+metadata.file <- "metadata.RData"
 dada.err.file <- "dada_err_data_q15.RData"
 mergers.file <- "mergers_q15.RData"
 seqtab.file <- "seqtab_q15.RData"
 seqtab.snames.file <- "seqtab_snames_q15.RData"
 taxtab.file <- "taxtab_g15.RData"
 treeGTR.file <- "fitGTR_g15.RData"
+treeGTR_2.file <- "fitGTR_2_g15.RData"
 
+phyloseq.file <- "phyloseq_g15.RData"
