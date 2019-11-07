@@ -1,4 +1,5 @@
-# @Alex: UK Twins
+# Author: @Alex
+# Project: UK Twins
 # Taxonomy assignment to Seq Table
 # http://benjjneb.github.io/dada2/assign.html
 # http://benjjneb.github.io/dada2/tutorial.html

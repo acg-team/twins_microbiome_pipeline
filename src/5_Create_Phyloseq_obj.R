@@ -1,4 +1,5 @@
-## Combining a Phyloseq object for further manipulation (phangorn package)
+## Combining a S4 Phyloseq object for further manipulation
+## phyloseq object is an experiment level data structure
 ##########################################################################
 
 #### init: load packages and set path
@@ -13,26 +14,28 @@ load(file=file.path(models_path, seqtab.snames.file))
 load(file=file.path(models_path, taxtab.file))
 load(file=file.path(models_path, treeGTR_2.file)) 
 
-#########################################################################
+#####
 
-samdf <- df.metadata
-names(samdf)[names(samdf)=="file"] <- "SampleID"
-rownames(samdf) <- samdf$SampleID
+names(df.metadata)[names(df.metadata)=="file"] <- "SampleID"
+rownames(df.metadata) <- df.metadata$SampleID
+all(rownames(seqtab) %in% df.metadata$SampleID) # TRUE (sanity check)
 
-all(rownames(seqtab) %in% samdf$SampleID) # TRUE
-all(rownames(seqtab) %in% rownames(samdf)) # TRUE
-
-ps <- phyloseq::phyloseq(tax_table(taxtab), 
-               sample_data(samdf),
-               otu_table(seqtab, taxa_are_rows = FALSE), 
-               phy_tree(fitGTR$tree)
-               )
+ps <- phyloseq::phyloseq(
+              tax_table(taxtab), 
+              sample_data(df.metadata),
+              otu_table(seqtab, taxa_are_rows = FALSE), 
+              phy_tree(fitGTR$tree)
+              )
 
 save(ps, file=file.path(models_path, phyloseq.file)) 
 
 
 ##### Phyloseq TODO here
 
+
+
+
+#####################
 # melt all sequences of one taxa to one abundance
 # https://github.com/joey711/phyloseq/issues/418
 glom <- phyloseq::tax_glom(ps, taxrank = 'Family')   # aglomerate taxa
