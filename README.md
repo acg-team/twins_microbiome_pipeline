@@ -72,8 +72,9 @@ TODO:
 
 
 ## Possible futher directions
-  - check how to generate UNIFRAC metrics
+  - Phylogenetics: use PhyML, then try reconstruction with indels and TKF model
+  - generate UNIFRAC metrics (needs a good phylo-tree first)
   - check vusualization with Phyloseq
   - figure out the best parameters for quality filtering in DADA2 pipeline
   - generate OTU as well as SV table
-  - Phylogenetics: use PhyML, then try reconstruction with indels and TKF model
+  
