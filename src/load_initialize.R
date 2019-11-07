@@ -22,8 +22,8 @@ sapply(c(.cran_packages, .bioc_packages), require, character.only = TRUE)
 
 set.seed(100)
 
-###### 1: Paths to folders ###############################
 
+###### 1: Paths to folders ###############################
 
 # TODO create if they dont exists
 #if(!file_test("-d", filt_path)) dir.create(result_path)
@@ -32,17 +32,17 @@ set.seed(100)
 data_path    <- file.path(project_path, "data/raw")
 filt_path    <- file.path(project_path, "data/raw/filtered")
 processed_path <- file.path(project_path, "data/processed")
-models_path    <- file.path(project_path, "models")
+models_path    <- file.path(project_path, "files_intermediate")
 
-result_path  <- file.path(project_path, "reports")
+result_path  <- file.path(project_path, "reports_generated")
 rdp_path     <- file.path(project_path, "RDP")
 metadata_path   <- file.path(project_path, "data/metadata")
 
-##### 2: Set parameters ###########################$#
 
+##### 2: Set parameters ###########################$#
 # TODO: set trimming parameters in a single dataset (tuple?)
 
-# file names for intermediare results
+# file names for intermediate results
 metadata.file <- "metadata.RData"
 dada.err.file <- "dada_err_data_q15.RData"
 mergers.file <- "mergers_q15.RData"
