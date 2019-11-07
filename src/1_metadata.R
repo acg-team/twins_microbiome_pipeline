@@ -27,7 +27,7 @@ host.subject.id_vector <- c()
 
 sample_number = 3289 ##3289
 
-# extract metainformation for each sample from anXML at ebi
+# extract meta information from anXML / ebi for each sample
 for (sample_idx in 2:sample_number){ 
   # construct url
   # http://www.ebi.ac.uk/ena/data/view/ERS1131064&display=xml&download=xml&filename=ERS1131064.xml
@@ -42,6 +42,7 @@ for (sample_idx in 2:sample_number){
   zygosity  <- xmlValue(  getNodeSet(xmldata,'//SAMPLE/SAMPLE_ATTRIBUTES/SAMPLE_ATTRIBUTE[TAG="zygosity"]/VALUE')[[1]] )
   family_id <- xmlValue(  getNodeSet(xmldata,'//SAMPLE/SAMPLE_ATTRIBUTES/SAMPLE_ATTRIBUTE[TAG="family_id"]/VALUE')[[1]] )
   host.subject.id <- xmlValue(  getNodeSet(xmldata,'//SAMPLE/SAMPLE_ATTRIBUTES/SAMPLE_ATTRIBUTE[TAG="host subject id"]/VALUE')[[1]] )
+  country <- xmlValue(  getNodeSet(xmldata,'//SAMPLE/SAMPLE_ATTRIBUTES/SAMPLE_ATTRIBUTE[TAG="geographic location (country and/or sea)"]/VALUE')[[1]] )
   
   collection_date_vector <- c(collection_date_vector,collection_date )
   age_vector       <- c(age_vector, age)
@@ -50,6 +51,7 @@ for (sample_idx in 2:sample_number){
   zygosity_vector  <- c(zygosity_vector, zygosity)
   family_id_vector <- c(family_id_vector, family_id)
   host.subject.id_vector <- c(host.subject.id_vector, host.subject.id)
+  country_vector <- c(country_vector, country)
   
 }
 
@@ -61,7 +63,8 @@ df.metadata <- data.frame(
   zygosity        = zygosity_vector,
   family_id       = family_id_vector,
   host.subject.id = host.subject.id_vector,
-  age             = age_vector
+  age             = age_vector,
+  country         = country_vector
 )
 
 df.metadata.ordered <- df.metadata[ order(df.metadata["family_id"]), ]
