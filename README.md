@@ -10,7 +10,7 @@ Pipeline as from https://www.bioconductor.org/packages/devel/bioc/vignettes/dada
 - place them into /data/raw
 
 ## run subsequently
-1. [ 1_metadata.R  ]
+### 1. [ 1_metadata.R  ]
 
 A result od this script should be creating a dataframe with metadata [ twin_id/ sex/ zigosity/ etc ] attached to each sample's name
 
@@ -19,7 +19,7 @@ A result od this script should be creating a dataframe with metadata [ twin_id/ 
   - save in into data/metadata/metadata.RData.
 Possible inprovements: If nessesary, modify the script to get more features.
 
-2. [ 2_BIG_dada_SV_table.R ]
+### 2. [ 2_BIG_dada_SV_table.R ]
 
 WARNING: most computationally demanding script! ~1 day on 4 core server with 32G memory
 
@@ -35,7 +35,7 @@ IMPROMEMENTS:
   - play wit other quality prameyers
   
   
-3. [ 3_Tax_Assign.R ]
+### 3. [ 3_Tax_Assign.R ]
 
 For each sequence variant deduced during previous step (8299) assign a taxomomy
 RESULT: taxtab_g15.RData file, [ 8299 sequence variants x [Kingdom, Phulym, etc]]
@@ -44,7 +44,7 @@ IMPROVEMENTS:
    - silva assignment is not very accurate, check another 
    
    
-4. [ 4_Phylogeny.R ]
+### 4. [ 4_Phylogeny.R ]
 
 Create a phylogeny out of all deduced sequence 8299 variants as follows
   - MSA with ClustalW
@@ -59,7 +59,7 @@ POSSIBLE IMPROVEMENTS:
   - read about metagenomic taxonomy and functional assignment;
   
   
-5. [ 5_Create_Phyloseq_obj.R ]
+### 5. [ 5_Create_Phyloseq_obj.R ]
 
 Create  Phyloseq object for further manipulation and vusulization of microbiome data
 https://vaulot.github.io/tutorials/Phyloseq_tutorial.html#aim
