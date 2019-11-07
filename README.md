@@ -1,15 +1,18 @@
-# twins_microbiome_pipeline
-Bioinformatics procession of raw Illumina reads for microbiome analysis of UK twins study with dada2 pipeline
+# UK twins microbiome processing pipeline
+Bioinformatics workflow for processing raw Illumina reads of microbiome.
+
+INPUTS: raw illimina data, metainformation (age, sex etc)
+OUTPUT: exact sequence variant table (SV table), taxomony assignments, phylogeny of samples
 
 Contains a complete workflow from extracting metainformation to assigning taxa information and phylogenetic tree of beta diversion.
 Pipeline as from https://www.bioconductor.org/packages/devel/bioc/vignettes/dada2/inst/doc/dada2-intro.html
 
 
-## raw Data and third-party data
+## Raw Data
 - download all raw illumina reads from http://www.ebi.ac.uk/ena/data/view/PRJEB13747
 - place them into /data/raw
 
-## run subsequently
+## WorkFlow: run subsequently
 ### 1. [ 1_metadata.R  ]
 
 A result od this script should be creating a dataframe with metadata [ twin_id/ sex/ zigosity/ etc ] attached to each sample's name
