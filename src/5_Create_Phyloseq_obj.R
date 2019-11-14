@@ -10,9 +10,9 @@ source("src/load_initialize.R")
 ### LOAD PREVIOUS DATA
 load(file=file.path(metadata_path, metadata.file))
 load(file=file.path(result_path, seqtab.file)) 
-load(file=file.path(models_path, seqtab.snames.file)) 
-load(file=file.path(models_path, taxtab.file))
-load(file=file.path(models_path, treeGTR_2.file)) 
+load(file=file.path(files_intermediate, seqtab.snames.file)) 
+load(file=file.path(files_intermediate, taxtab.file))
+load(file=file.path(files_intermediate, treeGTR_2.file)) 
 
 #####
 
@@ -27,7 +27,7 @@ ps <- phyloseq::phyloseq(
               phy_tree(fitGTR$tree)
               )
 
-save(ps, file=file.path(models_path, phyloseq.file)) 
+save(ps, file=file.path(files_intermediate, phyloseq.file)) 
 
 
 ##### Phyloseq TODO here

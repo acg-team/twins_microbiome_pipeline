@@ -15,8 +15,8 @@ source("src/load_initialize.R")
 #########################################################################
 
 ### LOAD PREVIOUS DATA
-load(file=file.path(models_path, mergers.file)) 
-load(file=file.path(models_path, seqtab.file)) 
+load(file=file.path(files_intermediate, mergers.file)) 
+load(file=file.path(files_intermediate, seqtab.file)) 
 
 
 ###### 1: ASSIGN TAXONOMY ########################

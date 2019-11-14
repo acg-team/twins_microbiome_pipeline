@@ -32,7 +32,7 @@ set.seed(100)
 data_path    <- file.path(project_path, "data/raw")
 filt_path    <- file.path(project_path, "data/raw/filtered")
 processed_path <- file.path(project_path, "data/processed")
-models_path    <- file.path(project_path, "files_intermediate")
+files_intermediate    <- file.path(project_path, "files_intermediate")
 
 result_path  <- file.path(project_path, "reports_generated")
 rdp_path     <- file.path(project_path, "RDP")
@@ -49,7 +49,9 @@ mergers.file <- "mergers_q15.RData"
 seqtab.file <- "seqtab_q15.RData"
 seqtab.snames.file <- "seqtab_snames_q15.RData"
 taxtab.file <- "taxtab_g15.RData"
-treeGTR.file <- "fitGTR_g15.RData"
-treeGTR_2.file <- "fitGTR_2_g15.RData"
+
+msa.file <- "msa.RData"
+treeGTR.file <- "fitGTR.RData"
+treeGTR_2.file <- "fitGTR_2.RData"
 
 phyloseq.file <- "phyloseq_g15.RData"

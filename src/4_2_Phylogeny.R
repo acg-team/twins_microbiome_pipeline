@@ -6,9 +6,9 @@ project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
 source("src/load_initialize.R")
 
-load(file=file.path(models_path, seqtab.file)) 
-load(file=file.path(models_path, seqtab.snames.file)) 
-load(file=file.path(models_path, taxtab.file))
+load(file=file.path(files_intermediate, seqtab.file)) 
+load(file=file.path(files_intermediate, seqtab.snames.file)) 
+load(file=file.path(files_intermediate, taxtab.file))
 
 
 ######## Simple Phylogeny (MSA then NJ)  #######
@@ -18,7 +18,7 @@ names(seqs) <- seqtab.samples.names # This propagates to the tip labels of the t
 
 #msa package provides a unified R/Bioconductor interface to MSA: ClustalW, ClustalOmega, and Muscle
 mult <- msa::msa(seqs, method="Muscle", type="dna", order="input")
-save(mult, file=file.path(models_path, "msa_g15.RData")) 
+save(mult, file=file.path(files_intermediate, "msa_g15.RData")) 
 
 ########## Construct tree 
 ### NOTE: if we use seqtab, this is not a tree of species but a tree of sequence variants!
@@ -40,5 +40,5 @@ toc()
 
 
 # save the tree to file
-save(fitGTR, file=file.path(models_path, treeGTR_2.file)) 
+save(fitGTR, file=file.path(files_intermediate, treeGTR_2.file)) 
 

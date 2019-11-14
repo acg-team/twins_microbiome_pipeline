@@ -6,9 +6,9 @@ project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
 source("src/load_initialize.R")
 
-load(file=file.path(models_path, seqtab.file)) 
-load(file=file.path(models_path, seqtab.snames.file)) 
-load(file=file.path(models_path, taxtab.file))
+load(file=file.path(files_intermediate, seqtab.file)) 
+load(file=file.path(files_intermediate, seqtab.snames.file)) 
+load(file=file.path(files_intermediate, taxtab.file))
 
 
 ######## Simple Phylogeny (MSA then NJ)  #######
@@ -17,7 +17,16 @@ seqs <- dada2::getSequences(seqtab)
 names(seqs) <- seqtab.samples.names # This propagates to the tip labels of the tree
 
 #msa package provides a unified R/Bioconductor interface to MSA: ClustalW, ClustalOmega, and Muscle
-mult <- msa::msa(seqs, method="ClustalW", type="dna", order="input")
+# TODO: check for ClustalW specific parameters
+microbiome.msa.clustalW <- msa::msa(seqs, method="ClustalW", type="dna", order="input")
+
+# TODO: check for Muscle specific parameters
+microbiome.msa.muscle <- msa::msa(seqs, method="Muscle", type="dna", order="input")
+
+# save MSA to a file 
+save(microbiome.msa.clustalW,microbiome.msa.muscle, file=file.path(files_intermediate, msa.file)) 
+
+
 
 
 ########## Construct tree 
@@ -40,5 +49,5 @@ toc()
 
 
 # save the tree to file
-save(fitGTR, file=file.path(models_path, treeGTR.file)) 
+save(fitGTR, file=file.path(files_intermediate, treeGTR.file)) 
 

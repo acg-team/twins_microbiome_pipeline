@@ -112,7 +112,7 @@ toc() # 9806.114 sec
 ## plot error rates for control
 plotErrors(errF)
 plotErrors(errR)
-save(errF, errR, file=file.path(models_path, dada.err.file)) 
+save(errF, errR, file=file.path(files_intermediate, dada.err.file)) 
 
 
 ### Big Data dada2 pipeline
@@ -138,7 +138,7 @@ for (sam in sample.names) {
   counter <- counter+1
   cat(counter, "...", sam, " Done.\n")
   cat("---------- \n")
-  save(mergers, file=file.path(models_path, mergers.file)) 
+  save(mergers, file=file.path(files_intermediate, mergers.file)) 
 }
 print("Total time of sample inference:")
 toc()
@@ -153,10 +153,10 @@ toc()
 
 ### remove chimeras ----
 seqtab <- dada2::removeBimeraDenovo(seqtab.all, verbose = TRUE)
-save(seqtab, file=file.path(models_path, seqtab.file)) 
+save(seqtab, file=file.path(files_intermediate, seqtab.file)) 
 
 ### Extract sample names and save them separatelly (for futher Python data analysis)
 seqtab.samples.names = rownames(seqtab)
-save(seqtab.samples.names, file=file.path(models_path, seqtab.snames.file)) 
+save(seqtab.samples.names, file=file.path(files_intermediate, seqtab.snames.file)) 
 
 
