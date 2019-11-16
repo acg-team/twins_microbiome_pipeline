@@ -18,11 +18,14 @@ names(seqs) <- seqtab.samples.names # This propagates to the tip labels of the t
 
 #msa package provides a unified R/Bioconductor interface to MSA: ClustalW, ClustalOmega, and Muscle
 # TODO: check for ClustalW specific parameters
-microbiome.msa.clustalW <- msa::msa(seqs, method="ClustalW", type="dna", order="input")
+#microbiome.msa.clustalW <- msa::msa(seqs, method="ClustalW", type="dna", order="input")
 
 # TODO: check for Muscle specific parameters
 microbiome.msa.muscle <- msa::msa(seqs, method="Muscle", type="dna", order="input")
 
+# TODO:  visualize MSA , type: msa::MsaDNAMultipleAlignment
+msa::msaPrettyPrint(x=microbiome.msa.muscle, output="pdf", subset=NULL,file=paste0("msa.muscle", ".pdf"))
+               
 # save MSA to a file 
 save(microbiome.msa.clustalW,microbiome.msa.muscle, file=file.path(files_intermediate, msa.file)) 
 
@@ -35,7 +38,7 @@ save(microbiome.msa.clustalW,microbiome.msa.muscle, file=file.path(files_interme
 ## Option 1: GTR tree
 tic()
 # infer a guide tree
-phang.align <- as.phangorn::phyDat(mult, type="DNA", names=seqtab.samples.names)
+phang.align <- phangorn::as.phyDat(mult, type="DNA", names=seqtab.samples.names)
 dm <- dist.ml(phang.align)
 treeNJ <- phangorn::NJ(dm) # Note, tip order != sequence order
 fit = phangorn::pml(treeNJ, data=phang.align)
