@@ -18,10 +18,16 @@ if(any(!.inst)) {
   biocLite(.bioc_packages[!.inst], ask = F)
 }
 
-devtools::install_github("benjjneb/dada2")
+#devtools::install_github("benjjneb/dada2")
 
 # Load packages into session, and print package version
 sapply(c(.cran_packages, .bioc_packages), require, character.only = TRUE)
+
+
+# Check versions if nessesary
+packageVersion("dada2")
+R.version
+sessionInfo()
 
 set.seed(100)
 
