@@ -1,5 +1,7 @@
-#### INFER A PHYLOGENY TREE ( beta diversity?)
+#### INFER A PHYLOGENY TREE
 ##############################################
+# http://www.metagenomics.wiki/tools/phylogenetic-tree
+
 
 #### init: load packages and set path
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
@@ -11,12 +13,11 @@ load(file=file.path(files_intermediate, seqtab.snames.file))
 load(file=file.path(files_intermediate, taxtab.file))
 
 
-######## Simple Phylogeny (MSA then NJ)  #######
-#####  MSA 
+##############  MSA Construction
 seqs <- dada2::getSequences(seqtab)
 names(seqs) <- seqtab.samples.names # This propagates to the tip labels of the tree
 
-#msa package provides a unified R/Bioconductor interface to MSA: ClustalW, ClustalOmega, and Muscle
+#msa package provides a unified R/Bioconductor interface to MSA (ClustalW, ClustalOmega, Muscle)
 # TODO: check for ClustalW specific parameters
 #microbiome.msa.clustalW <- msa::msa(seqs, method="ClustalW", type="dna", order="input")
 
@@ -33,23 +34,48 @@ save(microbiome.msa.clustalW,microbiome.msa.muscle, file=file.path(files_interme
 
 
 ########## Construct tree 
-### NOTE: if we use seqtab, this is not a tree of species but a tree of sequence variants!
 
-## Option 1: GTR tree
+################# NJ tree with phangorn
 tic()
 # infer a guide tree
 phang.align <- phangorn::as.phyDat(mult, type="DNA", names=seqtab.samples.names)
 dm <- dist.ml(phang.align)
 treeNJ <- phangorn::NJ(dm) # Note, tip order != sequence order
-fit = phangorn::pml(treeNJ, data=phang.align)
+toc()
 
-## infer a  GTR tree
+################ ML tree with phangorn
+## WARNING! Might take a lot of time
+# try ML tree with Jukes-Cantor model
+tic()
+fit = phangorn::pml(treeNJ, data=phang.align)
+toc()
+
+# try ML tree with GTR model
+tic()
 fitGTR <- update(fit, k=4, inv=0.2)  #???
-fitGTR <- optim.pml(fitGTR, model="GTR", optInv=TRUE, optGamma=TRUE,
+fitGTR <- phangorn::optim.pml(fitGTR, model="GTR", optInv=TRUE, optGamma=TRUE,
                     rearrangement = "stochastic", control = pml.control(trace = 0))
 toc()
+
+############### ML tree with RAxML: ML tree for species >1000 with fast heuristics
+# NOTE: need to install raxml on local MAC first
+exec.path <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
+
+# msa data must be in DNAbin format??
+msa.raxm <- microbiome.msa.muscle
+
+tic()
+# f - RAxML algorithm
+# N - Integers give the number of independent searches on different starting tree or replicates in bootstrapping. 
+# p - Integer, setting a random seed for the parsimony starting trees.
+# return tr is a list of tr[1] - info, tr[2] - best tree 
+tr <- raxml(msa.raxm, m = "GTRGAMMA", f = "d", N = 1, p = 1234, exec = exec, threads=2, file="twin_tree") 
+toc()
+
+
 #########################
 
+# TODO: save trees in appropriate format
 
 # save the tree to file
 save(fitGTR, file=file.path(files_intermediate, treeGTR.file)) 

@@ -50,7 +50,7 @@ IMPROVEMENTS:
 ### 4. [ 4_Phylogeny.R ]
 
 Create a phylogeny out of all deduced sequence 8299 variants as follows
-  - MSA with ClustalW
+  - MSA with Muscle or ClustalW (seems very slow, need to investigate its advantages if any)
   - create a guide tree with NJ
   - build a tree with Phangorn, and parameters : model="GTR", optInv=TRUE, optGamma=TRUE
 
@@ -69,6 +69,8 @@ https://vaulot.github.io/tutorials/Phyloseq_tutorial.html#aim
 
 TODO:
   - study Phyloseq
+  - create a Phyloseq object which include all information (tree, sequences etc)
+  - use Phyloseq to calculate Tree-based UNIFRAC
 
 
 ## Possible futher directions
@@ -85,3 +87,15 @@ TODO:
   - figure out the best parameters for quality filtering in DADA2 pipeline
   - generate OTU as well as SV table
   
+  
+  
+## References and packages
+#### packages to study
+- ape - Analyses of Phylogenetics and Evolution
+- RAxML - create a phylo tree for big abount of short sequnces (16S)
+- phangorn
+
+#### Articles
+- 
+
+
