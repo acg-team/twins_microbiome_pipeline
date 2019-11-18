@@ -25,12 +25,14 @@ names(seqs) <- seqtab.samples.names # This propagates to the tip labels of the t
 #microbiome.msa.muscle <- msa::msa(seqs, method="Muscle", type="dna", order="input")
 tic()
 microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
+print("msa (muscle) took:")
+toc()
 
 # TODO:  visualize MSA , type: msa::MsaDNAMultipleAlignment
 msa::msaPrettyPrint(x=microbiome.msa.muscle, output="pdf", subset=NULL,file=paste0("msa.muscle", ".pdf"))
                
 # save MSA to a file 
-save(microbiome.msa.clustalW,microbiome.msa.muscle, file=file.path(files_intermediate, msa.file)) 
+save(microbiome.msa.muscle, file=file.path(files_intermediate, msa.file)) 
 
 
 
