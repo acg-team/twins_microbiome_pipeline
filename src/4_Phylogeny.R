@@ -14,8 +14,7 @@ load(file=file.path(files_intermediate, taxtab.file))
 
 
 ##############  MSA Construction
-#seqs <- dada2::getSequences(seqtab)   # does not work for some reason
-seqs <- colnames(seqtab)
+seqs <- dada2::getSequences(seqtab)   # does not work for some reason
 names(seqs) <- seqtab.samples.names # This propagates to the tip labels of the tree
 
 #msa package provides a unified R/Bioconductor interface to MSA (ClustalW, ClustalOmega, Muscle)
