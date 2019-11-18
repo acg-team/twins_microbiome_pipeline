@@ -31,11 +31,10 @@ toc()
 # save MSA to a file 
 save(microbiome.msa.muscle, file=file.path(files_intermediate, msa.file)) 
 
+
 # TODO:  visualize MSA , type: msa::MsaDNAMultipleAlignment
 msa::msaPrettyPrint(x=microbiome.msa.muscle, output="pdf", subset=NULL,file=paste0("msa.muscle", ".pdf"))
-               
-
-
+              
 
 
 
