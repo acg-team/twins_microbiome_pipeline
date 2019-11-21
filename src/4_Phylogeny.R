@@ -74,15 +74,17 @@ save(treeNJ, fitGTR, file=file.path(files_intermediate, phylo.file))
 exec.path <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 
-# msa data must be in DNAbin format??
-msa.raxm <- microbiome.msa.muscle
+# convert msa::MsaDNAMultipleAlignment data into ips::DNAbin (ape::DNAbim) format!
+msa.dnabin <- microbiome.msa.muscle
+msa::msaConvert(msa.dnabin, "ape::DNAbin")
+
 
 tic()
 # f - RAxML algorithm
 # N - Integers give the number of independent searches on different starting tree or replicates in bootstrapping. 
 # p - Integer, setting a random seed for the parsimony starting trees.
 # return tr is a list of tr[1] - info, tr[2] - best tree 
-tr <- raxml(msa.raxm, m = "GTRGAMMA", f = "d", N = 1, p = 1234, exec = exec.path.ubuntu, threads=2, file="twin_tree") 
+tr <- raxml(msa.dnabin, m = "GTRGAMMA", f = "d", N = 1, p = 1234, exec = exec.path.ubuntu, threads=2, file="twin_tree") 
 toc()
 
 
