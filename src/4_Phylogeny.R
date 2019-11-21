@@ -75,8 +75,7 @@ exec.path <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 
 # convert msa::MsaDNAMultipleAlignment data into ips::DNAbin (ape::DNAbim) format!
-msa.dnabin <- microbiome.msa.muscle
-msa::msaConvert(msa.dnabin, "ape::DNAbin")
+msa.dnabin <- msa::msaConvert(microbiome.msa.muscle, "ape::DNAbin")
 
 
 tic()
