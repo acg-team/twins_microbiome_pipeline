@@ -11,6 +11,8 @@ source("src/load_initialize.R")
 load(file=file.path(files_intermediate, seqtab.file)) 
 load(file=file.path(files_intermediate, seqtab.snames.file)) 
 load(file=file.path(files_intermediate, taxtab.file))
+load(file=file.path(files_intermediate, msa.file))
+
 
 
 ##############  MSA Construction
