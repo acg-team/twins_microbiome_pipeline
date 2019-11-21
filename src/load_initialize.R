@@ -60,7 +60,7 @@ seqtab.snames.file <- "seqtab_snames_q15.RData"
 taxtab.file <- "taxtab_g15.RData"
 
 msa.file <- "msa.RData"
-treeGTR.file <- "fitGTR.RData"
+phylo.file <- "fitGTR.RData"
 treeGTR_2.file <- "fitGTR_2.RData"
 
 phyloseq.file <- "phyloseq_g15.RData"

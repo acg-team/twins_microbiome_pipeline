@@ -42,9 +42,10 @@ msa::msaPrettyPrint(x=microbiome.msa.muscle, output="pdf", subset=NULL,file=past
 ########## Construct tree 
 
 ################# NJ tree with phangorn
+
 tic()
 # infer a guide tree
-phang.align <- phangorn::as.phyDat(mult, type="DNA", names=seqtab.samples.names)
+phang.align <- phangorn::as.phyDat(microbiome.msa.muscle, type="DNA", names=seqtab.samples.names)
 dm <- dist.ml(phang.align)
 treeNJ <- phangorn::NJ(dm) # Note, tip order != sequence order
 toc()
@@ -62,6 +63,11 @@ fitGTR <- update(fit, k=4, inv=0.2)  #???
 fitGTR <- phangorn::optim.pml(fitGTR, model="GTR", optInv=TRUE, optGamma=TRUE,
                     rearrangement = "stochastic", control = pml.control(trace = 0))
 toc()
+
+# save the tree to file
+save(treeNJ, fitGTR, file=file.path(files_intermediate, phylo.file)) 
+
+
 
 ############### ML tree with RAxML: ML tree for species >1000 with fast heuristics
 # NOTE: need to install raxml on local MAC first
@@ -84,6 +90,5 @@ toc()
 
 # TODO: save trees in appropriate format
 
-# save the tree to file
-save(fitGTR, file=file.path(files_intermediate, treeGTR.file)) 
+
 
