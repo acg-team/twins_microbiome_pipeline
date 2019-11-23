@@ -3,7 +3,7 @@
 
 ##### 0: load the necessary packages #####   
 # ips - Interfaces to Phylogenetic Software in R (to RAXML, Beast, MrBayes etc)
-.cran_packages <- c("ggplot2", "gridExtra", "ShortRead", "XML", "tictoc", "MASS", "ape", "phangorn","ips")
+.cran_packages <- c("ggplot2", "gridExtra", "ShortRead", "XML", "tictoc", "MASS", "ape", "phangorn","ips","tools")
 .bioc_packages <- c("ShortRead", "devtools", "dada2", "phyloseq", "msa")
 
 .inst <- .cran_packages %in% installed.packages()

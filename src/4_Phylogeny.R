@@ -23,6 +23,7 @@ names(seqs) <- seqtab.samples.names # This propagates to the tip labels of the t
 # TODO: check for ClustalW specific parameters
 #microbiome.msa.clustalW <- msa::msa(seqs, method="ClustalW", type="dna", order="input")
 
+# TODO: look for another package for MSA, this on msa is very badly written
 # TODO: check for Muscle specific parameters
 #microbiome.msa.muscle <- msa::msa(seqs, method="Muscle", type="dna", order="input")
 tic()
@@ -32,12 +33,14 @@ toc()
 
 # save MSA to a file 
 save(microbiome.msa.muscle, file=file.path(files_intermediate, msa.file)) 
+print(microbiome.msa.muscle)
+writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa.fasta"))
 
 
 # TODO:  visualize MSA , type: msa::MsaDNAMultipleAlignment
-msa::msaPrettyPrint(x=microbiome.msa.muscle, output="pdf", subset=NULL,file=paste0("msa.muscle", ".pdf"))
+# msa::msaPrettyPrint(x=microbiome.msa.muscle, output="tex", subset=NULL)
+# tools::texi2pdf("msaPrettyPrintOutput.tex",clean=TRUE)
               
-
 
 
 
@@ -77,8 +80,11 @@ exec.path <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 
 # convert msa::MsaDNAMultipleAlignment data into ips::DNAbin (ape::DNAbim) format!
+
 msa.dnabin <- msa::msaConvert(microbiome.msa.muscle, "ape::DNAbin")
 save(microbiome.msa.muscle,msa.dnabin, file=file.path(files_intermediate, msa.file)) 
+
+#image.DNAbin 	Plot of DNA Sequence Alignement
 
 tic()
 # f - RAxML algorithm
