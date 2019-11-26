@@ -30,11 +30,22 @@ tic()
 microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
 print("msa (muscle) took:")
 toc()
+print(microbiome.msa.muscle)
+
+tic()
+microbiome.msa.clustalw <- msa::msaClustalW(seqs, type="dna", order="input")
+print("msa (clustalw) took:")
+toc()
+print(microbiome.msa.clustalw)
+
+tic()
+# TODO try PRANK with ips... this msa gives and error during printing
+toc()
 
 # save MSA to a file 
 save(microbiome.msa.muscle, file=file.path(files_intermediate, msa.file)) 
-print(microbiome.msa.muscle)
-writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa.fasta"))
+
+writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
 
 
 # TODO:  visualize MSA , type: msa::MsaDNAMultipleAlignment
@@ -82,9 +93,13 @@ exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-A
 # convert msa::MsaDNAMultipleAlignment data into ips::DNAbin (ape::DNAbim) format!
 
 msa.dnabin <- msa::msaConvert(microbiome.msa.muscle, "ape::DNAbin")
+
+# vizual control of MSA
+labels(msa.dnabin)
+print(msa.dnabin)
+
 save(microbiome.msa.muscle,msa.dnabin, file=file.path(files_intermediate, msa.file)) 
 
-#image.DNAbin 	Plot of DNA Sequence Alignement
 
 tic()
 # f - RAxML algorithm
