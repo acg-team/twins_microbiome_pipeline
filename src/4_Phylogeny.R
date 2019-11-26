@@ -11,13 +11,13 @@ source("src/load_initialize.R")
 load(file=file.path(files_intermediate, seqtab.file)) 
 load(file=file.path(files_intermediate, seqtab.snames.file)) 
 load(file=file.path(files_intermediate, taxtab.file))
-load(file=file.path(files_intermediate, msa.file))
+
 
 
 
 ##############  MSA Construction
-seqs <- dada2::getSequences(seqtab)   # does not work for some reason
-names(seqs) <- seqtab.samples.names # This propagates to the tip labels of the tree
+seqs <- dada2::getSequences(seqtab)   # 8299
+names(seqs) <- seqs # This propagates to the tip labels of the tree
 
 #msa package provides a unified R/Bioconductor interface to MSA (ClustalW, ClustalOmega, Muscle)
 # TODO: check for ClustalW specific parameters
@@ -31,21 +31,25 @@ microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
 print("msa (muscle) took:")
 toc()
 print(microbiome.msa.muscle)
+writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
 
 tic()
 microbiome.msa.clustalw <- msa::msaClustalW(seqs, type="dna", order="input")
 print("msa (clustalw) took:")
 toc()
 print(microbiome.msa.clustalw)
+microbiome.msa.clustalw@unmasked@ranges@NAMES[3000:4000] # why it has NA?
+#writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
+
 
 tic()
 # TODO try PRANK with ips... this msa gives and error during printing
 toc()
 
 # save MSA to a file 
-save(microbiome.msa.muscle, file=file.path(files_intermediate, msa.file)) 
+save(microbiome.msa.muscle, microbiome.msa.clustalw, file=file.path(files_intermediate, msa.file)) 
 
-writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
+
 
 
 # TODO:  visualize MSA , type: msa::MsaDNAMultipleAlignment
@@ -58,10 +62,11 @@ writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "ms
 ########## Construct tree 
 
 ################# NJ tree with phangorn
+my.msa <- microbiome.msa.clustalw
 
 tic()
 # infer a guide tree
-phang.align <- phangorn::as.phyDat(microbiome.msa.muscle, type="DNA", names=seqtab.samples.names)
+phang.align <- phangorn::as.phyDat(my.msa, type="DNA", names=seqtab.samples.names)
 dm <- dist.ml(phang.align)
 treeNJ <- phangorn::NJ(dm) # Note, tip order != sequence order
 toc()
@@ -92,22 +97,21 @@ exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-A
 
 # convert msa::MsaDNAMultipleAlignment data into ips::DNAbin (ape::DNAbim) format!
 
-msa.dnabin <- msa::msaConvert(microbiome.msa.muscle, "ape::DNAbin")
+msa.dnabin <- msa::msaConvert(my.msa, "ape::DNAbin")
 
 # vizual control of MSA
 labels(msa.dnabin)
 print(msa.dnabin)
 
-save(microbiome.msa.muscle,msa.dnabin, file=file.path(files_intermediate, msa.file)) 
+save(msa.dnabin, file=file.path(files_intermediate, msa.file)) 
 
-
-tic()
+# I exported my alignment to a server to run RAXML, it took 9 days for 5000 sequences.
 # f - RAxML algorithm
 # N - Integers give the number of independent searches on different starting tree or replicates in bootstrapping. 
 # p - Integer, setting a random seed for the parsimony starting trees.
 # return tr is a list of tr[1] - info, tr[2] - best tree 
-
-tr <- raxml(msa.dnabin, m = "GTRGAMMA", f = "d", N = 2, p = 1234, exec = exec.path.ubuntu, threads=3, file="RAxMLtwin_tree") 
+tic()
+tr <- raxml(msa.dnabin, m = "GTRGAMMA", f = "d", N = 2, p = 1234, exec = exec.path.ubuntu, threads=2, file="RAxMLtwin_tree") 
 toc()
 
 
