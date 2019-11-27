@@ -25,26 +25,20 @@ names(seqs) <- seqs # This propagates to the tip labels of the tree
 
 # TODO: look for another package for MSA, this on msa is very badly written
 # TODO: check for Muscle specific parameters
-#microbiome.msa.muscle <- msa::msa(seqs, method="Muscle", type="dna", order="input")
 tic()
 microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
 print("msa (muscle) took:")
-toc()
+toc()  # 5 hours
 print(microbiome.msa.muscle)
 writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
 
 tic()
 microbiome.msa.clustalw <- msa::msaClustalW(seqs, type="dna", order="input")
 print("msa (clustalw) took:")
-toc()
+toc() # 6 hours
 print(microbiome.msa.clustalw)
-microbiome.msa.clustalw@unmasked@ranges@NAMES[3000:4000] # why it has NA?
-#writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
-
-
-tic()
-# TODO try PRANK with ips... this msa gives and error during printing
-toc()
+#microbiome.msa.clustalw@unmasked@ranges@NAMES[3000:4000]
+writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
 
 # save MSA to a file 
 save(microbiome.msa.muscle, microbiome.msa.clustalw, file=file.path(files_intermediate, msa.file)) 
