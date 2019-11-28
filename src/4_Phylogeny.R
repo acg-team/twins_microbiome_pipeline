@@ -17,7 +17,15 @@ load(file=file.path(files_intermediate, taxtab.file))
 
 ##############  MSA Construction
 seqs <- dada2::getSequences(seqtab)   # 8299
-names(seqs) <- seqs # This propagates to the tip labels of the tree
+names(seqs) <- seqs    # This propagates to the tip labels of the tree
+seq.variant.names <- names(seqs)
+seq.number <- length(seq.variant.names)
+# generate short names (RAXML requires names to be less then 256)
+prefix <- "sv_seq_variant"
+suffix <- seq(1:seq.number)
+seq.variant.short.names <- paste(prefix, suffix, sep='_')
+names(seqs) <- seq.variant.short.names
+
 
 #msa package provides a unified R/Bioconductor interface to MSA (ClustalW, ClustalOmega, Muscle)
 # TODO: check for ClustalW specific parameters
@@ -43,10 +51,7 @@ writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "
 # save MSA to a file 
 save(microbiome.msa.muscle, microbiome.msa.clustalw, file=file.path(files_intermediate, msa.file)) 
 
-
-
-
-# TODO:  visualize MSA , type: msa::MsaDNAMultipleAlignment
+# TODO:  visualize MSA , type: msa::MsaDNAMultipleAlignment or use UGene browser
 # msa::msaPrettyPrint(x=microbiome.msa.muscle, output="tex", subset=NULL)
 # tools::texi2pdf("msaPrettyPrintOutput.tex",clean=TRUE)
               
@@ -56,7 +61,7 @@ save(microbiome.msa.muscle, microbiome.msa.clustalw, file=file.path(files_interm
 ########## Construct tree 
 
 ################# NJ tree with phangorn
-my.msa <- microbiome.msa.clustalw
+my.msa <- microbiome.msa.muscle
 
 tic()
 # infer a guide tree
@@ -64,6 +69,7 @@ phang.align <- phangorn::as.phyDat(my.msa, type="DNA", names=seqtab.samples.name
 dm <- dist.ml(phang.align)
 treeNJ <- phangorn::NJ(dm) # Note, tip order != sequence order
 toc()
+save(treeNJ, file=file.path(files_intermediate, phylo.file)) 
 
 ################ ML tree with phangorn
 ## WARNING! Might take a lot of time
@@ -105,7 +111,7 @@ save(msa.dnabin, file=file.path(files_intermediate, msa.file))
 # p - Integer, setting a random seed for the parsimony starting trees.
 # return tr is a list of tr[1] - info, tr[2] - best tree 
 tic()
-tr <- raxml(msa.dnabin, m = "GTRGAMMA", f = "d", N = 2, p = 1234, exec = exec.path.ubuntu, threads=2, file="RAxMLtwin_tree") 
+tr <- raxml(msa.dnabin, f = "d", N = 2, p = 1234, exec = exec.path.ubuntu, threads=4) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
 toc()
 
 
