@@ -9,22 +9,27 @@ source("src/load_initialize.R")
 
 ### LOAD PREVIOUS DATA
 load(file=file.path(metadata_path, metadata.file))
-load(file=file.path(result_path, seqtab.file)) 
+load(file=file.path(files_intermediate, seqtab.file)) 
 load(file=file.path(files_intermediate, seqtab.snames.file)) 
 load(file=file.path(files_intermediate, taxtab.file))
-load(file=file.path(files_intermediate, treeGTR_2.file)) 
+load(file=file.path(files_intermediate, phylo.file)) 
 
-#####
 
+#### BUILD a Phyloseq obgect which carries all information about tree in one file
+
+# change the name of /file/ column to SampleID
 names(df.metadata)[names(df.metadata)=="file"] <- "SampleID"
+# assign the names of samples (ERR138...) to rows instead of 1,2,3...
 rownames(df.metadata) <- df.metadata$SampleID
-all(rownames(seqtab) %in% df.metadata$SampleID) # TRUE (sanity check)
+# should be all TRUE (sanity check)
+all(rownames(seqtab) %in% df.metadata$SampleID) 
 
+# build phyloseq object
 ps <- phyloseq::phyloseq(
               tax_table(taxtab), 
               sample_data(df.metadata),
               otu_table(seqtab, taxa_are_rows = FALSE), 
-              phy_tree(fitGTR$tree)
+              phy_tree(treeNJ)   # phylo object (fitGTR$tree) we temporarily use NJ tree here instead of RAXML: 
               )
 
 save(ps, file=file.path(files_intermediate, phyloseq.file)) 
