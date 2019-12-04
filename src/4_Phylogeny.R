@@ -74,6 +74,7 @@ save(microbiome.msa.muscle, microbiome.msa.clustalw, seq.variant.names, file=fil
 my.msa <- microbiome.msa.muscle
 
 # infer a tree with fast NJ method 
+# 40 min
 tic()
 phang.align <- phangorn::as.phyDat(my.msa, type="DNA", names=seqtab.samples.names)
 dm <- dist.ml(phang.align)  #distance matrix
@@ -85,10 +86,12 @@ save(treeNJ, file=file.path(files_intermediate, phylo.file))
 ## WARNING! Might take a lot of time
 # infer ML tree with Jukes-Cantor model (JC69, default one), usin NJ as a guide tree
 # fitJC is "pml" object, tree can be extracted as fitJC$tree, also has logLik etc parameters
+# 55 min
 tic()
 fitJC = phangorn::pml(tree=treeNJ, data=phang.align)   # pmlcomputes  the  likelihood  of  a  phylogenetic  tree 
 fitJC <- optim.pml(fitJC)    # optimize edge length etc parameters
 toc()
+save(treeNJ,fitJC, file=file.path(files_intermediate, phylo.file))
 
 # futher refine ML tree with GTR+G+I model
 tic()

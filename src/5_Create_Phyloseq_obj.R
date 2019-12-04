@@ -31,7 +31,7 @@ all(rownames(seqtab) %in% df.metadata$SampleID)
 # build phyloseq object
 feature.table <- otu_table(seqtab, taxa_are_rows = FALSE)
 metadata.table <- sample_data(df.metadata)
-tree.final <- phy_tree(treeNJ)   # fitGTR$tree # phylo object (fitGTR$tree) we temporarily use NJ tree here instead of RAXML: 
+tree.final <- fitGTR$tree # phy_tree(treeNJ) phylo object (fitGTR$tree) we temporarily use NJ tree here instead of RAXML: 
 
 # assign long sequence names back (we made it short after RAxML)
 taxa_names(tree.final) <- colnames(feature.table)
