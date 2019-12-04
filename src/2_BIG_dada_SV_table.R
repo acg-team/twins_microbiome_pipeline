@@ -160,3 +160,5 @@ seqtab.samples.names = rownames(seqtab)
 save(seqtab.samples.names, file=file.path(files_intermediate, seqtab.snames.file)) 
 
 
+### TODO:
+# sequence variants have very long names, so substitute them with short ones (Seq1, Seq2 ...) and create mathing table

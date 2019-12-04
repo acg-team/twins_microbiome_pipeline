@@ -1,5 +1,6 @@
 ## Combining a S4 Phyloseq object for further manipulation
 ## phyloseq object is an experiment level data structure
+## http://rpubs.com/lgschaerer/515637
 ##########################################################################
 
 #### init: load packages and set path
@@ -15,47 +16,51 @@ load(file=file.path(files_intermediate, taxtab.file))
 load(file=file.path(files_intermediate, phylo.file)) 
 
 
-#### BUILD a Phyloseq obgect which carries all information about tree in one file
+############    BUILD a Phyloseq object
+# Phyloseq obgect is a  typical amplicon sequencing experiment in one single data object 
 
-# change the name of /file/ column to SampleID
+# we need all sampleID to be the same in rownames(seqtab) and samples metadata (df.metadata$SampleID)
+# we need a SampleID in order to Phyloseq object be valid (change the name of /file/ column to SampleID)
 names(df.metadata)[names(df.metadata)=="file"] <- "SampleID"
-# assign the names of samples (ERR138...) to rows instead of 1,2,3...
+# assign the names of samples (ERR138...) to metadata rows instead of 1,2,3...
 rownames(df.metadata) <- df.metadata$SampleID
+
 # should be all TRUE (sanity check)
 all(rownames(seqtab) %in% df.metadata$SampleID) 
 
 # build phyloseq object
-ps <- phyloseq::phyloseq(
+feature.table <- otu_table(seqtab, taxa_are_rows = FALSE)
+metadata.table <- sample_data(df.metadata)
+tree.final <- fitGTR$tree #phy_tree(treeNJ)   # phylo object (fitGTR$tree) we temporarily use NJ tree here instead of RAXML: 
+
+# control
+rownames(metadata.table)
+colnames(feature.table)
+taxa_names(tree.final)
+
+# assign long sequence names back (we made it short after RAxML)
+taxa_names(tree.final) <- colnames(feature.table)
+
+
+ps.tweens <- phyloseq::phyloseq(
               tax_table(taxtab), 
-              sample_data(df.metadata),
-              otu_table(seqtab, taxa_are_rows = FALSE), 
-              phy_tree(treeNJ)   # phylo object (fitGTR$tree) we temporarily use NJ tree here instead of RAXML: 
+              metadata.table,
+              feature.table,
+              tree.final
               )
 
-save(ps, file=file.path(files_intermediate, phyloseq.file)) 
+save(ps.tweens, file=file.path(files_intermediate, phyloseq.file)) 
+
+## CHECK UP: phyloseq-class experiment-level object
+otu_table(ps)     # OTU Table:         [ 8299 taxa and 3288 samples ]
+sample_data(ps)   # Sample Data:       [ 3288 samples by 8 features ]
+tax_table(ps)     # Taxonomy Table:    [ 8299 taxa by 6 taxonomic ranks ]
+phy_tree(ps)      # Phylogenetic Tree: [ 8299 tips, ??? internal nodes ] - need to re run the whole workflow
 
 
-##### Phyloseq TODO here
 
 
 
 
-#####################
-# melt all sequences of one taxa to one abundance
-# https://github.com/joey711/phyloseq/issues/418
-glom <- phyloseq::tax_glom(ps, taxrank = 'Family')   # aglomerate taxa
-dat <- psmelt(glom)   # convert to df
-dat$Family <- as.character(dat$Family)  # convert Phylum to a character vector from a factor
-
-Phylum_abundance <- aggregate(Abundance~Sample+Phylum, dat, FUN=sum)  #aggregate
-
-# reorganize the table so that each phylum is a column
-Phylum_abundance <- cast(Phylum_abundance, Sample ~ Phylum)
-
-save(Phylum_abundance, file=file.path(result_path, "Phylum_abundance.RData")) 
-
-write.table(Phylum_abundance, file.path(result_path,"Famuly_abundance.csv"), sep=",")
-
-# TODO - put twins together
 
 

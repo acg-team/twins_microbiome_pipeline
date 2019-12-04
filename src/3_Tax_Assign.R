@@ -21,7 +21,7 @@ load(file=file.path(files_intermediate, seqtab.file))
 
 ###### 1: ASSIGN TAXONOMY ########################
 # assignTaxonomy implements the RDP Naive Bayesian Classifier algorithm
-# taxtab[1:1227, 1:6] - for each inferred sequence we have a taxonomy assognment
+# taxtab[1:1227, 1:6] - for each inferred sequence we have a taxonomy assignment
 
 tic()
 #ref_fasta <- file.path(rdp_path, "rdp_train_set_14.fa.gz")
