@@ -39,19 +39,21 @@ names(seqs) <- seq.variant.short.names
 # TODO: check for Muscle specific parameters
 
 # generate MSA with Muscle
+# 5 hours
 tic()
 microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
 print("msa (muscle) took:")
-toc()  # 5 hours
+toc()  
 print(microbiome.msa.muscle)
 # save MSA as a fasta file for possible vizualization with UGene browser
 writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
 
 # generate MSA with clustalW
+# 6 hours
 tic()
 microbiome.msa.clustalw <- msa::msaClustalW(seqs, type="dna", order="input")
 print("msa (clustalw) took:")
-toc() # 6 hours
+toc() 
 print(microbiome.msa.clustalw)
 #microbiome.msa.clustalw@unmasked@ranges@NAMES[3000:4000]
 writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
@@ -68,7 +70,7 @@ save(microbiome.msa.muscle, microbiome.msa.clustalw, seq.variant.names, file=fil
 ####################### Infer a phylogenetic tree 
 
 ########### fast NJ tree, can be used as guide tree as well
-# choose MSA to use
+# choose Muscle MSA to use
 my.msa <- microbiome.msa.muscle
 
 # infer a tree with fast NJ method 

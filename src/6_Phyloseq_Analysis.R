@@ -10,11 +10,16 @@ load(file=file.path(files_intermediate, phyloseq.file))
 ps.tweens <- ps
 
 
-### Start exploration and analysis
+#########  Start exploration and analysis
 
 # Unifrac assess a distance btw two sets of microbial community based on their tree position and abandunce 
-# this might take a lot of time!
-uni.dist.matr <- distance(ps.tweens, method="unifrac", type="samples", fast=TRUE)
+# this might take some time!
+tic()
+unifrac.dist.matr <- distance(ps.tweens, method="unifrac", type="samples", fast=TRUE)
+toc()
+
+save(unifrac.dist.matr, file=file.path(files_intermediate, phyloseq.file)) 
+
 
 # TODO: fither analysis of sample by sample UNIFRAC distance matrix?
 # clustering? PCoA? PCA? 
