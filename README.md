@@ -64,13 +64,16 @@ POSSIBLE IMPROVEMENTS:
   
 ### 5. [ 5_Create_Phyloseq_obj.R ]
 
-Create  Phyloseq object for further manipulation and vusulization of microbiome data
+Create and save Phyloseq object for further manipulation and visulization of microbiome data
 https://vaulot.github.io/tutorials/Phyloseq_tutorial.html#aim
 
-TODO:
-  - study Phyloseq
-  - create a Phyloseq object which include all information (tree, sequences etc)
-  - use Phyloseq to calculate Tree-based UNIFRAC
+
+### 6. [ 5_Phyloseq_Analysis.R ]
+Use Phyloseq to 
+  - calculate a distance matrix btw all 3288 samples based on abundance/ Tree information (UNIFRAC)
+  - plot hierarsicul clustering
+  - try to do PCA / PCoA to detect variations
+
 
 
 ## Possible futher directions
@@ -88,12 +91,13 @@ TODO:
   - generate OTU as well as SV table
   
   
-  
 ## References and packages
 #### packages to study
 - ape - Analyses of Phylogenetics and Evolution
 - RAxML - create a phylo tree for big abount of short sequnces (16S)
-- phangorn
+- phangorn - phylo tree building package
+- Phyloseq - package to analyse microbial communities
+
 
 #### Articles
 - 
