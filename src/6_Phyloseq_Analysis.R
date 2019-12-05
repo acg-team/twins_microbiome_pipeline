@@ -10,20 +10,33 @@ load(file=file.path(files_intermediate, phyloseq.file))
 
 
 #########  Start exploration and analysis
+# https://joey711.github.io/phyloseq-demo/unifrac.html
+# do we need a rooted tree?
 
 # Unifrac assess a distance btw two sets of microbial community based on their tree position and abandunce 
 # this might take some time!
+# 7 hours
 tic()
-unifrac.dist.matr <- distance(ps.tweens, method="unifrac", type="samples", fast=TRUE)
+unifrac.dist.matr <- phyloseq::distance(ps.tweens, method="unifrac", type="samples", fast=TRUE, parallel=TRUE)
 toc()
+# NOTE: Randomly assigning root as 
 
-save(unifrac.dist.matr, file=file.path(files_intermediate, phyloseq.file)) 
+save(unifrac.dist.matr, file=file.path(files_intermediate, phyloseq_analysis.file)) 
+
+
+
 
 
 # TODO: fither analysis of sample by sample UNIFRAC distance matrix?
 # clustering? PCoA? PCA? 
+# PCoA is recommended over PCA when there are lots of missing data and when there are fewer individuals than characters
 
 
+
+
+# TODO figure out what genera is most usefull
+# filter common taxa
+# check if microbiota is stable thouth the life
 
 
 

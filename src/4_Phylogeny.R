@@ -1,6 +1,8 @@
-#### INFER A PHYLOGENY TREE with
+#### do MSA and INFER A PHYLOGENY TREE with
+# MSA - a core Bioconductor package, for multiple sequence alignment
 # Phangorn (NJ, ML Felsenstein)
 # RAxML (TODO)
+# ape - Analyses of Phylogenetics and Evolution
 ##############################################
 # http://www.metagenomics.wiki/tools/phylogenetic-tree
 
@@ -15,7 +17,7 @@ load(file=file.path(files_intermediate, seqtab.snames.file))
 load(file=file.path(files_intermediate, taxtab.file))
 
 
-##############  MSA Construction
+##############  MSA Construction ##############
 # extract DNA seq from seqtab object
 seqs <- dada2::getSequences(seqtab)   # 8299
 names(seqs) <- seqs    # This propagates to the tip labels of the tree
@@ -38,17 +40,20 @@ names(seqs) <- seq.variant.short.names
 # TODO: look for another package for MSA, this on msa is very badly written
 # TODO: check for Muscle specific parameters
 
-# generate MSA with Muscle
+# option 1: generate MSA with Muscle
 # 5 hours
 tic()
 microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
 print("msa (muscle) took:")
 toc()  
 print(microbiome.msa.muscle)
-# save MSA as a fasta file for possible vizualization with UGene browser
-writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
+rownames(microbiome.msa.muscle)
 
-# generate MSA with clustalW
+# save MSA as a fasta file for possible vizualization with UGene browser
+Biostrings::writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
+
+
+# option 2: generate MSA with clustalW
 # 6 hours
 tic()
 microbiome.msa.clustalw <- msa::msaClustalW(seqs, type="dna", order="input")
@@ -56,7 +61,7 @@ print("msa (clustalw) took:")
 toc() 
 print(microbiome.msa.clustalw)
 #microbiome.msa.clustalw@unmasked@ranges@NAMES[3000:4000]
-writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
+Biostrings::writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
 
 # save objects for reusing late in pipeline 
 save(microbiome.msa.muscle, microbiome.msa.clustalw, seq.variant.names, file=file.path(files_intermediate, msa.file)) 
@@ -109,16 +114,17 @@ save(treeNJ, fitJC, fitGTR, file=file.path(files_intermediate, phylo.file))
 
 ############### ML tree with RAxML: ML tree for species >1000 with fast heuristics
 # NOTE: need to install raxml on local MAC first
-exec.path <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
+exec.path.mac <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 
 # convert msa::MsaDNAMultipleAlignment data into ips::DNAbin (ape::DNAbim) format!
-
+# probbaly a wrong conversion
+# look for dnabin conversion for ips !
 msa.dnabin <- msa::msaConvert(my.msa, "ape::DNAbin")
 
 # vizual control of MSA
 labels(msa.dnabin)
-print(msa.dnabin)
+print(msa.dnabin)   # Base composition: acgt = NaN! why?
 
 save(msa.dnabin, file=file.path(files_intermediate, msa.file)) 
 
@@ -128,7 +134,7 @@ save(msa.dnabin, file=file.path(files_intermediate, msa.file))
 # p - Integer, setting a random seed for the parsimony starting trees.
 # return tr is a list of tr[1] - info, tr[2] - best tree 
 tic()
-tr <- raxml(msa.dnabin, f = "d", N = 2, p = 1234, exec = exec.path.ubuntu, threads=4) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
+tr <- ips::raxml(msa.dnabin, f = "d", N = 2, p = 1234, exec = exec.path.mac, threads=1) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
 toc()
 
 
