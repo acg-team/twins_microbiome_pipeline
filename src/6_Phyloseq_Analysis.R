@@ -9,6 +9,56 @@ source("src/load_initialize.R")
 load(file=file.path(files_intermediate, phyloseq.file)) 
 
 
+
+##############  EXPLORATORY ANALYSIS of Phyloseq object  #######
+# TODO: show distribution of abandancies, max, min
+
+#####  Prevalence filtering
+# Define prevalence of each taxa (in how many samples did each taxa appear at least once)
+prev0 = apply(X = otu_table(ps.tweens),
+              MARGIN = ifelse(taxa_are_rows(ps.tweens), yes = 1, no = 2),
+              FUN = function(x){sum(x > 0)}
+              )
+prevdf = data.frame(Prevalence = prev0, TotalAbundance = taxa_sums(ps.tweens), tax_table(ps.tweens))
+View(head(prevdf))
+
+# we can filter out Phyla with abundance less then 50
+keepPhyla.gt50 = table(prevdf$Phylum)[(table(prevdf$Phylum) > 50)]
+prevdf.Phyla.gt50 = subset(prevdf, Phylum %in% names(keepPhyla.gt50))
+nrow(prevdf.Phyla.gt50)
+View(head(prevdf.Phyla.gt50))
+
+# we can define other rules for filering too
+
+# we can filter out 5% of taxa with lowest abandances  
+prevalenceThreshold = 0.05 * nsamples(ps.tweens) 
+prevalenceThreshold
+
+# Execute prevalence filter, using `prune_taxa()` function
+ps.tweens.1 = prune_taxa((prev0 > prevalenceThreshold), ps.tweens) 
+ps.tweens.1
+
+# Filter entries with unidentified Phylum.
+ps.tweens.2 = subset_taxa(ps.tweens.1, Phylum %in% names(keepPhyla.gt50))
+ps.tweens.2
+
+# plot abandance of each Phyla
+ggplot(prevdf.Phyla.gt50, aes(TotalAbundance, Prevalence, color = Phylum)) +
+  geom_hline(yintercept = prevalenceThreshold, alpha = 0.5, linetype = 2) +
+  geom_point(size = 1, alpha = 0.7) +
+  scale_y_log10() + scale_x_log10() +
+  xlab("Total~Abundance") +
+  facet_wrap(~Phylum)
+
+
+
+
+
+############ UNIFRAC Analysis   ##########
+# UNIFRAC distance is calculated between pairs of samples (each sample represents an organismal community)
+# - weighted (quantitative, abundance) and unweighted (qualitative, presence or absence)  
+
+
 #########  Start exploration and analysis
 # https://joey711.github.io/phyloseq-demo/unifrac.html
 # do we need a rooted tree?
@@ -22,6 +72,8 @@ toc()
 # NOTE: Randomly assigning root as 
 
 save(unifrac.dist.matr, file=file.path(files_intermediate, phyloseq_analysis.file)) 
+
+
 
 
 

@@ -51,12 +51,14 @@ ps.tweens <- phyloseq::phyloseq(
 
 save(ps.tweens, file=file.path(files_intermediate, phyloseq.file)) 
 
-## CHECK UP: phyloseq-class experiment-level object
-otu_table(ps)     # OTU Table:         [ 8299 taxa and 3288 samples ]
-sample_data(ps)   # Sample Data:       [ 3288 samples by 8 features ]
-tax_table(ps)     # Taxonomy Table:    [ 8299 taxa by 6 taxonomic ranks ]
-phy_tree(ps)      # Phylogenetic Tree: [ 8299 tips, ??? internal nodes ] - need to re run the whole workflow
+# Sanity: Check if there are ASVs with no counts
+any(taxa_sums(ps.tweens) == 0)
 
+## CHECK UP: phyloseq-class experiment-level object
+otu_table(ps.tweens)     # OTU Table:         [ 8299 taxa and 3288 samples ]
+sample_data(ps.tweens)   # Sample Data:       [ 3288 samples by 8 features ]
+tax_table(ps.tweens)     # Taxonomy Table:    [ 8299 taxa by 6 taxonomic ranks ]
+phy_tree(ps.tweens)      # Phylogenetic Tree: [ 8299 tips, ??? internal nodes ] - need to re run the whole workflow
 
 
 
