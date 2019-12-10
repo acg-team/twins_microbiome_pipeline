@@ -13,6 +13,15 @@ load(file=file.path(files_intermediate, phyloseq.file))
 ##############  EXPLORATORY ANALYSIS of Phyloseq object  #######
 # TODO: show distribution of abandancies, max, min
 
+# plot abundance of each taxa in all samples
+plot_bar(ps.tweens, fill="Class")
+
+# richness (number of taxa in each sample)
+plot_richness(ps.tweens, x="BODY_SITE", color="Description")
+
+# plot phylo tree with abandance
+plot_tree(ps.tweens, color="Genus", size="abundance")
+
 #####  Prevalence filtering
 # Define prevalence of each taxa (in how many samples did each taxa appear at least once)
 prev0 = apply(X = otu_table(ps.tweens),
@@ -64,14 +73,31 @@ ggplot(prevdf.Phyla.gt50, aes(TotalAbundance, Prevalence, color = Phylum)) +
 # do we need a rooted tree?
 
 # Unifrac assess a distance btw two sets of microbial community based on their tree position and abandunce 
-# this might take some time!
+##### calculate UNIFRAC distance matric
+# Takes a phyloseq object and method option,  and returns a distance object suitable for certain 
+# ordination methods and other distance-based analyses
+# methods: "unifrac": unweighted / UniFrac1, Unifrac2
+# type: pairwise comparisons by samples
+
 # 7 hours
 tic()
-unifrac.dist.matr <- phyloseq::distance(ps.tweens, method="unifrac", type="samples", fast=TRUE, parallel=TRUE)
+ps.dist.unifrac <- phyloseq::distance(ps.tweens, method="unifrac", type="samples", fast=TRUE, parallel=TRUE)
 toc()
-# NOTE: Randomly assigning root as 
+save(ps.dist.unifrac, file=file.path(files_intermediate, phyloseq_analysis.file)) 
 
-save(unifrac.dist.matr, file=file.path(files_intermediate, phyloseq_analysis.file)) 
+
+#### MDS analysis: heatMap
+plot_heatmap(ps.tweens, distance = "unifrac", method="NMDS", sample.label="SampleType", taxa.label="Family")
+
+
+plot(hclust(ps.dist.unifrac, method='ward.D'))
+
+
+# do ordination (NMDS)
+ord  <- ordinate(ps.tweens, "MDS", distance=ps.dist.unifrac)
+plot(ord)
+
+
 
 
 
