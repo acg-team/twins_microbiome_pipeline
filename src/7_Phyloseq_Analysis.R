@@ -18,7 +18,7 @@ load(file=file.path(files_intermediate, phyloseq.file))
 ######### 0 - Direct Plots: 
 # 1 - plot abundance of each taxa in all samples
 ggp2.bar <- plot_bar(ps.tweens, fill="Family")    # Error: vector memory exhausted (limit reached?)
-ggsave(file=file.path(result_path, "bar_taxa_in_samples.pdf"), plot = ggp2.bar, dpi = 300, width = 40, height = 20)
+ggsave(file=file.path(result_path, "bar_taxa_in_samples.png"), plot = ggp2.bar, dpi = 300, width = 49, height = 25)
 
 # 2 - richness (number of taxa in each sample)
 # ERROR: Error in uniroot, did not succeed extending the interval endpoints for ...
@@ -26,10 +26,13 @@ ggp2.rich <- plot_richness(ps.tweens, x="BODY_SITE", color="Description")
 ggsave(file=file.path(result_path, "richness.pdf"), plot = ggp2.rich, dpi = 300, width = 49, height = 30)
 
 # 3 - plot phylo tree with abandance
-ggp2.tree <- plot_tree(ps.tweens, color="Genus", size="abundance")   # 1 hour!!
+ggp2.tree <- plot_tree(ps.tweens, method = "treeonly", ladderize = "left", title = "Tree of twins taxa")
 ggsave(file=file.path(result_path, "tree.pdf"), plot = ggp2.tree, dpi = 300, width = 49, height = 30)
 
-save(ggp2.bar, ggp2.rich, ggp2.tree, file=file.path(files_intermediate, "ggplots.RData"))
+ggp2.tree.aband <- plot_tree(ps.tweens, color="Genus", size="abundance")   # 1 hour!!
+ggsave(file=file.path(result_path, "tree_abund.pdf"), plot = ggp2.tree.aband, dpi = 300, width = 49, height = 30)
+
+save(ggp2.bar, ggp2.rich, ggp2.tree.aband, file=file.path(files_intermediate, "ggplots.RData"))
 
 
 #########  1 - Preprocessing: filtering samples/taxa
@@ -40,6 +43,7 @@ save(ggp2.bar, ggp2.rich, ggp2.tree, file=file.path(files_intermediate, "ggplots
 
 
 # Prevalence filtering: Define prevalence of each taxa (in how many samples did each taxa appear at least once)
+# Fast: all in 5 min
 prev0 = apply(X = otu_table(ps.tweens),
               MARGIN = ifelse(taxa_are_rows(ps.tweens), yes = 1, no = 2),
               FUN = function(x){sum(x > 0)}
@@ -67,12 +71,14 @@ ps.tweens.2 = subset_taxa(ps.tweens.1, Phylum %in% names(keepPhyla.gt50))
 ps.tweens.2
 
 # plot abandance of each Phyla
-ggplot(prevdf.Phyla.gt50, aes(TotalAbundance, Prevalence, color = Phylum)) +
+ggp2.prevalence <- ggplot(prevdf.Phyla.gt50, aes(TotalAbundance, Prevalence, color = Phylum)) +
   geom_hline(yintercept = prevalenceThreshold, alpha = 0.5, linetype = 2) +
   geom_point(size = 1, alpha = 0.7) +
   scale_y_log10() + scale_x_log10() +
   xlab("Total~Abundance") +
   facet_wrap(~Phylum)
+ggsave(file=file.path(result_path, "prevalence.pdf"), plot = ggp2.prevalence, dpi = 300, width = 30, height = 20)
+
 
 
 ### Analysis: Intro
