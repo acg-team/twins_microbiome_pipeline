@@ -17,15 +17,20 @@ load(file=file.path(files_intermediate, phyloseq.file))
 
 ######### 0 - Direct Plots: 
 # 1 - plot abundance of each taxa in all samples
-ggp2.bar <- plot_bar(ps.tweens, fill="Class")    # Error: vector memory exhausted (limit reached?)
+ggp2.bar <- plot_bar(ps.tweens, fill="Family")    # Error: vector memory exhausted (limit reached?)
+ggsave(file=file.path(result_path, "bar_taxa_in_samples.pdf"), plot = ggp2.bar, dpi = 300, width = 40, height = 20)
 
 # 2 - richness (number of taxa in each sample)
+# ERROR: Error in uniroot, did not succeed extending the interval endpoints for ...
 ggp2.rich <- plot_richness(ps.tweens, x="BODY_SITE", color="Description")
-
+ggsave(file=file.path(result_path, "richness.pdf"), plot = ggp2.rich, dpi = 300, width = 49, height = 30)
 
 # 3 - plot phylo tree with abandance
 ggp2.tree <- plot_tree(ps.tweens, color="Genus", size="abundance")   # 1 hour!!
-ggsave(file=file.path(result_path, "tree.pdf"), plot = ggp2.tree, dpi = 300)
+ggsave(file=file.path(result_path, "tree.pdf"), plot = ggp2.tree, dpi = 300, width = 49, height = 30)
+
+save(ggp2.bar, ggp2.rich, ggp2.tree, file=file.path(files_intermediate, "ggplots.RData"))
+
 
 #########  1 - Preprocessing: filtering samples/taxa
 # to distinguish twins we have to filter out 

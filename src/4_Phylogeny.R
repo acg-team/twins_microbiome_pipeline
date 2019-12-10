@@ -110,6 +110,8 @@ toc()
 # save the tree to file
 save(treeNJ, fitJC, fitGTR, file=file.path(files_intermediate, phylo.file)) 
 
+# TODO: Visualize tree
+
 
 
 ############### ML tree with RAxML: ML tree for species >1000 with fast heuristics
@@ -121,6 +123,8 @@ exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-A
 # probbaly a wrong conversion
 # look for dnabin conversion for ips !
 msa.dnabin <- msa::msaConvert(my.msa, "ape::DNAbin")
+
+# ?  fastafile <- as.DNAbin(fastafile)
 
 # vizual control of MSA
 labels(msa.dnabin)

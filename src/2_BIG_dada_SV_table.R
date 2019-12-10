@@ -67,6 +67,7 @@ if(length(fnFs) != length(fnRs)) stop("BEFORE: Forward and reverse files do not 
 tic()
 # quality filtering and trimming
 # TODO: need an expert advice! Or experiment with eliminating bad quality reads !
+# need to deside on: trimLeft/truncLen; maxEE; truncQ;
 for(i in seq_along(fnFs)) {
   print (i)
   # if(i<5574){
@@ -107,7 +108,7 @@ if(length(filtFs) != length(filtRs)) stop("Forward and reverse files do not matc
 tic()
 errF <- learnErrors(filtFs, nreads=2e6, multithread = TRUE, randomize=TRUE)
 errR <- learnErrors(filtRs, nreads=2e6, multithread = TRUE, randomize=TRUE)
-toc() # 9806.114 sec
+toc() # 9806.114 sec / 2.7h
 
 ## plot error rates for control
 plotErrors(errF)
