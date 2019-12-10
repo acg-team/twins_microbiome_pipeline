@@ -1,0 +1,118 @@
+########### use combined Phyloseq object (ps.tweens) to analise microbial community
+
+#### init: load packages and set path
+project_path <- "~/Projects_R/twins_microbiome_pipeline"
+setwd(project_path)
+source("src/load_initialize.R")
+
+### LOAD PREVIOUS DATA
+load(file=file.path(files_intermediate, phyloseq.file)) 
+
+
+
+##############  EXPLORATORY ANALYSIS of Phyloseq object  #######
+# ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
+################################################################
+# TODO: do normalization!
+
+######### 0 - Direct Plots: 
+# 1 - plot abundance of each taxa in all samples
+ggp2.bar <- plot_bar(ps.tweens, fill="Class")    # Error: vector memory exhausted (limit reached?)
+
+# 2 - richness (number of taxa in each sample)
+ggp2.rich <- plot_richness(ps.tweens, x="BODY_SITE", color="Description")
+
+
+# 3 - plot phylo tree with abandance
+ggp2.tree <- plot_tree(ps.tweens, color="Genus", size="abundance")   # 1 hour!!
+ggsave(file=file.path(result_path, "tree.pdf"), plot = ggp2.tree, dpi = 300)
+
+#########  1 - Preprocessing: filtering samples/taxa
+# to distinguish twins we have to filter out 
+# - taxa with small variance (which are stable) - common
+# - shall it be Phyla? Class? which one?
+# - filter out stable taxa?
+
+
+# Prevalence filtering: Define prevalence of each taxa (in how many samples did each taxa appear at least once)
+prev0 = apply(X = otu_table(ps.tweens),
+              MARGIN = ifelse(taxa_are_rows(ps.tweens), yes = 1, no = 2),
+              FUN = function(x){sum(x > 0)}
+              )
+prevdf = data.frame(Prevalence = prev0, TotalAbundance = taxa_sums(ps.tweens), tax_table(ps.tweens))
+View(head(prevdf))
+
+# we can filter out Phyla with abundance less then 50
+keepPhyla.gt50 = table(prevdf$Phylum)[(table(prevdf$Phylum) > 50)]
+prevdf.Phyla.gt50 = subset(prevdf, Phylum %in% names(keepPhyla.gt50))
+nrow(prevdf.Phyla.gt50)
+View(head(prevdf.Phyla.gt50))
+#note: we can define other rules for filering too
+
+# we can filter out 5% of taxa with lowest abandances  
+prevalenceThreshold = 0.05 * nsamples(ps.tweens) 
+prevalenceThreshold
+
+# Execute prevalence filter, using `prune_taxa()` function
+ps.tweens.1 = prune_taxa((prev0 > prevalenceThreshold), ps.tweens) 
+ps.tweens.1
+
+# Filter entries with unidentified Phylum.
+ps.tweens.2 = subset_taxa(ps.tweens.1, Phylum %in% names(keepPhyla.gt50))
+ps.tweens.2
+
+# plot abandance of each Phyla
+ggplot(prevdf.Phyla.gt50, aes(TotalAbundance, Prevalence, color = Phylum)) +
+  geom_hline(yintercept = prevalenceThreshold, alpha = 0.5, linetype = 2) +
+  geom_point(size = 1, alpha = 0.7) +
+  scale_y_log10() + scale_x_log10() +
+  xlab("Total~Abundance") +
+  facet_wrap(~Phylum)
+
+
+### Analysis: Intro
+# - beta-diversity - type and quantity of OTU observed btw samples (sites) - what we are looking for
+# - alpha-diversity - diversity inside each sample (site)
+
+# we are interested in beta-diversity, i.e. comparison of microbial composition of two samples, it is achived with
+# - calculation of pairwise distances (distance matrix)
+# - dimensional reduction (ordination) methods
+
+
+############ 2 - Calculation of distances / ordination ##########
+# UNIFRAC distance is calculated between pairs of samples (each sample represents an organismal community)
+# Unifrac assess a distance btw two sets of microbial community based on their tree position and abandunce 
+# - weighted (quantitative, abundance) and unweighted (qualitative, presence or absence)  
+# NOTE: we need weighted UNIFRAC (with abandancies)
+# https://joey711.github.io/phyloseq-demo/unifrac.html
+
+# distance:
+# - methods: "unifrac": unweighted / UniFrac1, Unifrac2
+# - type: pairwise comparisons by samples
+
+# NOTE: investigate how to run UNIFRAC in parallel! 
+
+# 7 hours
+tic()
+ps.dist.unifrac <- phyloseq::distance(ps.tweens, method="unifrac", type="samples", fast=TRUE, parallel=TRUE)
+toc()
+save(ps.dist.unifrac, file=file.path(files_intermediate, phyloseq_analysis.file)) 
+# NOTE: ps.dist.unifrac - is a "dist" class (which package?) sutable for standard clustering analysis in R (hclust)
+
+
+# do ordination/dimensionality reduction (NMDS)
+ord  <- ordinate(ps.tweens, "MDS", distance=ps.dist.unifrac)
+
+
+
+############ 3 - Plot Exploratory Graphics: heatmap + hierarhucal clustering
+plot_heatmap(ps.tweens, distance = "unifrac", method="NMDS", sample.label="SampleType", taxa.label="Family")
+
+plot(hclust(ps.dist.unifrac, method='ward.D'))
+
+plot(ord)
+
+
+
+
+
