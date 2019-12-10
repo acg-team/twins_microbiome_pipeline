@@ -122,15 +122,15 @@ exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-A
 # convert msa::MsaDNAMultipleAlignment data into ips::DNAbin (ape::DNAbim) format!
 # probbaly a wrong conversion
 # look for dnabin conversion for ips !
-msa.dnabin <- msa::msaConvert(my.msa, "ape::DNAbin")
+#msa.dnabin <- msa::msaConvert(my.msa, "ape::DNAbin")
+msa.dnabin.as <- as.DNAbin(my.msa)
 
-# ?  fastafile <- as.DNAbin(fastafile)
 
 # vizual control of MSA
-labels(msa.dnabin)
-print(msa.dnabin)   # Base composition: acgt = NaN! why?
+labels(msa.dnabin.as)
+print(msa.dnabin.as)   # Base composition: acgt = NaN! why?
 
-save(msa.dnabin, file=file.path(files_intermediate, msa.file)) 
+save(msa.dnabin.as, file=file.path(files_intermediate, msa.file)) 
 
 # I exported my alignment to a server to run RAXML, it took 9 days for 5000 sequences.
 # f - RAxML algorithm
@@ -138,7 +138,7 @@ save(msa.dnabin, file=file.path(files_intermediate, msa.file))
 # p - Integer, setting a random seed for the parsimony starting trees.
 # return tr is a list of tr[1] - info, tr[2] - best tree 
 tic()
-tr <- ips::raxml(msa.dnabin, f = "d", N = 2, p = 1234, exec = exec.path.mac, threads=1) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
+tr <- ips::raxml(msa.dnabin.as, f = "d", N = 2, p = 1234, exec = exec.path.mac, threads=1) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
 toc()
 
 
