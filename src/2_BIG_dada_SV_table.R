@@ -12,7 +12,7 @@ setwd(project_path)
 source("src/load_initialize.R")
 
 packageVersion("dada2")
-QUALITY_THRESHOLD <- 15
+QUALITY_THRESHOLD <- 25
 
 
 ###### 1: Files preparation / Quality check ########################
@@ -67,7 +67,10 @@ if(length(fnFs) != length(fnRs)) stop("BEFORE: Forward and reverse files do not 
 tic()
 # quality filtering and trimming
 # TODO: need an expert advice! Or experiment with eliminating bad quality reads !
-# need to deside on: trimLeft/truncLen; maxEE; truncQ;
+# need to deside on: 
+# - trimLeft/truncLen; 
+# - maxEE; 
+# - truncQ;
 for(i in seq_along(fnFs)) {
   print (i)
   # if(i<5574){
@@ -104,7 +107,7 @@ if(length(filtFs) != length(filtRs)) stop("Forward and reverse files do not matc
 
 ### LEARN ERROR RATES ###############
 # https://github.com/benjjneb/dada2/issues/155
-# for large data sets error rates should be estimated on subset of data - change to 40
+# for large data sets error rates should be estimated on subset of data - change to 40, here it is ok
 tic()
 errF <- learnErrors(filtFs, nreads=2e6, multithread = TRUE, randomize=TRUE)
 errR <- learnErrors(filtRs, nreads=2e6, multithread = TRUE, randomize=TRUE)
@@ -134,8 +137,8 @@ for (sam in sample.names) {
   
   merger <- mergePairs(dadaF, derepF, dadaR, derepR)
   mergers[[sam]] <- merger
-  
   toc()
+  
   counter <- counter+1
   cat(counter, "...", sam, " Done.\n")
   cat("---------- \n")

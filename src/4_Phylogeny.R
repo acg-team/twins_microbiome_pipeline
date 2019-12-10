@@ -132,15 +132,19 @@ print(msa.dnabin.as)   # Base composition: acgt = NaN! why?
 
 save(msa.dnabin.as, file=file.path(files_intermediate, msa.file)) 
 
-# I exported my alignment to a server to run RAXML, it took 9 days for 5000 sequences.
+# Parameters:
 # f - RAxML algorithm
 # N - Integers give the number of independent searches on different starting tree or replicates in bootstrapping. 
 # p - Integer, setting a random seed for the parsimony starting trees.
-# return tr is a list of tr[1] - info, tr[2] - best tree 
+# return tr is a list of tr[1] - info, tr[2] - best tree (rooted)
+
+# 5.5h
 tic()
-tr <- ips::raxml(msa.dnabin.as, f = "d", N = 2, p = 1234, exec = exec.path.mac, threads=1) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
+tree.raxml <- ips::raxml(msa.dnabin.as, f = "d", N = 2, p = 1234, exec = exec.path.mac, threads=4) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
 toc()
 
+tree.raxml <- tr
+save(tree.raxml, file=file.path(files_intermediate, "raxml.RData")) 
 
 
 
