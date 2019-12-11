@@ -66,11 +66,20 @@ df.metadata <- data.frame(
   age             = age_vector,
   country         = country_vector
 )
+rownames(df.metadata) <- df.metadata$file # use ERR as row names instead of 1,2,3...
 
-df.metadata.ordered <- df.metadata[ order(df.metadata["family_id"]), ]
+df.metadata.ordered <- df.metadata[ order(df.metadata["family_id"]), ]  # order by family_id
+
+# only keep families with at least two time points for each tween
+number_of_samples_in_family <- table(df.metadata.ordered$family_id)
+family_id_of_large_families <- rownames(number_of_samples_in_family[number_of_samples_in_family>3])
+
+# create a df which only contains those persons who have 2 samples for each tween 
+df.metadata.4timepoints <- df.metadata.ordered[df.metadata.ordered$family_id %in% family_id_of_large_families,]
+
 
 # cache to disk to avoid downloading again
-save(df.metadata, df.metadata.ordered, file=file.path(metadata_path, metadata.file)) 
+save(df.metadata, df.metadata.ordered, df.metadata.4timepoints, file=file.path(metadata_path, metadata.file)) 
 
 # export to human readable format
 write.table(df.metadata, file.path(result_path,"metadata.csv"), sep=",")

@@ -6,13 +6,17 @@
 # https://github.com/benjjneb/dada2/tree/master/R
 
 
-##### 0: load the necessary packages and set path #####   
+##### init: load packages and set path  
+getwd()
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
 source("src/load_initialize.R")
-
 packageVersion("dada2")
-QUALITY_THRESHOLD <- 25
+
+### LOAD PREVIOUS DATA
+load(file=file.path(metadata_path, metadata.file)) 
+
+
 
 
 ###### 1: Files preparation / Quality check ########################
@@ -20,6 +24,11 @@ QUALITY_THRESHOLD <- 25
 # get all sample's file names to be processed
 # either by scanning the data folder
 fns <- sort(list.files(data_path, full.names = TRUE))
+
+# keep only those families who have 4 samples 
+# NOTE!!!:: REMOVE it if you need full file list!!! only 700 samples are left now!
+samples_to_be_kept <- df.metadata.4timepoints$file
+fns <- fns[grep(paste(samples_to_be_kept, collapse="|"), fns)]
 
 # split all filenames into Forward and Reverse reads files
 fnFs <- fns[grepl("_1.fastq.gz", fns)]
@@ -54,7 +63,7 @@ for(i in ii) {
 ### FILTERING  ##########################
 # trim and put into filtered folder
 # https://github.com/benjjneb/dada2/tree/master/R
-
+QUALITY_THRESHOLD <- 25  # Phred
 
 filtFs <- file.path(filt_path, basename(fnFs))  # names for filtered forwards reads
 filtRs <- file.path(filt_path, basename(fnRs))  # names for filtered reverse reads
