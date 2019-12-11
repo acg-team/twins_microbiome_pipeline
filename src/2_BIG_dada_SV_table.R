@@ -53,7 +53,7 @@ for (idx in seq_along(fnFs)){
 ### QUALITY: ##############
 # check FastQC plots for quality 
 # some of them are in bad quality #3
-ii <- seq(from=40,to=45,by=1)  #length(fnFs)
+ii <- seq(from=1,to=10,by=1)  #length(fnFs)
 for(i in ii) {
  print(dada2::plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i])))
  print(dada2::plotQualityProfile(fnRs[i]) + ggtitle(paste("Rev:", sample.names[i])))
