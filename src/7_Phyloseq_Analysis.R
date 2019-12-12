@@ -7,7 +7,6 @@ source("src/load_initialize.R")
 
 ### LOAD PREVIOUS DATA
 load(file=file.path(files_intermediate, phyloseq.file)) 
-load(file=file.path(files_intermediate, "raxml.RData")) 
 
 
 

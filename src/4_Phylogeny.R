@@ -143,8 +143,9 @@ tic()
 tree.raxml <- ips::raxml(msa.dnabin.as, f = "d", N = 2, p = 1234, exec = exec.path.mac, threads=4) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
 toc()
 
-tree.raxml <- tr
-save(tree.raxml, file=file.path(files_intermediate, "raxml.RData")) 
+
+save(treeNJ, fitJC, fitGTR, tree.raxml, file=file.path(files_intermediate, phylo.file)) 
+
 
 
 
