@@ -21,8 +21,8 @@ ggp2.bar <- plot_bar(ps.tweens, fill="Family")    # Error: vector memory exhaust
 ggsave(file=file.path(result_path, "bar_taxa_in_samples.png"), plot = ggp2.bar, dpi = 300, width = 49, height = 25)
 
 # 2 - richness (number of taxa in each sample)
-# ERROR: Error in uniroot, did not succeed extending the interval endpoints for ...
-ggp2.rich <- plot_richness(ps.tweens, x="BODY_SITE", color="Description")
+# Error in FUN(X[[i]], ...) : object 'BODY_SITE' not found
+ggp2.rich <- plot_richness(ps.tweens, x="BODY_SITE", measures="Observed") # study measures
 ggsave(file=file.path(result_path, "richness.pdf"), plot = ggp2.rich, dpi = 300, width = 49, height = 30)
 
 # 3 - plot phylo tree with abandance
