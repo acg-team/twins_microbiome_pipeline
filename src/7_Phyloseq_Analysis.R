@@ -13,12 +13,16 @@ load(file=file.path(files_intermediate, phyloseq.file))
 ##############  EXPLORATORY ANALYSIS of Phyloseq object  #######
 # ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 ################################################################
-# TODO: do normalization!
+# TODO: do normalization?
 
 ######### 0 - Direct Plots: 
+# https://joey711.github.io/phyloseq/plot_bar-examples.html
+
 # 1 - plot abundance of each taxa in all samples
-ggp2.bar <- plot_bar(ps.tweens, fill="Family")    # Error: vector memory exhausted (limit reached?)
-ggsave(file=file.path(result_path, "bar_taxa_in_samples.png"), plot = ggp2.bar, dpi = 300, width = 49, height = 25)
+ggp2.bar1 <- plot_bar(ps.tweens) 
+ggp2.bar2 <- plot_bar(ps.tweens, fill="Genus")    # Error: vector memory exhausted (limit reached?)
+
+ggsave(file=file.path(result_path, "bar_taxa_in_samples_all.png"), plot = ggp2.bar1, dpi = 200, width = 45, height = 25)
 
 # 2 - richness (number of taxa in each sample)
 # Error in FUN(X[[i]], ...) : object 'BODY_SITE' not found
@@ -32,7 +36,7 @@ ggsave(file=file.path(result_path, "tree.pdf"), plot = ggp2.tree, dpi = 300, wid
 ggp2.tree.aband <- plot_tree(ps.tweens, color="Genus", size="abundance")   # 1 hour!!
 ggsave(file=file.path(result_path, "tree_abund.pdf"), plot = ggp2.tree.aband, dpi = 300, width = 49, height = 30)
 
-save(ggp2.bar, ggp2.rich, ggp2.tree.aband, file=file.path(files_intermediate, "ggplots.RData"))
+save(ggp2.bar, ggp2.bar1, ggp2.rich, file=file.path(files_intermediate, "ggplots.RData"))
 
 
 #########  1 - Preprocessing: filtering samples/taxa
@@ -104,6 +108,7 @@ ggsave(file=file.path(result_path, "prevalence.pdf"), plot = ggp2.prevalence, dp
 # NOTE: investigate how to run UNIFRAC in parallel! 
 
 # 7 hours
+
 tic()
 ps.dist.unifrac <- phyloseq::distance(ps.tweens, method="unifrac", type="samples", fast=TRUE, parallel=TRUE)
 toc()
