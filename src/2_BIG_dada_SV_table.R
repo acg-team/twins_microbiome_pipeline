@@ -53,7 +53,7 @@ for (idx in seq_along(fnFs)){
 ### QUALITY: ##############
 # check FastQC plots for quality 
 # some of them are in bad quality #3
-ii <- seq(from=1,to=10,by=1)  #length(fnFs)
+ii <- seq(from=1,to=5,by=1)  #length(fnFs)
 for(i in ii) {
  print(dada2::plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i])))
  print(dada2::plotQualityProfile(fnRs[i]) + ggtitle(paste("Rev:", sample.names[i])))
@@ -63,7 +63,7 @@ for(i in ii) {
 ### FILTERING  ##########################
 # trim and put into filtered folder
 # https://github.com/benjjneb/dada2/tree/master/R
-QUALITY_THRESHOLD <- 25  # Phred
+QUALITY_THRESHOLD <- 20  # Phred
 
 filtFs <- file.path(filt_path, basename(fnFs))  # names for filtered forwards reads
 filtRs <- file.path(filt_path, basename(fnRs))  # names for filtered reverse reads
@@ -78,20 +78,17 @@ tic()
 # TODO: need an expert advice! Or experiment with eliminating bad quality reads !
 # need to deside on: 
 # - trimLeft/truncLen; 
-# - maxEE; 
+# - maxEE - maximum number of “expected errors” allowed in a read
 # - truncQ;
+# https://academic.oup.com/bioinformatics/article/31/21/3476/194979
 for(i in seq_along(fnFs)) {
-  print (i)
-  # if(i<5574){
-  #   print("skip")
-  #   next
-  # }
+  print(i)
   print(fnFs[[i]])
   print(fnRs[[i]])
   dada2::filterAndTrim( fwd=fnFs[[i]],     filt=filtFs[[i]],
                         rev=fnRs[[i]], filt.rev=filtRs[[i]],
-                        #trimLeft=c(3,3), truncLen=c(247,247), 
-                        maxEE=2, truncQ=QUALITY_THRESHOLD, maxN=0, rm.phix=TRUE,
+                        #trimLeft=c(3,3), truncLen=c(247,235), # warning: No reads passed the filter ?!
+                        maxEE=c(2,5), maxN=0, truncQ=QUALITY_THRESHOLD,  rm.phix=TRUE,
                         compress=TRUE, verbose=TRUE, multithread=TRUE
   )
 }
@@ -99,7 +96,7 @@ toc()
 # ERR1383004_2 / i =706
 
 # check quality afterward - if nessesary
-ii <- seq(from=40,to=45,by=1)  #length(fnFs)
+ii <- seq(from=1,to=5,by=1)  #length(fnFs)
 for(i in ii) { 
   print(plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i]))) 
   print(plotQualityProfile(filtFs[i]) + ggtitle(paste("Fwd_After:", sample.names[i]))) 
