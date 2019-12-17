@@ -1,15 +1,14 @@
-# Packages used
-# ips -  https://www.rdocumentation.org/packages/ips/versions/0.0.11
+#### This script loads all neccesary packages and set up paths 
+# Specific Packages used:
+# ips -  Interfaces to Phylogenetic Software in R (to RAXML, Beast, MrBayes etc)
+# dada2, phyloseq
 
-
-# TODO change to BiocManager /  https://www.bioconductor.org/packages/release/bioc/html/dada2.html
-
+# check environment
 paste0(R.Version()[c("major","minor")], collapse = ".") # was 3.5.1
 packageVersion("dada2") # 1.15
 sessionInfo()
 
 ##### 0: load the necessary packages #####   
-# ips - Interfaces to Phylogenetic Software in R (to RAXML, Beast, MrBayes etc)
 .cran_packages <- c("ggplot2", "gridExtra", "XML", "tictoc", "MASS", "ape", "phangorn","ips","tools","rphast","BiocManager")
 .bioc_packages <- c("ShortRead", "devtools", "dada2", "phyloseq", "msa")
 
@@ -54,8 +53,7 @@ rdp_path     <- file.path(project_path, "RDP")
 metadata_path   <- file.path(project_path, "data/metadata")
 
 
-##### 2: Set parameters ###########################$#
-# TODO: set trimming parameters in a single dataset (tuple?)
+##### 2: Set file names ###########################$#
 
 # file names for intermediate results
 metadata.file <- "metadata.RData"
