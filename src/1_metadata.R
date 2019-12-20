@@ -9,7 +9,8 @@ library(httr)
 
 
 # create a path variable to access data and processed-filtered data
-project_path <- "~/Projects_R/twins_microbiome_pipeline"
+project_path <- "~/Projects_R/twins_microbiome_pipeline"  # server & local, path is the same
+
 setwd(project_path)
 source("src/load_initialize.R")
 

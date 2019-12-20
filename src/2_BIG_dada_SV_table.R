@@ -24,11 +24,13 @@ load(file=file.path(metadata_path, metadata.file))
 # get all sample's file names to be processed
 # either by scanning the data folder
 fns <- sort(list.files(data_path, full.names = TRUE))
+print(paste("Samples (reverse and forward) left BEFORE filtering::", length(fns)))
 
 # keep only those families who have 4 samples 
 # NOTE!!!:: REMOVE it if you need full file list!!! only 700 samples are left now!
 samples_to_be_kept <- df.metadata.4timepoints$file
 fns <- fns[grep(paste(samples_to_be_kept, collapse="|"), fns)]
+print(paste("Samples (reverse and forward) left after filtering::", length(fns)))
 
 # split all filenames into Forward and Reverse reads files
 fnFs <- fns[grepl("_1.fastq.gz", fns)]
@@ -85,15 +87,15 @@ for(i in seq_along(fnFs)) {
   print(i)
   print(fnFs[[i]])
   print(fnRs[[i]])
-  dada2::filterAndTrim( fwd=fnFs[[i]],     filt=filtFs[[i]],
+  dada2::filterAndTrim( fwd=fnFs[[i]], filt=filtFs[[i]],
                         rev=fnRs[[i]], filt.rev=filtRs[[i]],
                         #trimLeft=c(3,3), truncLen=c(247,235), # warning: No reads passed the filter ?!
                         maxEE=c(2,5), maxN=0, truncQ=QUALITY_THRESHOLD,  rm.phix=TRUE,
                         compress=TRUE, verbose=TRUE, multithread=TRUE
   )
 }
-toc()
-# ERR1383004_2 / i =706
+toc()  # 5839sec = 1.5 hours
+
 
 # check quality afterward - if nessesary
 ii <- seq(from=1,to=5,by=1)  #length(fnFs)
@@ -117,7 +119,8 @@ if(length(filtFs) != length(filtRs)) stop("Forward and reverse files do not matc
 tic()
 errF <- learnErrors(filtFs, nreads=2e6, multithread = TRUE, randomize=TRUE)
 errR <- learnErrors(filtRs, nreads=2e6, multithread = TRUE, randomize=TRUE)
-toc() # 9806.114 sec / 2.7h
+print("Error rate calculation time:")
+toc() # 9806.114 sec / 2.7h = now 2509sec
 
 ## plot error rates for control
 plotErrors(errF)
@@ -151,7 +154,7 @@ for (sam in sample.names) {
   save(mergers, file=file.path(files_intermediate, mergers.file)) 
 }
 print("Total time of sample inference:")
-toc()
+toc() # 8669sec
 
 
 
@@ -159,11 +162,12 @@ toc()
 tic()
 seqtab.all <- dada2::makeSequenceTable(mergers, orderBy = "abundance")
 print("Total time of makeSequenceTable:")
-toc()
+toc() # 5sec
 
 ### remove chimeras ----
 seqtab <- dada2::removeBimeraDenovo(seqtab.all, verbose = TRUE)
 save(seqtab, file=file.path(files_intermediate, seqtab.file)) 
+
 
 ### Extract sample names and save them separatelly (for futher Python data analysis)
 seqtab.samples.names = rownames(seqtab)

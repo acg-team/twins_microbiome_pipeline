@@ -43,11 +43,13 @@ sapply(c(.cran_packages, .bioc_packages), require, character.only = TRUE)
 #if(!file_test("-d", filt_path)) dir.create(result_path)
 #if(!file_test("-d", filt_path)) dir.create(filt_path)  # create filetered folder
 
-data_path    <- file.path(project_path, "data/raw")
-filt_path    <- file.path(project_path, "data/raw/filtered")
-processed_path <- file.path(project_path, "data/processed")
-files_intermediate    <- file.path(project_path, "files_intermediate")
+data_path    <- file.path("/media/alex/db5547c3-1ac1-4ec5-aac9-29a383a87978/BIOINF_DATA/TwinUK_Full")  # server
+filt_path    <- file.path("/media/alex/db5547c3-1ac1-4ec5-aac9-29a383a87978/BIOINF_DATA/TwinUK_Full/filtered")  #server
+#data_path    <- file.path(project_path, "data/raw")  # local
+#filt_path    <- file.path(project_path, "data/raw/filtered")  #local
 
+
+files_intermediate    <- file.path(project_path, "files_intermediate")
 result_path  <- file.path(project_path, "reports_generated")
 rdp_path     <- file.path(project_path, "RDP")
 metadata_path   <- file.path(project_path, "data/metadata")
@@ -57,15 +59,15 @@ metadata_path   <- file.path(project_path, "data/metadata")
 
 # file names for intermediate results
 metadata.file <- "metadata.RData"
-dada.err.file <- "dada_err_data_q15.RData"
-mergers.file <- "mergers_q15.RData"
-seqtab.file <- "seqtab_q15.RData"
-seqtab.snames.file <- "seqtab_snames_q15.RData"
-taxtab.file <- "taxtab_g15.RData"
+dada.err.file <- "dada_err_data.RData"
+mergers.file <- "mergers.RData"
+seqtab.file <- "seqtab.RData"
+seqtab.snames.file <- "seqtab_snames.RData"
+
+taxtab.file <- "taxtab.RData"
 
 msa.file <- "msa.RData"
-phylo.file <- "fitGTR.RData"
-treeGTR_2.file <- "fitGTR_2.RData"
+phylo.file <- "phylo_trees.RData"
 
-phyloseq.file <- "phyloseq_g15.RData"
+phyloseq.file <- "phyloseq_object.RData"
 phyloseq_analysis.file <- "phyloseq_analysis.RData"
