@@ -45,9 +45,10 @@ names(seqs) <- seq.variant.short.names
 tic()
 microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
 print("msa (muscle) took:")
-toc()  
+toc()  # 1972.561sec
 print(microbiome.msa.muscle)
 rownames(microbiome.msa.muscle)
+save(microbiome.msa.muscle, seq.variant.names, file=file.path(files_intermediate, msa.file)) 
 
 # save MSA as a fasta file for possible vizualization with UGene browser
 Biostrings::writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
@@ -140,11 +141,12 @@ save(msa.dnabin.as, file=file.path(files_intermediate, msa.file))
 
 # 5.5h
 tic()
-tree.raxml <- ips::raxml(msa.dnabin.as, f = "d", N = 2, p = 1234, exec = exec.path.mac, threads=4) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
-toc()
+tree.raxml <- ips::raxml(msa.dnabin.as, f = "d", N = 2, p = 1234, exec = exec.path.ubuntu, threads=4) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
+toc() # 3045.909 sec = 0.8 h om 5 core server - very fast
 
 
 save(treeNJ, fitJC, fitGTR, tree.raxml, file=file.path(files_intermediate, phylo.file)) 
+
 
 
 
