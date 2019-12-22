@@ -6,6 +6,7 @@ setwd(project_path)
 source("src/load_initialize.R")
 
 ### LOAD PREVIOUS DATA
+load(file=file.path(metadata_path, metadata.file))
 load(file=file.path(files_intermediate, phyloseq.file)) 
 
 
@@ -15,14 +16,34 @@ load(file=file.path(files_intermediate, phyloseq.file))
 ################################################################
 # TODO: do normalization?
 
-######### 0 - Direct Plots: 
+# extract all family names and corresponding samples
+twin.families <- unique(df.metadata.4timepoints$family_id)
+twin.family.samples <- df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[1], ]$file
+
+# subset phyloobject to contain only one familty
+ps.onefamily <- subset_samples(ps.tweens, sample_names(ps.tweens) %in% twin.family.samples)
+
+######### PLOT: 
 # https://joey711.github.io/phyloseq/plot_bar-examples.html
-
 # 1 - plot abundance of each taxa in all samples
-ggp2.bar1 <- plot_bar(ps.tweens) 
-ggp2.bar2 <- plot_bar(ps.tweens, fill="Genus")    # Error: vector memory exhausted (limit reached?)
+ggp2bar.all <- plot_bar(ps.onefamily) 
+ggp2bar.family <- plot_bar(ps.onefamily, fill="Family")  
+ggsave(file=file.path(result_path, "bar_taxa_in_samples_all.png"), plot = ggp2bar.all, dpi = 300, width =8, height = 5)
+ggsave(file=file.path(result_path, "bar_taxa_in_samples_Genus.png"), plot = ggp2bar.family, dpi = 300, width =30, height = 20)
+# todo - add ID to name or legend
 
-ggsave(file=file.path(result_path, "bar_taxa_in_samples_all.png"), plot = ggp2.bar1, dpi = 200, width = 45, height = 25)
+
+# 2 - richness (number of taxa in each sample)
+# Error in FUN(X[[i]], ...) : object 'BODY_SITE' not found
+ggp2.rich <- plot_richness(ps.tweens, x="BODY_SITE", measures="Observed") # study measures
+ggsave(file=file.path(result_path, "richness.pdf"), plot = ggp2.rich, dpi = 300, width = 49, height = 30)
+
+
+
+
+
+
+
 
 # 2 - richness (number of taxa in each sample)
 # Error in FUN(X[[i]], ...) : object 'BODY_SITE' not found
