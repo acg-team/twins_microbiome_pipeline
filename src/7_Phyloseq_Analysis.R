@@ -17,7 +17,7 @@ load(file=file.path(files_intermediate, phyloseq.file))
 # TODO: do normalization?
 
 # extract all family names and corresponding sample names
-family.number = 1
+family.number = 2
 twin.families <- unique(df.metadata.4timepoints$family_id)
 twin.family.samples <- df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ]$file
 print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
@@ -44,10 +44,10 @@ ggsave(file=file.path(result_path, "richness.png"), plot = ggp2rich, dpi = 300, 
 # 3 - plot phylo tree with abandance
 # Incorrect number of arguments (7), expecting 5 for 'node_depth_edgelength'
 ggp2tree <- plot_tree(ps.onefamily, method = "treeonly", ladderize = "left", title = "Tree of twins taxa")
-ggsave(file=file.path(result_path, "tree.pdf"), plot = ggp2tree, dpi = 300, width = 49, height = 30)
+ggsave(file=file.path(result_path, "tree.png"), plot = ggp2tree, dpi = 300, width = 20, height = 20)
 
 ggp2tree.aband <- plot_tree(ps.onefamily, color="Genus", size="abundance") 
-ggsave(file=file.path(result_path, "tree_abund.png"), plot = ggp2tree.aband, dpi = 300, width = 30, height = 20)
+ggsave(file=file.path(result_path, "tree_abund.png"), plot = ggp2tree.aband, dpi = 300, width = 30, height = 30)
 
 
 
@@ -61,7 +61,7 @@ ggsave(file=file.path(result_path, "tree_abund.png"), plot = ggp2tree.aband, dpi
 # - dimensional reduction (ordination) methods
 
 
-############ 2 - Calculation of distances / ordination ##########
+############ Calculation of distances / ordination ##########
 # UNIFRAC distance is calculated between pairs of samples (each sample represents an organismal community)
 # Unifrac assess a distance btw two sets of microbial community based on their tree position and abandunce 
 # - weighted (quantitative, abundance) and unweighted (qualitative, presence or absence)  
@@ -73,10 +73,9 @@ ggsave(file=file.path(result_path, "tree_abund.png"), plot = ggp2tree.aband, dpi
 # - type: pairwise comparisons by samples
 
 
-
-
-
 ps.family.dist.unifrac <- phyloseq::distance(ps.onefamily, method="unifrac", type="samples", fast=TRUE, parallel=TRUE)
+plot(hclust(ps.family.dist.unifrac, method='ward.D'))
+print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
 
 #save(ps.family.dist.unifrac, file=file.path(files_intermediate, phyloseq_analysis.file)) 
 # NOTE: ps.dist.unifrac - is a "dist" class (which package?) sutable for standard clustering analysis in R (hclust)
@@ -90,7 +89,7 @@ ord  <- ordinate(ps.tweens, "MDS", distance=ps.dist.unifrac)
 ############ 3 - Plot Exploratory Graphics: heatmap + hierarhucal clustering
 plot_heatmap(ps.onefamily, distance = "unifrac", method="NMDS", sample.label="SampleType", taxa.label="Family")
 
-plot(hclust(ps.dist.unifrac, method='ward.D'))
+
 
 plot(ord)
 
