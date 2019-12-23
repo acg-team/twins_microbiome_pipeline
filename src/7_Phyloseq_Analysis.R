@@ -14,17 +14,21 @@ load(file=file.path(files_intermediate, phyloseq.file))
 ##############  EXPLORATORY ANALYSIS of Phyloseq object  #######
 # ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 ################################################################
-# TODO: normalization and log transform - WHY?
-ps.tweens.log <- transform_sample_counts(ps.tweens, function(x) log(1 + x))
+# OTU = species
+# ASV - an OTU with 100% similariry inside
+
+#normalization and log transform - WHY?
+ps.tweens.norm <- transform_sample_counts(ps.tweens, function(x) x / sum(x) )
+#ps.tweens.log <- transform_sample_counts(ps.tweens.norm, function(x) log(1 + x))
 
 # extract all family names and corresponding sample names
-family.number = 2
+family.number = 4
 twin.families <- unique(df.metadata.4timepoints$family_id)
 twin.family.samples <- df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ]$file
 print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
 
 # subset phyloseq object to contain only one familty
-ps.onefamily <- subset_samples(ps.tweens.log, sample_names(ps.tweens) %in% twin.family.samples)
+ps.onefamily <- subset_samples(ps.tweens.norm, sample_names(ps.tweens) %in% twin.family.samples)
 
 
 
@@ -76,19 +80,30 @@ ggsave(file=file.path(result_path, "tree_abund.png"), plot = ggp2tree.aband, dpi
 # - type: pairwise comparisons by samples
 
 
-ps.family.dist.unifrac <- phyloseq::distance(ps.onefamily, method="unifrac", type="samples", fast=TRUE, parallel=TRUE)
+ps.family.dist.unifrac <- phyloseq::distance(ps.onefamily, method="wunifrac", type="samples", fast=TRUE, parallel=TRUE)
 plot(hclust(ps.family.dist.unifrac, method='ward.D'))
 print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
-
-# Loop throught the all families and seethe percentage of being in one cluster?
-
-
-#save(ps.family.dist.unifrac, file=file.path(files_intermediate, phyloseq_analysis.file)) 
 # NOTE: ps.dist.unifrac - is a "dist" class (which package?) sutable for standard clustering analysis in R (hclust)
 
 
 # do ordination/dimensionality reduction (NMDS)
-ord  <- ordinate(ps.tweens, "MDS", distance=ps.dist.unifrac)
+#ord  <- ordinate(ps.tweens, "MDS", distance=ps.dist.unifrac)
+twin.ord <- ordinate(ps.onefamily, "NMDS", "unifrac")
+p1 = plot_ordination(ps.onefamily, twin.ord, type="samples", color='twin_id')
+print(p1)
+print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
+
+
+twin.ord = ordinate(ps.onefamily, "PCoA", "unifrac", weighted=TRUE)
+plot_ordination(ps.onefamily, twin.ord, color="twin_id", shape="collection_date")
+
+# TODO
+# show distances 
+# loop
+# weited unifrac
+# get a distance , calculated everage distance average 
+# distance between same twin samples versus different twin samples
+# run another fasta from quimm2
 
 
 
@@ -98,6 +113,9 @@ plot_heatmap(ps.onefamily, distance = "unifrac", method="NMDS", sample.label="Sa
 
 
 plot(ord)
+
+
+
 
 
 
