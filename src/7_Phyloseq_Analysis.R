@@ -14,7 +14,8 @@ load(file=file.path(files_intermediate, phyloseq.file))
 ##############  EXPLORATORY ANALYSIS of Phyloseq object  #######
 # ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 ################################################################
-# TODO: do normalization?
+# TODO: normalization and log transform - WHY?
+ps.tweens.log <- transform_sample_counts(ps.tweens, function(x) log(1 + x))
 
 # extract all family names and corresponding sample names
 family.number = 2
@@ -23,7 +24,9 @@ twin.family.samples <- df.metadata.4timepoints[df.metadata.4timepoints$family_id
 print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
 
 # subset phyloseq object to contain only one familty
-ps.onefamily <- subset_samples(ps.tweens, sample_names(ps.tweens) %in% twin.family.samples)
+ps.onefamily <- subset_samples(ps.tweens.log, sample_names(ps.tweens) %in% twin.family.samples)
+
+
 
 ######### exploration PLOT: 
 # https://joey711.github.io/phyloseq/plot_bar-examples.html
@@ -76,6 +79,9 @@ ggsave(file=file.path(result_path, "tree_abund.png"), plot = ggp2tree.aband, dpi
 ps.family.dist.unifrac <- phyloseq::distance(ps.onefamily, method="unifrac", type="samples", fast=TRUE, parallel=TRUE)
 plot(hclust(ps.family.dist.unifrac, method='ward.D'))
 print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
+
+# Loop throught the all families and seethe percentage of being in one cluster?
+
 
 #save(ps.family.dist.unifrac, file=file.path(files_intermediate, phyloseq_analysis.file)) 
 # NOTE: ps.dist.unifrac - is a "dist" class (which package?) sutable for standard clustering analysis in R (hclust)
