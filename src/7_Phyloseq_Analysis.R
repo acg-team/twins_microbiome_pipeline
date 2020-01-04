@@ -9,6 +9,44 @@ source("src/load_initialize.R")
 load(file=file.path(metadata_path, metadata.file))
 load(file=file.path(files_intermediate, phyloseq.file)) 
 
+# abanduncy normalization and log transform
+ps.tweens.norm <- transform_sample_counts(ps.tweens, function(x) x / sum(x) )
+ps.tweens.log <- transform_sample_counts(ps.tweens.norm, function(x) log(1 + x))
+
+twin.families <- unique(df.metadata.4timepoints$family_id)
+
+subset_by_family <- function(family_id){
+  twin.family.samples <- df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ]$file
+  ps.onefamily <- subset_samples(ps.tweens.log, sample_names(ps.tweens) %in% twin.family.samples)
+  ps.onefamily
+}
+
+print_family <- function(family_id){
+  print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
+}
+
+plot_bar_rich_tree <- function(ps.onefamily){
+  # https://joey711.github.io/phyloseq/plot_bar-examples.html
+  # 1 - bar plot -  ABUNDANCE of each taxa in all samples
+  ggp2bar.family <- plot_bar(ps.onefamily, fill="Family")  
+  ggsave(file=file.path(result_path, "bar_taxa_in_samples_Genus.png"), plot = ggp2bar.family, dpi = 300, width =30, height = 20)
+  # todo - add ID to name or legend
+  
+  # 2 - richness - number of taxa in each sample (alpha-diversity)
+  # TODO: study measures: observed, shennon etc
+  ggp2rich <- plot_richness(ps.onefamily)   #x='family_id', measures="Observed"
+  ggsave(file=file.path(result_path, "richness.png"), plot = ggp2rich, dpi = 300, width = 10, height = 8)
+  
+  
+  # 3 - plot phylo tree with abandance
+  # Incorrect number of arguments (7), expecting 5 for 'node_depth_edgelength'
+  ggp2tree <- plot_tree(ps.onefamily, method = "treeonly", ladderize = "left", title = "Tree of twins taxa")
+  ggsave(file=file.path(result_path, "tree.png"), plot = ggp2tree, dpi = 300, width = 20, height = 20)
+  
+  ggp2tree.aband <- plot_tree(ps.onefamily, color="Genus", size="abundance") 
+  ggsave(file=file.path(result_path, "tree_abund.png"), plot = ggp2tree.aband, dpi = 300, width = 30, height = 30)
+  
+}
 
 
 ##############  EXPLORATORY ANALYSIS of Phyloseq object  #######
@@ -16,74 +54,37 @@ load(file=file.path(files_intermediate, phyloseq.file))
 ################################################################
 # OTU = species
 # ASV - an OTU with 100% similariry inside
-
-#normalization and log transform - WHY?
-ps.tweens.norm <- transform_sample_counts(ps.tweens, function(x) x / sum(x) )
-#ps.tweens.log <- transform_sample_counts(ps.tweens.norm, function(x) log(1 + x))
-
-# extract all family names and corresponding sample names
-family.number = 4
-twin.families <- unique(df.metadata.4timepoints$family_id)
-twin.family.samples <- df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ]$file
-print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
-
-# subset phyloseq object to contain only one familty
-ps.onefamily <- subset_samples(ps.tweens.norm, sample_names(ps.tweens) %in% twin.family.samples)
-
-
-
-######### exploration PLOT: 
-# https://joey711.github.io/phyloseq/plot_bar-examples.html
-# 1 - bar plot -  ABUNDANCE of each taxa in all samples
-ggp2bar.all <- plot_bar(ps.onefamily) 
-ggp2bar.family <- plot_bar(ps.onefamily, fill="Family")  
-ggsave(file=file.path(result_path, "bar_taxa_in_samples_all.png"), plot = ggp2bar.all, dpi = 300, width =8, height = 5)
-ggsave(file=file.path(result_path, "bar_taxa_in_samples_Genus.png"), plot = ggp2bar.family, dpi = 300, width =30, height = 20)
-# todo - add ID to name or legend
-
-
-# 2 - richness - number of taxa in each sample (alpha-diversity)
-# TODO: study measures: observed, shennon etc
-ggp2rich <- plot_richness(ps.onefamily)   #x='family_id', measures="Observed"
-ggsave(file=file.path(result_path, "richness.png"), plot = ggp2rich, dpi = 300, width = 10, height = 8)
-
-
-# 3 - plot phylo tree with abandance
-# Incorrect number of arguments (7), expecting 5 for 'node_depth_edgelength'
-ggp2tree <- plot_tree(ps.onefamily, method = "treeonly", ladderize = "left", title = "Tree of twins taxa")
-ggsave(file=file.path(result_path, "tree.png"), plot = ggp2tree, dpi = 300, width = 20, height = 20)
-
-ggp2tree.aband <- plot_tree(ps.onefamily, color="Genus", size="abundance") 
-ggsave(file=file.path(result_path, "tree_abund.png"), plot = ggp2tree.aband, dpi = 300, width = 30, height = 30)
-
-
-
-
-### Analysis: Intro
-# - beta-diversity - type and quantity of OTU observed btw samples (sites) - what we are looking for
-# - alpha-diversity - diversity inside each sample (site)
+# beta-diversity - type and quantity of OTU observed btw samples (sites) - what we are looking for
+# alpha-diversity - diversity inside each sample (site)
 
 # we are interested in beta-diversity, i.e. comparison of microbial composition of two samples, it is achived with
 # - calculation of pairwise distances (distance matrix)
 # - dimensional reduction (ordination) methods
 
-
-############ Calculation of distances / ordination ##########
-# UNIFRAC distance is calculated between pairs of samples (each sample represents an organismal community)
 # Unifrac assess a distance btw two sets of microbial community based on their tree position and abandunce 
 # - weighted (quantitative, abundance) and unweighted (qualitative, presence or absence)  
-# NOTE: we need weighted UNIFRAC (with abandancies)
 # https://joey711.github.io/phyloseq-demo/unifrac.html
 
-# distance:
-# - methods: "unifrac": unweighted / UniFrac1, Unifrac2
-# - type: pairwise comparisons by samples
 
+# LOOP::
+family.number = 4
+print_family(family.number)
 
-ps.family.dist.unifrac <- phyloseq::distance(ps.onefamily, method="wunifrac", type="samples", fast=TRUE, parallel=TRUE)
-plot(hclust(ps.family.dist.unifrac, method='ward.D'))
-print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
+ps.onefamily <- subset_by_family(family.number)
+
+### calculate Unifrac DISTANCE matrix
+# distances: "unifrac": unweighted / wunifrac-weighted
+# type: pairwise comparisons by samples
 # NOTE: ps.dist.unifrac - is a "dist" class (which package?) sutable for standard clustering analysis in R (hclust)
+ps.family.dist.unifrac <- phyloseq::distance(ps.onefamily, method="wunifrac", type="samples", fast=TRUE, parallel=TRUE)
+
+# HClustering linkage criteria or aglomerative methoe: "average" (= UPGMA), "centroid" (= UPGMC), "ward.D", "ward.D2"
+plot(hclust(ps.family.dist.unifrac, method='ward.D'))
+
+plot_heatmap(ps.onefamily, distance = "wunifrac", method="NMDS", sample.label="SampleType", taxa.label="Family")
+
+
+
 
 
 # do ordination/dimensionality reduction (NMDS)
@@ -91,7 +92,7 @@ print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[f
 twin.ord <- ordinate(ps.onefamily, "NMDS", "unifrac")
 p1 = plot_ordination(ps.onefamily, twin.ord, type="samples", color='twin_id')
 print(p1)
-print(df.metadata.4timepoints[df.metadata.4timepoints$family_id==twin.families[family.number], ])
+
 
 
 twin.ord = ordinate(ps.onefamily, "PCoA", "unifrac", weighted=TRUE)
@@ -104,15 +105,6 @@ plot_ordination(ps.onefamily, twin.ord, color="twin_id", shape="collection_date"
 # get a distance , calculated everage distance average 
 # distance between same twin samples versus different twin samples
 # run another fasta from quimm2
-
-
-
-############ 3 - Plot Exploratory Graphics: heatmap + hierarhucal clustering
-plot_heatmap(ps.onefamily, distance = "unifrac", method="NMDS", sample.label="SampleType", taxa.label="Family")
-
-
-
-plot(ord)
 
 
 
