@@ -8,7 +8,8 @@ setwd(project_path)
 
 ### LOAD PREVIOUS DATA
 load(file=file.path(metadata_path, metadata.file))
-load(file=file.path(files_intermediate, phyloseq.file)) 
+load(file=file.path(files_intermediate, phyloseq.file))
+# ps.tweens must be in a worspace now
 
 # abanduncy normalization and log transform
 ps.tweens.norm <- transform_sample_counts(ps.tweens, function(x) x / sum(x) )

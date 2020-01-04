@@ -6,7 +6,7 @@ names(conf) <- c("location", "dataset")
 
 ### now we set it as calculare on local macbook and use 34 new dataset
 conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
-conf$dataset <- "34"  #  TWEEN / "34"
+conf$dataset <- "34"  #  TWEEN / "BODYFL" / TWIN
 ##################################################################
 
 
