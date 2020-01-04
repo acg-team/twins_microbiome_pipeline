@@ -7,15 +7,15 @@
 
 
 ##### init: load packages and set path  
-getwd()
-project_path <- "~/Projects_R/twins_microbiome_pipeline"
+source("src/load.R")
+source("src/configure.R")
 setwd(project_path)
-source("src/load_initialize.R")
+
+getwd()
 packageVersion("dada2")
 
 ### LOAD PREVIOUS DATA
 load(file=file.path(metadata_path, metadata.file)) 
-
 
 
 

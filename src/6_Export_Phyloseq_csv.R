@@ -1,8 +1,8 @@
 
 #### init: load packages and set path
-project_path <- "~/Projects_R/twins_microbiome_pipeline"
+source("src/load.R")
+source("src/configure.R")
 setwd(project_path)
-source("src/load_initialize.R")
 
 ### LOAD PREVIOUS DATA
 load(file=file.path(files_intermediate, phyloseq.file)) 
