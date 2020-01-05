@@ -23,7 +23,7 @@ load(file=file.path(metadata_path, metadata.file))
 ### QC QUALITY: ##############
 # check FastQC plots for quality 
 # some of them are in bad quality #3
-ii <- seq(from=1,to=5,by=1)  #length(fnFs)
+ii <- seq(from=1,to=4,by=1)  #length(fnFs)
 for(i in ii) {
  print(dada2::plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i])))
  print(dada2::plotQualityProfile(fnRs[i]) + ggtitle(paste("Rev:", sample.names[i])))
@@ -66,7 +66,7 @@ toc()  # 5839sec = 1.5 hours
 
 
 # check quality afterward - if nessesary
-ii <- seq(from=1,to=5,by=1)  #length(fnFs)
+ii <- seq(from=1,to=4,by=1)  #length(fnFs)
 for(i in ii) { 
   print(plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i]))) 
   print(plotQualityProfile(filtFs[i]) + ggtitle(paste("Fwd_After:", sample.names[i]))) 

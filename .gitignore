@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-data_set/raw/*
-data_set_34/raw/*
-data_set/reports_generated/*
+data_set_twin/raw/*
+data_set_twin/reports_generated/*
+data_set_bodyfl/raw/*
+data_set_bodyfl/reports_generated/*

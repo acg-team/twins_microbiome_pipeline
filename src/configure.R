@@ -9,6 +9,7 @@ conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
 conf$dataset <- "BODYFL"  #  TWIN / "BODYFL" /
 ##################################################################
 
+print(paste("########   Configuration set for : ", conf, " ###############" ))
 
 
 
