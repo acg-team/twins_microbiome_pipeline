@@ -13,7 +13,7 @@ setwd(project_path)
 
 
 #####: Extract metadata desription information from different files
-if(conf$dataset == "TWEEN"){
+if(conf$dataset == "TWIN"){
   metadata.raw <- read.table(file.path(metadata_path,"PRJEB13747.txt"))
   
   # initialize vectors of different features
@@ -83,8 +83,9 @@ if(conf$dataset == "TWEEN"){
   write.table(df.metadata, file.path(result_path,"metadata.csv"), sep=",")
   write.table(df.metadata.ordered, file.path(result_path,"metadata_ordered.csv"), sep=",")
   
-} else if(conf$dataset == "34"){
-  metadata.raw <- read.csv2(file.path(metadata_path,"metadata.txt"), header=TRUE, sep="" )
+} else if(conf$dataset == "BODYFL"){
+  df.metadata <- read.csv2(file.path(metadata_path,"metadata.txt"), header=TRUE, sep="" )
+  save(df.metadata, file=file.path(metadata_path, metadata.file)) 
   
 } else {
   stop("WRONG dataset configuration!")

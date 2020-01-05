@@ -6,7 +6,7 @@ names(conf) <- c("location", "dataset")
 
 ### now we set it as calculare on local macbook and use 34 new dataset
 conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
-conf$dataset <- "34"  #  TWEEN / "BODYFL" / TWIN
+conf$dataset <- "BODYFL"  #  TWIN / "BODYFL" /
 ##################################################################
 
 
@@ -29,10 +29,10 @@ if(conf$location == "LOCAL"){
 
 
 ######## 2:  set pathes to folders depending on dataset
-if(conf$dataset == "TWEEN"){
-  metadata_path   <- file.path(project_path, "data_set/metadata")
-  files_intermediate    <- file.path(project_path, "data_set/files_intermediate")
-  result_path  <- file.path(project_path, "data_set/reports_generated")
+if(conf$dataset == "TWIN"){
+  metadata_path   <- file.path(project_path, "data_set_twin/metadata")
+  files_intermediate    <- file.path(project_path, "data_set_twin/files_intermediate")
+  result_path  <- file.path(project_path, "data_set_twin/reports_generated")
   if(conf$location == "LOCAL"){
     data_path <- file.path(project_path, "data/raw")
     filt_path <- file.path(project_path, "data/raw/filtered")
@@ -40,13 +40,13 @@ if(conf$dataset == "TWEEN"){
     data_path    <- file.path(project_path, "BIOINF_DATA/TwinUK_Full")
     filt_path    <- file.path(project_path, "BIOINF_DATA/TwinUK_Full/filtered")
   }
-} else if (conf$dataset == "34"){
-  metadata_path   <- file.path(project_path, "data_set_34/metadata")
-  files_intermediate    <- file.path(project_path, "data_set_34/files_intermediate")
-  result_path  <- file.path(project_path, "data_set_34/reports_generated")
+} else if (conf$dataset == "BODYFL"){
+  metadata_path   <- file.path(project_path, "data_set_bodyfl/metadata")
+  files_intermediate    <- file.path(project_path, "data_set_bodyfl/files_intermediate")
+  result_path  <- file.path(project_path, "data_set_bodyfl/reports_generated")
   if(conf$location == "LOCAL"){
-    data_path <- file.path(project_path, "data_set_34/raw")
-    filt_path <- file.path(project_path, "data_set_34/raw/filtered")
+    data_path <- file.path(project_path, "data_set_bodyfl/raw")
+    filt_path <- file.path(project_path, "data_set_bodyfl/raw/filtered")
   } else if(conf$location == "HOMESERVER"){
     stop("no such configuration exists")
   }
