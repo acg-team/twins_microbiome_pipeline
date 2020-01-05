@@ -53,7 +53,7 @@ if(conf$dataset == "TWIN"){
   }
 }
 
-
+silva_path <- file.path(project_path, "silva")
 
 ##### 3: Set file names (same for any dataset but in different folders) ###########################
 

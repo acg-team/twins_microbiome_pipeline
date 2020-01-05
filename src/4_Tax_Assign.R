@@ -29,7 +29,7 @@ tic()
 #ref_fasta <- file.path(rdp_path, "rdp_train_set_14.fa.gz")
 
 # TODO what is the dufference btw training and assignment?
-ref_fasta <- file.path(metadata_path, "silva_nr_v132_train_set.fa.gz")
+ref_fasta <- file.path(silva_path, "silva_nr_v132_train_set.fa.gz")
 #ref_fasta <- file.path(metadata_path, "silva_species_assignment_v128.fa.gz")
 taxtab <- dada2::assignTaxonomy(seqtab, refFasta = ref_fasta)
 colnames(taxtab) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
@@ -43,7 +43,7 @@ toc()
 # so we can combine for each sample a table with taxa names and abanduncies
 # see Exploratoty_Analysys file
 
-save(taxtab, file=file.path(result_path, taxtab.file)) 
+save(taxtab, file=file.path(files_intermediate, taxtab.file)) 
 
 
 
