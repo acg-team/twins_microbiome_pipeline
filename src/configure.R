@@ -22,8 +22,10 @@ print(paste("########   Configuration set for : ", conf, " ###############" ))
 # set project path depending on location
 if(conf$location == "LOCAL"){
   project_path <- "~/Projects_R/twins_microbiome_pipeline"
+  raxm.exec.path <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 } else if(conf$location == "HOMESERVER") {
   project_path <- "/media/alex/db5547c3-1ac1-4ec5-aac9-29a383a87978"
+  raxm.exec.path <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 } else {
   stop(" WRONG SERVER CONFIGURATION")
 }

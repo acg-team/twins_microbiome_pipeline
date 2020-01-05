@@ -116,14 +116,11 @@ save(treeNJ, fitJC, fitGTR, file=file.path(files_intermediate, phylo.file))
 
 
 ############### ML tree with RAxML: ML tree for species >1000 with fast heuristics
-# NOTE: need to install raxml on local MAC first
-exec.path.mac <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
-exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
+####  NOTE: need to install raxml on local MAC first
+#exec.path.mac <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
+#exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 
 # convert msa::MsaDNAMultipleAlignment data into ips::DNAbin (ape::DNAbim) format!
-# probbaly a wrong conversion
-# look for dnabin conversion for ips !
-#msa.dnabin <- msa::msaConvert(my.msa, "ape::DNAbin")
 msa.dnabin.as <- as.DNAbin(my.msa)
 
 
@@ -141,8 +138,8 @@ save(msa.dnabin.as, file=file.path(files_intermediate, msa.file))
 
 # 5.5h
 tic()
-tree.raxml <- ips::raxml(msa.dnabin.as, f = "d", N = 2, p = 1234, exec = exec.path.ubuntu, threads=4) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
-toc() # 3045.909 sec = 0.8 h om 5 core server - very fast
+tree.raxml <- ips::raxml(msa.dnabin.as, f = "d", N = 2, p = 1234, exec = raxm.exec.path, threads=6) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
+toc() # 3045.909 sec = 0.8 h om 6 core server - very fast
 
 
 save(treeNJ, fitJC, fitGTR, tree.raxml, file=file.path(files_intermediate, phylo.file)) 
