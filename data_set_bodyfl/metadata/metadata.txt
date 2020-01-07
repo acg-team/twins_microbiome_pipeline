@@ -34,7 +34,6 @@ SampleID	Body_site	Individual	State
 19Mbt1	menstrualblood	17	fresh
 19Mbt3	menstrualblood	17	exposed
 20Set1	semen	18	fresh
-25Blt3	blood	12	exposed
 26Skt1a	skin	9	fresh
 26Skt1b	skin	9	fresh
 26Skt2	skin	9	fresh

@@ -31,7 +31,7 @@ if(conf$dataset == "TWIN"){
 # assign the names of samples (ERR138...) to metadata rows instead of 1,2,3...
 rownames(df.metadata) <- df.metadata$SampleID
 
-# should be TRUE (sanity check)
+# must be TRUE (sanity check)
 all(rownames(seqtab) %in% df.metadata$SampleID) 
 for(seqname in rownames(seqtab)){
   if(seqname %in% df.metadata$SampleID){
