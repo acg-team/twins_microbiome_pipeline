@@ -78,10 +78,10 @@ if(conf$dataset == "TWIN"){
   number_of_samples_of_twin <- table(df.metadata.ordered$twin_id)
   twin_id_more_1sample <- rownames(number_of_samples_of_twin[number_of_samples_of_twin>1])
   
-  #filter out twin with less then 2 samples
+  #filter out twins with less then 2 samples
   df.metadata.4timepoints <- df.metadata.ordered[df.metadata.ordered$twin_id %in% twin_id_more_1sample,]
   
-  # filter out families with lt 3 samples
+  # filter out families with lt 4 samples
   df.metadata.4timepoints <- df.metadata.4timepoints[df.metadata.4timepoints$family_id %in% family_id_of_large_families,]
   
   
