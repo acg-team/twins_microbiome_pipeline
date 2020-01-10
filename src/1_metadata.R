@@ -69,12 +69,22 @@ if(conf$dataset == "TWIN"){
   
   df.metadata.ordered <- df.metadata[ order(df.metadata["family_id"]), ]  # order by family_id
   
-  # only keep families with at least two time points for each tween
+  #### filter the list of samples to have 2 samples for eash twin
+  # get family list with >3 members
   number_of_samples_in_family <- table(df.metadata.ordered$family_id)
   family_id_of_large_families <- rownames(number_of_samples_in_family[number_of_samples_in_family>3])
   
-  # create a df which only contains those persons who have 2 samples for each tween 
-  df.metadata.4timepoints <- df.metadata.ordered[df.metadata.ordered$family_id %in% family_id_of_large_families,]
+  # get twin list with more then 1 samples
+  number_of_samples_of_twin <- table(df.metadata.ordered$twin_id)
+  twin_id_more_1sample <- rownames(number_of_samples_of_twin[number_of_samples_of_twin>1])
+  
+  #filter out twin with less then 2 samples
+  df.metadata.4timepoints <- df.metadata.ordered[df.metadata.ordered$twin_id %in% twin_id_more_1sample,]
+  
+  # filter out families with lt 3 samples
+  df.metadata.4timepoints <- df.metadata.4timepoints[df.metadata.4timepoints$family_id %in% family_id_of_large_families,]
+  
+  
   
   # cache to disk to avoid downloading again
   save(df.metadata, df.metadata.ordered, df.metadata.4timepoints, file=file.path(metadata_path, metadata.file)) 
