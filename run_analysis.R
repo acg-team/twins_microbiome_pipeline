@@ -15,4 +15,6 @@ print("==================> Phylogeny reconstraction has started...")
 source("src/5_Phylogeny.R")
 
 source("src/6_Create_Phyloseq_obj.R")
-# etc...
+
+
+# Now PhyloSeq object is created and you can run analysis
