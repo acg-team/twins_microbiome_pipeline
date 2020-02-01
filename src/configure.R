@@ -6,7 +6,7 @@ names(conf) <- c("location", "dataset")
 
 ### now we set it as calculare on local macbook and use 34 new dataset
 conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
-conf$dataset <- "BODYFL" # "BODYFL"  #  TWIN / "BODYFL" /
+conf$dataset <- "TWIN" # "BODYFL"  #  TWIN / "BODYFL" /
 ##################################################################
 
 print(paste("########   Configuration set for : ", conf, " ###############" ))
@@ -36,6 +36,7 @@ if(conf$dataset == "TWIN"){
   metadata_path   <- file.path(project_path, "data_set_twin/metadata")
   files_intermediate    <- file.path(project_path, "data_set_twin/files_intermediate")
   result_path  <- file.path(project_path, "data_set_twin/reports_generated")
+  alalysis_path  <- file.path(project_path, "data_set_twin/analysis")
   if(conf$location == "LOCAL"){
     data_path <- file.path(project_path, "data/raw")
     filt_path <- file.path(project_path, "data/raw/filtered")
@@ -47,6 +48,7 @@ if(conf$dataset == "TWIN"){
   metadata_path   <- file.path(project_path, "data_set_bodyfl/metadata")
   files_intermediate    <- file.path(project_path, "data_set_bodyfl/files_intermediate")
   result_path  <- file.path(project_path, "data_set_bodyfl/reports_generated")
+  alalysis_path  <- file.path(project_path, "data_set_bodyfl/analysis")
   if(conf$location == "LOCAL"){
     data_path <- file.path(project_path, "data_set_bodyfl/raw")
     filt_path <- file.path(project_path, "data_set_bodyfl/raw/filtered")

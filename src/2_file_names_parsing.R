@@ -1,8 +1,8 @@
 # get and parse read's file names from raw folde
 # by the and of this script we have fnFs / fnRs as lists of reads names
 
-source("src/load.R")
 source("src/configure.R")
+source("src/load.R")
 setwd(project_path)
 
 load(file=file.path(metadata_path, metadata.file)) 
