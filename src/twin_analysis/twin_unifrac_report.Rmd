@@ -1,0 +1,45 @@
+---
+title: "Twin Unifrac"
+author: "Alex"
+date: "2/1/2020"
+output: pdf_document
+---
+
+
+## Setup and load
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "~/Projects_R/twins_microbiome_pipeline")
+```
+
+```{r load, include=FALSE, echo=FALSE}
+source("src/load.R")
+```
+
+
+```{r configure, echo=FALSE}
+source("src/configure.R")
+getwd()
+```
+
+
+```{r load data, include=TRUE} 
+load(file=file.path(metadata_path, metadata.file))
+load(file=file.path(files_intermediate, phyloseq.file))
+# ps.tweens must be in the workspace now
+```
+
+## Sanity check of the loaded data
+```{r check data}
+head(df.metadata.4timepoints)
+ps.tweens
+```
+
+## UNIFRAC distance matrix
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+

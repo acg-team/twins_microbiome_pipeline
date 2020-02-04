@@ -3,7 +3,7 @@
 
 #### init: load packages and set path
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
-files_intermediate    <- file.path(project_path, "data_set_bodyfl/files_intermediate")
+files_intermediate  <- file.path(project_path, "data_set_bodyfl/files_intermediate")
 source("src/load.R")
 setwd(project_path)
 
