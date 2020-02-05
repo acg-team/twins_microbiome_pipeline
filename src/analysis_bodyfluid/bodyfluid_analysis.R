@@ -2,6 +2,9 @@
 # do analysis of Body Fluid dataset
 
 library(adaptiveGPCA)
+library(dplyr)
+library("RColorBrewer")
+
 theme_set((theme_bw()))
 
 #### init: load packages and set path
@@ -50,7 +53,15 @@ metadata_nb <- df.metadata[!df.metadata$Body_site=="blood"]   # why?!
 names (bs.colours) <- levels(metadata_nb$Body_site)
 names(bs.colours)
 
-library("RColorBrewer")
+# Colour-shape test for phylum - genus
+df.tax <- as.data.frame(tax_table(physeq30_rel_logs))
+df.tax.reduced <- df.tax[,c("Phylum","Genus")]
+
+df.tax.reduced %>%
+  group_by(Phylum) %>%
+  summarize(n_unique = n_distinct(Genus))
+
+
 phyla.colours <- brewer.pal(n = 8, name = "Dark2")
 names(phyla.colours) <- unique(df.tax.reduced$Phylum)
 
