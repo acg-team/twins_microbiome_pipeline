@@ -29,10 +29,27 @@ get_taxa_unique(ps.bfluid, "Phylum")
 get_taxa_unique(ps.bfluid, "Genus")
 # Q: is NA a problem?
 
+a<-ps.bfluid@otu_table@.Data
+colnames(a) <- c()
+
+
+
+
+# do normalization and log transform
+ps.bfluid.log <- phyloseq::transform_sample_counts(ps.bfluid, function(x) log(1 + x)) # log transform with pseudocount
+ps.bfluid.rel <- phyloseq::transform_sample_counts(ps.bfluid, function(x) x / sum(x) ) # Total Sum Scaling (TSS)
+
+#Top 30 genera - TSS without blood
+genera.sum = tapply(taxa_sums(ps.bfluid.rel), tax_table(ps.bfluid.rel)[, "Genus"], sum, na.rm=TRUE)
+
+
+top30Genera = names(sort(genera.sum, TRUE))[1:30]
+physeq30_rel = prune_taxa((tax_table(physeq_rel)[, "Genus"] %in% top30Genera), physeq_rel)
+# Top30 genera - TSS with log transformationand pseudocount of the minimum non-zero abundance  
+physeq30_rel_logs <-transform_sample_counts(physeq30_rel, function(x) log(0.00001+x))
+
+
 #### do Adaptive gPCA
-
-# 1 - do normalization and log transform
-
 
 # 2 - processPhyloseq, create a loist of nessesary matrix for gPCA
 pp = adaptiveGPCA::processPhyloseq(ps.bfluid)
