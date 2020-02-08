@@ -4,7 +4,7 @@
 library(adaptiveGPCA)
 library(dplyr)
 library("RColorBrewer")
-
+library(randomcoloR)
 theme_set((theme_bw()))
 
 #### init: load packages and set path
@@ -33,26 +33,22 @@ a<-ps.bfluid@otu_table@.Data
 colnames(a) <- c()
 
 
-
-
 # do normalization and log transform
 ps.bfluid.log <- phyloseq::transform_sample_counts(ps.bfluid, function(x) log(1 + x)) # log transform with pseudocount
 ps.bfluid.rel <- phyloseq::transform_sample_counts(ps.bfluid, function(x) x / sum(x) ) # Total Sum Scaling (TSS)
 
 #Top 30 genera - TSS without blood
 genera.sum = tapply(taxa_sums(ps.bfluid.rel), tax_table(ps.bfluid.rel)[, "Genus"], sum, na.rm=TRUE)
-
-
 top30Genera = names(sort(genera.sum, TRUE))[1:30]
-physeq30_rel = prune_taxa((tax_table(physeq_rel)[, "Genus"] %in% top30Genera), physeq_rel)
-# Top30 genera - TSS with log transformationand pseudocount of the minimum non-zero abundance  
+physeq30_rel = prune_taxa((tax_table(ps.bfluid.rel)[, "Genus"] %in% top30Genera), ps.bfluid.rel)
 physeq30_rel_logs <-transform_sample_counts(physeq30_rel, function(x) log(0.00001+x))
 
 
 #### do Adaptive gPCA
 
 # 2 - processPhyloseq, create a loist of nessesary matrix for gPCA
-pp = adaptiveGPCA::processPhyloseq(ps.bfluid)
+pp = processPhyloseq(physeq30_rel_logs)
+
 
 # 3 - run and plot
 out.agpca = adaptivegpca(pp$X, pp$Q, k = 2)
@@ -66,14 +62,17 @@ plot(out.agpca, type = "variables", axes = c(1,2))
 # 4 - add color schemas
 # Body site colours
 bs.colours <- c("red","blue","cyan","burlywood1","magenta")
-metadata_nb <- df.metadata[!df.metadata$Body_site=="blood"]   # why?!
-names (bs.colours) <- levels(metadata_nb$Body_site)
+#metadata_nb <- df.metadata[!df.metadata$Body_site=="blood"]   # why?!
+names (bs.colours) <- levels(df.metadata$Body_site)
 names(bs.colours)
 
 # Colour-shape test for phylum - genus
 df.tax <- as.data.frame(tax_table(physeq30_rel_logs))
 df.tax.reduced <- df.tax[,c("Phylum","Genus")]
 
+# package: ‘dplyr’ is a fairly new (2014) package that tries to provide easy tools for the most common data manipulation tasks.
+# This addresses a common problem with R in that all operations are conducted in memory and thus the amount of data you can work with is limited by available memory.
+# why we use it here? is our dataset big? it is primarily for big data...
 df.tax.reduced %>%
   group_by(Phylum) %>%
   summarize(n_unique = n_distinct(Genus))
@@ -86,3 +85,18 @@ BS <- ggplot(data.frame(out.agpca$U, sample_data(physeq30_rel_logs))) +
   geom_point(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +
   scale_color_manual(values=bs.colours) +
   xlab("Axis 1") + ylab("Axis 2")
+
+
+# data.frame(out.agpca$QV, tax_table(physeq30_rel_logs)) : arguments imply differing number of rows: 801, 738
+n <- 30
+palette <- distinctColorPalette(n)
+pie(rep(1, n), col=palette)
+
+PHYL <- ggplot(data.frame(out.agpca$QV, tax_table(physeq30_rel_logs))) +
+  geom_point(aes(x = Axis1, y = Axis2, shape= Phylum, colour = Genus)) +
+  xlab("Axis 1") + ylab("Axis 2") + 
+  scale_color_manual(values=palette)+
+  theme (legend.position ="none")
+plot(PHYL)
+
+
