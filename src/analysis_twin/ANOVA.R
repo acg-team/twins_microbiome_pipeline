@@ -1,7 +1,7 @@
 # This is a fule for AKOS to modify
 # https://github.com/joey711/phyloseq/wiki/ordinate
 
-
+library(ggplot2)
 source("src/configure.R")
 source("src/load.R")
 my_path  <- file.path(project_path, "src/analysis_twin")
@@ -34,10 +34,10 @@ print_family <- function(family_id){
 
 # LOOP here :: loop through all families here, plot dendrogram and PCA
 # ===========
-library(ggplot2)
-library(qgraph)
-ps <- ps.tweens.log   # use log normalized abandancies
-#family.number <- twin.families[9]
+
+
+ps <- ps.tweens.norm   # use log normalized abandancies
+#family.number <- twin.families[1]
 
 
 for (family.number in twin.families[1:10]){
@@ -52,21 +52,29 @@ for (family.number in twin.families[1:10]){
   mat <- as(ps.dist.w.unifrac, "matrix")
   
   # create plot dendrogram
-  plot(hclust(ps.dist.w.unifrac, method='ward.D2'))
-  
+  #plot(hclust(ps.dist.w.unifrac, method='ward.D2'))
   
   # plot PCA two components
   twin.ord <- phyloseq::ordinate(ps.onefamily, "NMDS", "unifrac")
   p2 <- phyloseq::plot_ordination(ps.onefamily, twin.ord, type="samples", color='twin_id', shape="human")
-  print(p2)
   
   # plot grapg representation
-  qgraph(ps.dist.w.unifrac, layout='spring', vsize=15)
+  p3 <- phyloseq::plot_net(ps.onefamily, point_label = "twin_id", maxdist = 1.5, color = "twin_id")
   
+  tbl <- tableGrob(df.metadata.4timepoints[df.metadata.4timepoints$family_id==family.number,], rows=NULL)
+  
+  g<-ggarrange(p2, p3, tbl,
+            labels = c("NMDS", "B"),
+            ncol = 1, nrow = 3
+            #heights=c(3,3)
+            )
+  print(g)
 }
 
-## Add ggplot and combine all information on one page 
+
 ## check ordinate(ps.onefamily, "NMDS", "unifrac")
+
+
 
 
 
