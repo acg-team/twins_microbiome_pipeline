@@ -4,6 +4,7 @@
 source("src/configure.R")
 source("src/load.R")
 setwd(project_path)
+print(conf)  # check current dataset
 
 
 ### LOAD PREVIOUS DATA

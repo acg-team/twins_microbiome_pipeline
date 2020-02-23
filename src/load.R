@@ -9,7 +9,7 @@ packageVersion("dada2") # 1.15
 sessionInfo()
 
 ##### 0: load the necessary packages #####   
-.cran_packages <- c("ggplot2", "gridExtra", "XML", "tictoc", "MASS", "ape", "phangorn","ips","tools","rphast","BiocManager")
+.cran_packages <- c("ggplot2", "gridExtra", "XML", "tictoc", "MASS", "ape", "phangorn","ips","tools","rphast","BiocManager","qgraph")
 .bioc_packages <- c("ShortRead", "devtools", "dada2", "phyloseq", "msa")
 
 # CRAN packages
