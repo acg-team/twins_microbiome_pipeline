@@ -40,7 +40,7 @@ ps <- ps.tweens.norm   # use log normalized abandancies
 #family.number <- twin.families[1]
 
 
-for (family.number in twin.families[1:10]){
+for (family.number in twin.families[1:50]){
   print(family.number)
   twin.family.samples <- df.metadata.4timepoints[df.metadata.4timepoints$family_id==family.number, ]$file
   ps.onefamily <- phyloseq::subset_samples(ps, (sample_names(ps) %in% twin.family.samples))
@@ -61,18 +61,26 @@ for (family.number in twin.families[1:10]){
   # plot grapg representation
   p3 <- phyloseq::plot_net(ps.onefamily, point_label = "twin_id", maxdist = 1.5, color = "twin_id")
   
-  tbl <- tableGrob(df.metadata.4timepoints[df.metadata.4timepoints$family_id==family.number,], rows=NULL)
+  # add a table of samples
+  tt <- ttheme_default(base_size = 6)
+  
+  tbl <- tableGrob(df.metadata.4timepoints[df.metadata.4timepoints$family_id==family.number,], rows=NULL, theme=tt)
   
   g<-ggarrange(p2, p3, tbl,
-            labels = c("NMDS", "B"),
-            ncol = 1, nrow = 3
-            #heights=c(3,3)
+            labels = c("ORD", "G"),
+            ncol=2, nrow = 2,
+            heights=c(2,1)
             )
-  print(g)
+  #print(g)
+  ggsave(file=file.path(result_path, paste0(family.number,".jpg")), width=9, height = 4) 
 }
 
 
 ## check ordinate(ps.onefamily, "NMDS", "unifrac")
+## filter out if only one example
+
+
+
 
 
 
