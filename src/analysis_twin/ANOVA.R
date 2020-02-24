@@ -32,15 +32,10 @@ print_family <- function(family_id){
 }
 
 
-# LOOP here :: loop through all families here, plot dendrogram and PCA
-# ===========
+# CHANGE THE SOURCE PS FILI HERE 
+ps <- ps.tweens   # ps.tweens.norm  / ps.tweens.log
 
-
-ps <- ps.tweens.norm   # use log normalized abandancies
-#family.number <- twin.families[1]
-
-
-for (family.number in twin.families[1:50]){
+for (family.number in twin.families[1:100]){
   print(family.number)
   twin.family.samples <- df.metadata.4timepoints[df.metadata.4timepoints$family_id==family.number, ]$file
   ps.onefamily <- phyloseq::subset_samples(ps, (sample_names(ps) %in% twin.family.samples))
