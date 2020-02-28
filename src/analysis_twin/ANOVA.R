@@ -54,7 +54,9 @@ for (family.number in twin.families[1:100]){
   p2 <- phyloseq::plot_ordination(ps.onefamily, twin.ord, type="samples", color='twin_id', shape="human")
   
   # plot grapg representation
-  p3 <- phyloseq::plot_net(ps.onefamily, point_label = "twin_id", maxdist = 1.5, color = "twin_id")
+  p3 <- phyloseq::plot_net(ps.onefamily, ps.dist.w.unifrac, type = "samples",
+                           point_label = "twin_id", maxdist = 1.5, 
+                           color = "twin_id", point_size = 5)
   
   # add a table of samples
   tt <- ttheme_default(base_size = 6)
@@ -73,6 +75,9 @@ for (family.number in twin.families[1:100]){
 
 ## check ordinate(ps.onefamily, "NMDS", "unifrac")
 ## filter out if only one example
+
+# http://joey711.github.io/phyloseq/plot_ordination-examples
+# https://github.com/joey711/phyloseq/wiki/ordinate
 
 
 
