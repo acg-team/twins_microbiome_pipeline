@@ -50,13 +50,13 @@ for (family.number in twin.families[1:100]){
   #plot(hclust(ps.dist.w.unifrac, method='ward.D2'))
   
   # plot PCA two components
-  twin.ord <- phyloseq::ordinate(ps.onefamily, "NMDS", "unifrac")
+  twin.ord <- phyloseq::ordinate(ps.onefamily, method ="NMDS", distance ="unifrac")
   p2 <- phyloseq::plot_ordination(ps.onefamily, twin.ord, type="samples", color='twin_id', shape="human")
   
   # plot grapg representation
   p3 <- phyloseq::plot_net(ps.onefamily, ps.dist.w.unifrac, type = "samples",
-                           point_label = "twin_id", maxdist = 1.5, 
-                           color = "twin_id", point_size = 5)
+                           point_label = "twin_id", maxdist = 1, 
+                           color = "twin_id", point_size = 6)
   
   # add a table of samples
   tt <- ttheme_default(base_size = 6)
@@ -69,7 +69,7 @@ for (family.number in twin.families[1:100]){
             heights=c(2,1)
             )
   #print(g)
-  ggsave(file=file.path(result_path, paste0(family.number,".jpg")), width=9, height = 4) 
+  ggsave(file=file.path(result_path, paste0(family.number,".jpg")), width=10, height = 4) 
 }
 
 
