@@ -36,19 +36,21 @@ if(conf$dataset == "TWIN"){
   metadata_path   <- file.path(project_path, "data_set_twin/metadata")
   files_intermediate    <- file.path(project_path, "data_set_twin/files_intermediate")
   result_path  <- file.path(project_path, "data_set_twin/reports_generated")
-  alalysis_path  <- file.path(project_path, "data_set_twin/analysis")
+  #analysis_path  <- file.path(project_path, "data_set_twin/analysis")
   if(conf$location == "LOCAL"){
-    data_path <- file.path(project_path, "data/raw")
-    filt_path <- file.path(project_path, "data/raw/filtered")
+    data_path <- file.path(project_path, "data_set_twin/raw")
+    filt_path <- file.path(project_path, "data_set_twin/raw/filtered")
+    qiime_path <- file.path(project_path, "data_set_twin/raw/qiime")
   } else if(conf$location == "HOMESERVER"){
     data_path    <- file.path(project_path, "BIOINF_DATA/TwinUK_Full")
     filt_path    <- file.path(project_path, "BIOINF_DATA/TwinUK_Full/filtered")
+    qiime_path    <- file.path(project_path, "BIOINF_DATA/TwinUK_Full/qiime")
   }
 } else if (conf$dataset == "BODYFL"){
   metadata_path   <- file.path(project_path, "data_set_bodyfl/metadata")
   files_intermediate    <- file.path(project_path, "data_set_bodyfl/files_intermediate")
   result_path  <- file.path(project_path, "data_set_bodyfl/reports_generated")
-  alalysis_path  <- file.path(project_path, "data_set_bodyfl/analysis")
+  #analysis_path  <- file.path(project_path, "data_set_bodyfl/analysis")
   if(conf$location == "LOCAL"){
     data_path <- file.path(project_path, "data_set_bodyfl/raw")
     filt_path <- file.path(project_path, "data_set_bodyfl/raw/filtered")
