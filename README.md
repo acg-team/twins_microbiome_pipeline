@@ -1,8 +1,13 @@
 # UK twins microbiome processing pipeline
-Bioinformatics workflow for processing raw Illumina reads of microbiome.
+Bioinformatics pipeline for processing 16S amplican raw Illumina reads and subsequent microbiome analysis.
 
 INPUTS: raw illimina data, metainformation (age, sex etc)
-OUTPUT: exact sequence variant table (SV table), taxomony assignments, phylogeny of samples
+OUTPUT: 
+- exact sequence variant table (SV table - dada2)
+- taxomony assignments (silva, dada2)
+- phylogeny of samples (RAxML)
+- combine all in Phyloseq object
+- re-done everythong with QIIME2 for OTU
 
 Contains a complete workflow from extracting metainformation to assigning taxa information and phylogenetic tree of beta diversion.
 Pipeline as from https://www.bioconductor.org/packages/devel/bioc/vignettes/dada2/inst/doc/dada2-intro.html
@@ -10,10 +15,15 @@ Pipeline as from https://www.bioconductor.org/packages/devel/bioc/vignettes/dada
 
 ## Raw Data
 - download all raw illumina reads from http://www.ebi.ac.uk/ena/data/view/PRJEB13747
-- place them into /data/raw
+- place them into /data_set_twin/raw
 
-## WorkFlow: run subsequently
-### 1. [ 1_metadata.R  ]
+## Pepiline: run subsequently
+### 0. [load.R  / configure.R]
+Those scripts load R packages and previously processed data. No need to run them separatelly, they are included in each script below.
+In future, that structure might be substituted with NextFlow framework
+
+
+### 1. [ src/pipeline_dada2/1_metadata.R  ]
 
 A result od this script should be creating a dataframe with metadata [ twin_id/ sex/ zigosity/ etc ] attached to each sample's name
 
@@ -22,7 +32,7 @@ A result od this script should be creating a dataframe with metadata [ twin_id/ 
   - save in into data/metadata/metadata.RData.
 Possible inprovements: If nessesary, modify the script to get more features.
 
-### 2. [ 2_BIG_dada_SV_table.R ]
+### 2. [ src/pipeline_dada2/3_BIG_dada_SV_table.R ]
 
 WARNING: most computationally demanding script! ~1 day on 4 core server with 32G memory
 
@@ -35,10 +45,10 @@ saved into "seqtab_q15.RData" (q means trim parameter used during run)
 
 IMPROMEMENTS:
   - play with trim parameters for raw reads
-  - play wit other quality prameyers
+  - play with other quality prameyers
   
   
-### 3. [ 3_Tax_Assign.R ]
+### 3. [ src/pipeline_dada2/4_Tax_Assign.R ]
 
 For each sequence variant deduced during previous step (8299) assign a taxomomy
 RESULT: taxtab_g15.RData file, [ 8299 sequence variants x [Kingdom, Phulym, etc]]
@@ -47,48 +57,29 @@ IMPROVEMENTS:
    - silva assignment is not very accurate, check another 
    
    
-### 4. [ 4_Phylogeny.R ]
+### 4. [ src/pipeline_dada2/5_Phylogeny.R ]
 
 Create a phylogeny out of all deduced sequence 8299 variants as follows
   - MSA with Muscle or ClustalW (seems very slow, need to investigate its advantages if any)
   - create a guide tree with NJ
-  - build a tree with Phangorn, and parameters : model="GTR", optInv=TRUE, optGamma=TRUE
-
-WARNING: has to be improved
-
-POSSIBLE IMPROVEMENTS:
-  - try PhyML ;
-  - since we have short sequences (250) we might try to use phylogenies with indel in Bayesian settings;
-  - read about metagenomic taxonomy and functional assignment;
+  - build a tree with Phangorn, and parameters : model="GTR", optInv=TRUE, optGamma=TRUE (fast option)
+  - Run  RAxML (slow, but accurate option) - need to be installed on local machine!
   
   
-### 5. [ 5_Create_Phyloseq_obj.R ]
+### 5. [ src/pipeline_dada2/6_Create_Phyloseq_obj.R ]
 
+Combine everithing in one place.
 Create and save Phyloseq object for further manipulation and visulization of microbiome data
 https://vaulot.github.io/tutorials/Phyloseq_tutorial.html#aim
 
 
-### 6. [ 5_Phyloseq_Analysis.R ]
-Use Phyloseq to 
-  - calculate a distance matrix btw all 3288 samples based on abundance/ Tree information (UNIFRAC)
-  - plot hierarsicul clustering
-  - try to do PCA / PCoA to detect variations
+### [ src/analysis_twin/ ]
+
 
 
 
 ## Possible futher directions
-#### Calculate the metric based on taxonomy  
-  - Phylogenetics: use PhyML, then try reconstruction with indels and TKF model
-  - generate UNIFRAC metrics (needs a good phylo-tree first)
-  
-#### Calculate the metric based on abandance
-  - do we already have such a metric?
-  - can we combine UNIFRAC with abandancies?
-  
-#### Other approaches  
-  - check vusualization with Phyloseq
-  - figure out the best parameters for quality filtering in DADA2 pipeline
-  - generate OTU as well as SV table
+
   
   
 ## References and packages
