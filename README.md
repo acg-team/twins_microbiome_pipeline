@@ -17,7 +17,7 @@ Pipeline as from https://www.bioconductor.org/packages/devel/bioc/vignettes/dada
 - download all raw illumina reads from http://www.ebi.ac.uk/ena/data/view/PRJEB13747
 - place them into /data_set_twin/raw
 
-## Pepiline: run subsequently
+## Pipeline: run subsequently
 ### 0. [load.R  / configure.R]
 Those scripts load R packages and previously processed data. No need to run them separatelly, they are included in each script below.
 In future, that structure might be substituted with NextFlow framework
