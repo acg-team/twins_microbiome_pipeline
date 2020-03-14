@@ -33,6 +33,27 @@ print(file.path(qiime_path, "twin_demux-paired-end.qza"))
 
 # 4 - OTU clustering
 
+### get data into R
+otus.99 <- qiime2R::read_qza("~/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/qiime/table-dn-99.qza")
+otus.99$data
+# add sequence names?
+
+
+
+
+### Build a phyloseq
+library(phyloseq)
+tree<-read_qza("~/QIIME2/mvpics/rooted-tree.qza")
+
+taxonomy<-read_qza("~/QIIME2/mvpics/taxonomy.qza")
+tax_table<-do.call(rbind, strsplit(as.character(taxonomy$data$Taxon), "; "))
+colnames(tax_table)<-c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+rownames(tax_table)<-taxonomy$data$Feature.ID
+
+metadata<-read.table("~/QIIME2/mvpics/sample-metadata.tsv", sep='\t', header=T, row.names=1, comment="")
+metadata<-metadata[-1,]#remove the second line that specifies the data type
+
+physeq<-phyloseq(otu_table(otus$data, taxa_are_rows = T), phy_tree(tree$data), tax_table(tax_table), sample_data(metadata))
 
 
 

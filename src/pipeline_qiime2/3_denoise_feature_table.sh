@@ -1,9 +1,12 @@
-DATA=~/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/qiime/twin_demux-paired-end.qza
-OUTPUT_REP=~/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/qiime/rep-seqs-dada2.qza
-OUTPUT_TABLE=~/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/qiime/table-dada2.qza
-OUTPUT_STATS=~/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/qiime/stats-dada2.qza
-VIZ_STATS=~/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/qiime/stats-dada2.qzv
-EXPORT_DIR=~/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/qiime/rep-seqs-dada2
+P=~/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/qiime/
+
+DATA=${P}twin_demux-paired-end.qza
+
+OUTPUT_REP=${P}feature_table/rep-seqs-dada2.qza
+OUTPUT_TABLE=${P}feature_table/table-dada2.qza
+OUTPUT_STATS=${P}feature_table/stats-dada2.qza
+VIZ_STATS=${P}feature_table/stats-dada2.qzv
+EXPORT_DIR=${P}feature_table/rep-seqs-dada2
 
 
 # repseqs.qza contains sequences of representative sequences identified by DADA2 and 
