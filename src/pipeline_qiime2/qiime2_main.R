@@ -21,6 +21,7 @@ load(file=file.path(metadata_path, metadata.file))
 qiime.manifest <- data.frame(sample.names, fnFs, fnRs)
 colnames(qiime.manifest) <- c("sample-id", "forward-absolute-filepath", "reverse-absolute-filepath")
 write_tsv(qiime.manifest, file.path(qiime_path, "manifest.tsv"))
+
 print(file.path(qiime_path, "manifest.tsv"))
 print(file.path(qiime_path, "twin_demux-paired-end.qza"))
 
@@ -38,10 +39,12 @@ otus.99 <- qiime2R::read_qza("~/Projects_R/twins_microbiome_pipeline/data_set_tw
 otus.99$data
 # add sequence names?
 
+# 5 - tree
+
+# 6 - Taxonomy with greengenes (in dada2 is with SILVA) - is that a difference?
 
 
-
-### Build a phyloseq
+### Build a phyloseq object
 library(phyloseq)
 tree<-read_qza("~/QIIME2/mvpics/rooted-tree.qza")
 

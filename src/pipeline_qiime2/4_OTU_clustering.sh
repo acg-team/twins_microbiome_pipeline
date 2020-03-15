@@ -4,7 +4,7 @@ TABLE=${P}feature_table/table-dada2.qza
 REP=${P}feature_table/rep-seqs-dada2.qza
 
 OUTPUT_CLUST_TABLE99=${P}otu/table-dn-99.qza
-OUTPUT_CLUST_SEQ99=~${P}otu/rep-seqs-dn-99.qza
+OUTPUT_CLUST_SEQ99=${P}otu/rep-seqs-dn-99.qza
 EXPORT_DIR99=${P}otu/99otu_table
 
 OUTPUT_CLUST_TABLE97=${P}otu/table-dn-97.qza
