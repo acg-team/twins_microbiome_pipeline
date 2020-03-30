@@ -36,12 +36,11 @@ qiime feature-classifier fit-classifier-naive-bayes \
   --o-classifier ${OUT}classifier.qza 
 
 
-## Test the classifier : We verify that the classifier works by classifying the representative sequences from Dobay et al.
-
-#qiime feature-classifier classify-sklearn 
-#  --i-classifier classifier.qza 
-#  --i-reads rep-seqs-dn-99.qza
-#  --o-classification taxonomy.qza
+## Run the classifier 
+qiime feature-classifier classify-sklearn \
+  --i-classifier ${OUT}classifier.qza \
+  --i-reads ${P}otu/rep-seqs-dn-99.qza \
+  --o-classification ${OUT}taxonomy.qza 
 
 #qiime metadata tabulate \
 #  --m-input-file taxonomy.qza \

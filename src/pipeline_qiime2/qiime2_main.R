@@ -45,35 +45,37 @@ qiime.data.path <- "~/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/qii
 qiime.metadata <- df.metadata
 names(qiime.metadata)[names(qiime.metadata)=="file"] <- "SampleID"
 
-# form feature table
+# read a  feature table
 otus.99 <- qiime2R::read_qza(file.path(qiime.data.path, 'otu/table-dn-99.qza'))
-feature.table <- otus.99$data
+feature.table.qiime <- otus.99$data   # variants(TAXA) x samples(columns)
+feature.table.qiime <- otu_table(feature.table.qiime, taxa_are_rows = TRUE)
 
 # tree
-tree <- qiime2R::read_qza(file.path(qiime.data.path, 'tree/rooted-tree.qza'))
-tree$data
+tree.qiime <- qiime2R::read_qza(file.path(qiime.data.path, 'tree/rooted-tree.qza'))
+tree.qiime$data
 
-# taxonomy --- TODO - something wrong here. we have to run slassifier on data?
-tax.table <- qiime2R::read_qza(file.path(qiime.data.path, 'taxonomy/classifier.qza'))
-
-# TODO here - !
-
-taxonomy<-read_qza("~/QIIME2/mvpics/taxonomy.qza")
-tax_table<-do.call(rbind, strsplit(as.character(taxonomy$data$Taxon), "; "))
-colnames(tax_table)<-c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
-rownames(tax_table)<-taxonomy$data$Feature.ID
+# taxonomy 
+tax.table.qiime <- qiime2R::read_qza(file.path(qiime.data.path, 'taxonomy/taxonomy.qza')) # TODO!
 
 
+# TODO here - !!!
+
+tax_table <- do.call(rbind, strsplit(as.character(taxonomy$data$Taxon), "; "))
+colnames(tax_table) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+rownames(tax_table) <- taxonomy$data$Feature.ID
 
 
-physeq<-phyloseq(
-  otu_table(feature.table, taxa_are_rows = T), ### is that correct?
-  phy_tree(tree$data), 
-  tax_table(tax_table), 
-  sample_data(metadata)
+
+###### form a phyloseq object
+ps.twins.qiime <- phyloseq(
+  feature.table.qiime, # dine
+  phy_tree(tree.qiime$data), 
+  tax_table(tax.table.qiime), 
+  sample_data(qiime.metadata) # done
   )
 
-# save it
+# save it here
+save(ps.twins.qiime, file=file.path(files_intermediate, 'phyloseq_object_qiime.RData')) 
 
 
 
