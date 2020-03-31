@@ -13,8 +13,10 @@ source("src/load.R")
 my_path  <- file.path(project_path, "src/analysis_twin")
 
 load(file=file.path(metadata_path, metadata.file))
-load(file=file.path(files_intermediate, phyloseq.file))
-load('data_set_twin/analysis/unifrac.RData')  # load unifrac distance tables
+load(file=file.path(files_intermediate, phyloseq.file))  # load ps object from dada2 pipeline
+load(file=file.path(files_intermediate, 'phyloseq_object_qiime.RData')) # load ps object from qiime pipeline
+
+load('data_set_twin/analysis/unifrac.RData')  # load unifrac distance tables - do we need it?
 
 print(conf)  # check current dataset
 
@@ -131,7 +133,7 @@ for (family.number in twin.families.dz){
     same.year.different.twins <- c(same.year.different.twins,d2)
   } 
   
-  # dirrefent twins different years
+  # diffefent twins -  different years
   for( twin in twins){
     for (year in years){
       current_sample <- m[(m$twin_id == twin) & (m$year == year),]$file

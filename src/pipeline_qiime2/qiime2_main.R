@@ -55,22 +55,19 @@ tree.qiime <- qiime2R::read_qza(file.path(qiime.data.path, 'tree/rooted-tree.qza
 tree.qiime$data
 
 # taxonomy 
-tax.table.qiime <- qiime2R::read_qza(file.path(qiime.data.path, 'taxonomy/taxonomy.qza')) # TODO!
+taxonomy.qiime <- qiime2R::read_qza(file.path(qiime.data.path, 'taxonomy/taxonomy.qza')) # TODO!
 
-
-# TODO here - !!!
-
-tax_table <- do.call(rbind, strsplit(as.character(taxonomy$data$Taxon), "; "))
+# form a taxonomy from qiime object
+tax_table <- do.call(rbind, strsplit(as.character(taxonomy.qiime$data$Taxon), "; "))
 colnames(tax_table) <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
-rownames(tax_table) <- taxonomy$data$Feature.ID
-
+rownames(tax_table) <- taxonomy.qiime$data$Feature.ID
 
 
 ###### form a phyloseq object
 ps.twins.qiime <- phyloseq(
-  feature.table.qiime, # dine
+  feature.table.qiime, # done
   phy_tree(tree.qiime$data), 
-  tax_table(tax.table.qiime), 
+  tax_table(tax_table), # done
   sample_data(qiime.metadata) # done
   )
 
