@@ -27,7 +27,7 @@ print(file.path(qiime_path, "manifest.tsv"))
 print(file.path(qiime_path, "twin_demux-paired-end.qza"))
 
 
-##### Here we have to run qiime worklow by subsequently running 6 scripts
+##### Here we have to run qiime worklow by subsequently running 6 bash scripts in shell
 # chmod +x 1_import.sh 2_vizualization.sh 3_denoise_feature_table.sh
 # 2 - run import script 
 # 3 - Denoising and feture table construction
@@ -71,7 +71,7 @@ ps.twins.qiime <- phyloseq(
   sample_data(qiime.metadata) # done
   )
 
-# save it here
+##################### save it here
 save(ps.twins.qiime, file=file.path(files_intermediate, 'phyloseq_object_qiime.RData')) 
 
 

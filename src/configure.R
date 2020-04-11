@@ -6,7 +6,7 @@ names(conf) <- c("location", "dataset")
 
 ### now we set it as calculare on local macbook and use 34 new dataset
 conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
-conf$dataset <- "TWIN"    # "BODYFL"  #  TWIN / "BODYFL" /
+conf$dataset <- "BODYFL"    #   TWIN / "BODYFL" /
 ##################################################################
 
 print(paste("########   Configuration set for : ", conf, " ###############" ))

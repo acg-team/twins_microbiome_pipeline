@@ -20,20 +20,21 @@ qiime tools import --type 'FeatureData[Taxonomy]' \
     --output-path ${OUT}ref-99taxonomy.qza
 
 
-# TODO Do we need it?    
-### Extracted the V4-V5 region by specifying the primers
-#qiime feature-classifier 
-#    extract-reads --i-sequences 99_otus.qza 
-#    --p-f-primer CCAGCAGCYGCGGTAAN 
-#    --p-r-primer CCGTCAATTNNTTTNANT 
-#    --o-reads ref-99otus.qza
+# TODO - need to understand what is going on here
+### Extracted the V4-V5 region by specifying the primers: speed up process because we only hav V? region in data
+qiime feature-classifier extract-reads \
+    --i-sequences ${OUT}99_otus.qza \
+    --p-f-primer CCAGCAGCYGCGGTAAN \
+    --p-r-primer CCGTCAATTNNTTTNANT \
+    --o-reads ${OUT}ref-99otus.qza
     
 
 ### Train the classifier
 qiime feature-classifier fit-classifier-naive-bayes \
-  --i-reference-reads ${OUT}99_otus.qza \
+  --i-reference-reads ${OUT}ref-99otus.qza \
   --i-reference-taxonomy ${OUT}ref-99taxonomy.qza \
   --o-classifier ${OUT}classifier.qza 
+
 
 
 ## Run the classifier 
@@ -42,7 +43,7 @@ qiime feature-classifier classify-sklearn \
   --i-reads ${P}otu/rep-seqs-dn-99.qza \
   --o-classification ${OUT}taxonomy.qza 
 
-#qiime metadata tabulate \
-#  --m-input-file taxonomy.qza \
-#  --o-visualization taxonomy.qzv
+qiime metadata tabulate \
+  --m-input-file ${OUT}taxonomy.qza \
+  --o-visualization ${OUT}taxonomy.qzv
 
