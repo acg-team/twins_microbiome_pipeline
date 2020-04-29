@@ -1,0 +1,6 @@
+sample-id	forward-absolute-filepath	reverse-absolute-filepath
+ERR1382288	/Users/alex/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/ERR1382288_1.fastq.gz	/Users/alex/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/ERR1382288_2.fastq.gz
+ERR1382290	/Users/alex/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/ERR1382290_1.fastq.gz	/Users/alex/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/ERR1382290_2.fastq.gz
+ERR1382292	/Users/alex/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/ERR1382292_1.fastq.gz	/Users/alex/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/ERR1382292_2.fastq.gz
+ERR1382297	/Users/alex/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/ERR1382297_1.fastq.gz	/Users/alex/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/ERR1382297_2.fastq.gz
+ERR1382302	/Users/alex/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/ERR1382302_1.fastq.gz	/Users/alex/Projects_R/twins_microbiome_pipeline/data_set_twin/raw/ERR1382302_2.fastq.gz

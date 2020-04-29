@@ -33,7 +33,7 @@ for(i in ii) {
 ### FILTERING  ##########################
 # trim and put into filtered folder
 # https://github.com/benjjneb/dada2/tree/master/R
-QUALITY_THRESHOLD <- 20  # Phred
+QUALITY_THRESHOLD <- 18  # Phred
 
 filtFs <- file.path(filt_path, basename(fnFs))  # names for filtered forwards reads
 filtRs <- file.path(filt_path, basename(fnRs))  # names for filtered reverse reads
@@ -52,15 +52,16 @@ tic()
 # - truncQ;
 # https://academic.oup.com/bioinformatics/article/31/21/3476/194979
 for(i in seq_along(fnFs)) {
-  print(i)
+  print(paste("Filering and Trimming sample: ", i))
   print(fnFs[[i]])
   print(fnRs[[i]])
-  dada2::filterAndTrim( fwd=fnFs[[i]], filt=filtFs[[i]],
+  out <- dada2::filterAndTrim( fwd=fnFs[[i]], filt=filtFs[[i]],
                         rev=fnRs[[i]], filt.rev=filtRs[[i]],
                         #trimLeft=c(3,3), truncLen=c(247,235), # warning: No reads passed the filter ?!
-                        maxEE=c(2,5), maxN=0, truncQ=QUALITY_THRESHOLD,  rm.phix=TRUE,
+                        maxEE=c(5,5), maxN=0, truncQ=QUALITY_THRESHOLD,  rm.phix=TRUE,
                         compress=TRUE, verbose=TRUE, multithread=TRUE
   )
+  print(out)
 }
 toc()  # 5839sec = 1.5 hours
 
@@ -93,7 +94,7 @@ toc() # 9806.114 sec / 2.7h = now 2509sec
 ## plot error rates for control
 plotErrors(errF)
 plotErrors(errR)
-save(errF, errR, file=file.path(files_intermediate, dada.err.file)) 
+save(errF, errR, file=file.path(files_intermediate_dada, dada.err.file)) 
 
 
 ### Big Data dada2 pipeline
@@ -112,18 +113,27 @@ for (sam in sample.names) {
   dadaF <- dada(derepF, err=errF, pool=TRUE, multithread = TRUE)
   dadaR <- dada(derepR, err=errR, pool=TRUE, multithread = TRUE)
   
-  merger <- mergePairs(dadaF, derepF, dadaR, derepR)
+  ### Merge forward and reverse reads
+  # NOTE if merger is zero, it means your reads aren't overlapping after truncation - check trimming
+  # mergePairs requires 20 nts of overlap by default
+  # https://github.com/benjjneb/dada2/issues/419
+  merger <- dada2::mergePairs(dadaF, derepF, dadaR, derepR)
+  if (length(merger$sequence)==0){
+    print(" !!!!!  You have a PROBLEM !!!!!! ")
+    print("  Forward and Revers reads are not overlapping during merging! Please check trimming parameters!")
+    print(" justConcatenate=TRUE has been used for this sample")
+    merger <- dada2::mergePairs(dadaF, derepF, dadaR, derepR, justConcatenate=TRUE)  
+    }
   mergers[[sam]] <- merger
   toc()
   
   counter <- counter+1
-  cat(counter, "...", sam, " Done.\n")
+  cat(counter, "...", sam, " ... Done.\n")
   cat("---------- \n")
-  save(mergers, file=file.path(files_intermediate, mergers.file)) 
 }
 print("Total time of sample inference:")
-toc() # 8669sec
-
+toc() # 8669sec=2.5h
+save(mergers, file=file.path(files_intermediate_dada, mergers.file))
 
 
 ### SEQTAB: constructs a sequence table (analogous to an OTU table) from the list of samples.
@@ -134,12 +144,12 @@ toc() # 5sec
 
 ### remove chimeras ----
 seqtab <- dada2::removeBimeraDenovo(seqtab.all, verbose = TRUE)
-save(seqtab, file=file.path(files_intermediate, seqtab.file)) 
+save(seqtab, file=file.path(files_intermediate_dada, seqtab.file)) 
 
 
 ### Extract sample names and save them separatelly (for futher Python data analysis)
 seqtab.samples.names = rownames(seqtab)
-save(seqtab.samples.names, file=file.path(files_intermediate, seqtab.snames.file)) 
+save(seqtab.samples.names, file=file.path(files_intermediate_dada, seqtab.snames.file)) 
 
 
 ### TODO:

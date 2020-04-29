@@ -1,12 +1,13 @@
 # datasets are switched here
 
 #################### 0: CONFIGURATION : PLEASE SET!  ##############
-conf <- vector(mode="list", length=2)
-names(conf) <- c("location", "dataset")
+conf <- vector(mode="list", length=3)
+names(conf) <- c("location", "dataset", "pipeline")
 
 ### now we set it as calculare on local macbook and use 34 new dataset
 conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
 conf$dataset <- "BODYFL"    #   TWIN / "BODYFL" /
+conf$pipeline <- "DADA2"   # QIIME / DADA2
 ##################################################################
 
 print(paste("########   Configuration set for : ", conf, " ###############" ))
@@ -19,41 +20,50 @@ print(paste("########   Configuration set for : ", conf, " ###############" ))
 #if(!file_test("-d", filt_path)) dir.create(result_path)
 #if(!file_test("-d", filt_path)) dir.create(filt_path)  # create filetered folder
 
-# set project path depending on location
+
+# General Project and installed utilities 
 if(conf$location == "LOCAL"){
   project_path <- "~/Projects_R/twins_microbiome_pipeline"
   raxm.exec.path <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
+
 } else if(conf$location == "HOMESERVER") {
   project_path <- "/media/alex/db5547c3-1ac1-4ec5-aac9-29a383a87978"
   raxm.exec.path <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
+
 } else {
   stop(" WRONG SERVER CONFIGURATION")
 }
 
 
-######## 2:  set pathes to folders depending on dataset
+
+
+######## 2:  set SPECIFIC FOLDERS depending on dataset
 if(conf$dataset == "TWIN"){
   metadata_path   <- file.path(project_path, "data_set_twin/metadata")
-  files_intermediate    <- file.path(project_path, "data_set_twin/files_intermediate")
+  files_intermediate_dada  <- file.path(project_path, "data_set_twin/files_intermediate_dada")
+  files_intermediate_qiime <- file.path(project_path, "data_set_twin/files_intermediate_qiime")
   result_path  <- file.path(project_path, "data_set_twin/reports_generated")
-  #analysis_path  <- file.path(project_path, "data_set_twin/analysis")
+  
   if(conf$location == "LOCAL"){
     data_path <- file.path(project_path, "data_set_twin/raw")
     filt_path <- file.path(project_path, "data_set_twin/raw/filtered")
-    qiime_path <- file.path(project_path, "data_set_twin/raw/qiime")
+    qiime_qza_path <- file.path(project_path, "data_set_twin/raw/qza")
   } else if(conf$location == "HOMESERVER"){
     data_path    <- file.path(project_path, "BIOINF_DATA/TwinUK_Full")
     filt_path    <- file.path(project_path, "BIOINF_DATA/TwinUK_Full/filtered")
-    qiime_path    <- file.path(project_path, "BIOINF_DATA/TwinUK_Full/qiime")
   }
+
+  
 } else if (conf$dataset == "BODYFL"){
   metadata_path   <- file.path(project_path, "data_set_bodyfl/metadata")
-  files_intermediate    <- file.path(project_path, "data_set_bodyfl/files_intermediate")
+  files_intermediate_dada  <- file.path(project_path, "data_set_bodyfl/files_intermediate_dada")
+  files_intermediate_qiime <- file.path(project_path, "data_set_bodyfl/files_intermediate_qiime")
   result_path  <- file.path(project_path, "data_set_bodyfl/reports_generated")
-  #analysis_path  <- file.path(project_path, "data_set_bodyfl/analysis")
+
   if(conf$location == "LOCAL"){
     data_path <- file.path(project_path, "data_set_bodyfl/raw")
     filt_path <- file.path(project_path, "data_set_bodyfl/raw/filtered")
+    qiime_qza_path <- file.path(project_path, "data_set_bodyfl/raw/qza")
   } else if(conf$location == "HOMESERVER"){
     stop("no such configuration exists")
   }

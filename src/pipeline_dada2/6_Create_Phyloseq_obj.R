@@ -10,10 +10,10 @@ setwd(project_path)
 
 ### LOAD PREVIOUS DATA
 load(file=file.path(metadata_path, metadata.file))
-load(file=file.path(files_intermediate, seqtab.file)) 
-load(file=file.path(files_intermediate, seqtab.snames.file)) 
-load(file=file.path(files_intermediate, taxtab.file))
-load(file=file.path(files_intermediate, phylo.file)) 
+load(file=file.path(files_intermediate_dada, seqtab.file)) 
+load(file=file.path(files_intermediate_dada, seqtab.snames.file)) 
+load(file=file.path(files_intermediate_dada, taxtab.file))
+load(file=file.path(files_intermediate_dada, phylo.file)) 
 
 
 ############    BUILD a Phyloseq object
@@ -42,15 +42,19 @@ for(seqname in rownames(seqtab)){
 
 
 # build phyloseq object
+# canonical OTU mast be taxa x samples?  Here samples x taxa, so we set taxa_are_rows = FALSE
 feature.table <- otu_table(seqtab, taxa_are_rows = FALSE)  # seqtab = ERR128(row) x TCGA(cols, taxa)
 metadata.table <- sample_data(df.metadata)
-#tree.final <- fitGTR$tree # phy_tree(treeNJ) phylo object (fitGTR$tree) we temporarily use NJ tree here instead of RAXML: 
 tree.final <-  tree.raxml$bestTree   # raxml is rooted / GTP is unrooted
 
 # assign long sequence names back (we made it short after RAxML)
 taxa_names(tree.final) <- colnames(feature.table)
 
-# control
+# control for TWIN
+# Sample Data:       [ samples x sample variables ]
+# Taxonomy Table:    [ taxa x taxonomic ranks ]
+# OTU Table:         [ taxa x samples ]
+
 rownames(metadata.table)
 colnames(feature.table)
 taxa_names(tree.final)
@@ -63,18 +67,21 @@ ps.tweens <- phyloseq::phyloseq(
               tree.final
               )
 
-save(ps.tweens, file=file.path(files_intermediate, phyloseq.file)) 
 
 # Sanity: Check if there are ASVs with no counts
 any(taxa_sums(ps.tweens) == 0)
+is.rooted(phy_tree(ps.tweens))
+any(is.na(ps.tweens@otu_table@.Data))
 
 ## CHECK UP: phyloseq-class experiment-level object
-otu_table(ps.tweens)     # OTU Table:         [ 8299 taxa and 3288 samples ]
-sample_data(ps.tweens)   # Sample Data:       [ 3288 samples by 8 features ]
-tax_table(ps.tweens)     # Taxonomy Table:    [ 8299 taxa by 6 taxonomic ranks ]
-phy_tree(ps.tweens)      # Phylogenetic Tree: [ 8299 tips, ??? internal nodes ] - need to re run the whole workflow
+# https://joey711.github.io/phyloseq/import-data.html
+dim( otu_table(ps.tweens) )   # OTU Table:      [ 8299 taxa and 3288 samples ] - You must also specify if the species are rows or columns
+dim( sample_data(ps.tweens) ) # Sample Data:    [ 3288 samples by 8 features ] - rownames must match the sample names in the otu_table
+dim( tax_table(ps.tweens) )   # Taxonomy Table: [ 8299 taxa by 6 taxonomic ranks ] - The rownames must match the OTU names (taxa_names) 
+phy_tree(ps.tweens)     # Phylogenetic Tree: [ 8299 tips, ??? internal nodes ] - need to re run the whole workflow
 
 
+save(ps.tweens, file=file.path(files_intermediate_dada, phyloseq.file)) 
 
 
 

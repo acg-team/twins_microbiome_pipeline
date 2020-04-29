@@ -15,8 +15,8 @@ setwd(project_path)
 #########################################################################
 
 ### LOAD PREVIOUS DATA
-load(file=file.path(files_intermediate, mergers.file)) 
-load(file=file.path(files_intermediate, seqtab.file)) 
+load(file=file.path(files_intermediate_dada, mergers.file)) 
+load(file=file.path(files_intermediate_dada, seqtab.file)) 
 
 
 ###### 1: ASSIGN TAXONOMY #################################
@@ -30,12 +30,11 @@ tic()
 
 # TODO what is the dufference btw training and assignment?
 ref_fasta <- file.path(silva_path, "silva_nr_v132_train_set.fa.gz")
-#ref_fasta <- file.path(metadata_path, "silva_species_assignment_v128.fa.gz")
 taxtab <- dada2::assignTaxonomy(seqtab, refFasta = ref_fasta)
 colnames(taxtab) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 unname(taxtab)
 print("Total time of taxonomy assignment:")
-toc()
+toc() # 1468 sec = 24 min
 
 ## now we have
 # - seqtab [1:28, 1:1227]
@@ -43,7 +42,7 @@ toc()
 # so we can combine for each sample a table with taxa names and abanduncies
 # see Exploratoty_Analysys file
 
-save(taxtab, file=file.path(files_intermediate, taxtab.file)) 
+save(taxtab, file=file.path(files_intermediate_dada, taxtab.file)) 
 
 
 

@@ -12,9 +12,9 @@ source("src/load.R")
 source("src/configure.R")
 setwd(project_path)
 
-load(file=file.path(files_intermediate, seqtab.file)) 
-load(file=file.path(files_intermediate, seqtab.snames.file)) 
-load(file=file.path(files_intermediate, taxtab.file))
+load(file=file.path(files_intermediate_dada, seqtab.file)) 
+load(file=file.path(files_intermediate_dada, seqtab.snames.file)) 
+load(file=file.path(files_intermediate_dada, taxtab.file))
 
 
 ##############  MSA Construction ##############
@@ -48,7 +48,7 @@ print("msa (muscle) took:")
 toc()  # 1972.561sec
 print(microbiome.msa.muscle)
 rownames(microbiome.msa.muscle)
-save(microbiome.msa.muscle, seq.variant.names, file=file.path(files_intermediate, msa.file)) 
+save(microbiome.msa.muscle, seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
 
 # save MSA as a fasta file for possible vizualization with UGene browser
 Biostrings::writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
@@ -73,11 +73,10 @@ save(microbiome.msa.muscle, microbiome.msa.clustalw, seq.variant.names, file=fil
               
 
 
+my.msa <- microbiome.msa.muscle
 ####################### Infer a phylogenetic tree 
 
 ########### fast NJ tree, can be used as guide tree as well
-# choose Muscle MSA to use
-my.msa <- microbiome.msa.muscle
 
 # infer a tree with fast NJ method 
 # 40 min
@@ -86,7 +85,7 @@ phang.align <- phangorn::as.phyDat(my.msa, type="DNA", names=seqtab.samples.name
 dm <- dist.ml(phang.align)  #distance matrix
 treeNJ <- phangorn::NJ(dm) # "phylo" object (a tree)
 toc()
-save(treeNJ, file=file.path(files_intermediate, phylo.file)) 
+save(treeNJ, file=file.path(files_intermediate_dada, phylo.file)) 
 
 ################ refine NJ tree with nt substitution model by Felsenstein ML mehod
 ## WARNING! Might take a lot of time
@@ -97,7 +96,7 @@ tic()
 fitJC = phangorn::pml(tree=treeNJ, data=phang.align)   # pmlcomputes  the  likelihood  of  a  phylogenetic  tree 
 fitJC <- optim.pml(fitJC)    # optimize edge length etc parameters
 toc()
-save(treeNJ,fitJC, file=file.path(files_intermediate, phylo.file))
+save(treeNJ,fitJC, file=file.path(files_intermediate_dada, phylo.file))
 
 # futher refine ML tree with GTR+G+I model
 tic()
@@ -109,7 +108,7 @@ fitGTR <- phangorn::optim.pml(fitGTR, model="GTR", optInv=TRUE, optGamma=TRUE,
 toc()
 
 # save the tree to file
-save(treeNJ, fitJC, fitGTR, file=file.path(files_intermediate, phylo.file)) 
+save(treeNJ, fitJC, fitGTR, file=file.path(files_intermediate_dada, phylo.file)) 
 
 # TODO: Visualize tree
 
@@ -128,7 +127,7 @@ msa.dnabin.as <- as.DNAbin(my.msa)
 labels(msa.dnabin.as)
 print(msa.dnabin.as)   # Base composition: acgt = NaN! why?
 
-save(msa.dnabin.as, file=file.path(files_intermediate, msa.file)) 
+save(msa.dnabin.as, file=file.path(files_intermediate_dada, msa.file)) 
 
 # Parameters:
 # f - RAxML algorithm
@@ -142,7 +141,9 @@ tree.raxml <- ips::raxml(msa.dnabin.as, f = "d", N = 2, p = 1234, exec = raxm.ex
 toc() # 3045.909 sec = 0.8 h om 6 core server - very fast
 
 
-save(treeNJ, fitJC, fitGTR, tree.raxml, file=file.path(files_intermediate, phylo.file)) 
+save( tree.raxml, file=file.path(files_intermediate_dada, phylo.file)) 
+
+save(treeNJ, fitJC, fitGTR, tree.raxml, file=file.path(files_intermediate_dada, phylo.file)) 
 
 
 
