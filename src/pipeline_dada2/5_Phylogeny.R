@@ -40,6 +40,11 @@ names(seqs) <- seq.variant.short.names
 # TODO: look for another package for MSA, this on msa is very badly written
 # TODO: check for Muscle specific parameters
 
+# option 0:  AlignSeqsfrom the DECIPHER
+microbiome.msa.decipher <- DECIPHER::AlignSeqs( DNAStringSet(seqs) )
+
+
+
 # option 1: generate MSA with Muscle
 # 5 hours
 tic()
@@ -62,21 +67,22 @@ print("msa (clustalw) took:")
 toc() 
 print(microbiome.msa.clustalw)
 #microbiome.msa.clustalw@unmasked@ranges@NAMES[3000:4000]
-Biostrings::writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
+#Biostrings::writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
 
 # save objects for reusing late in pipeline 
-save(microbiome.msa.muscle, microbiome.msa.clustalw, seq.variant.names, file=file.path(files_intermediate, msa.file)) 
+#save(microbiome.msa.muscle, microbiome.msa.clustalw, seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
 
-# TODO:  visualize MSA , type: msa::MsaDNAMultipleAlignment or use UGene browser
-# msa::msaPrettyPrint(x=microbiome.msa.muscle, output="tex", subset=NULL)
-# tools::texi2pdf("msaPrettyPrintOutput.tex",clean=TRUE)
+
               
 
-
+#################################################
+# use on of this 
+my.msa <- microbiome.msa.decipher
+my.msa <- microbiome.msa.clustalw
 my.msa <- microbiome.msa.muscle
 ####################### Infer a phylogenetic tree 
 
-########### fast NJ tree, can be used as guide tree as well
+########### OPTION 1:  fast NJ tree, can be used as guide tree as well
 
 # infer a tree with fast NJ method 
 # 40 min
@@ -87,7 +93,7 @@ treeNJ <- phangorn::NJ(dm) # "phylo" object (a tree)
 toc()
 save(treeNJ, file=file.path(files_intermediate_dada, phylo.file)) 
 
-################ refine NJ tree with nt substitution model by Felsenstein ML mehod
+####### refine NJ tree with nt substitution model by Felsenstein ML mehod
 ## WARNING! Might take a lot of time
 # infer ML tree with Jukes-Cantor model (JC69, default one), usin NJ as a guide tree
 # fitJC is "pml" object, tree can be extracted as fitJC$tree, also has logLik etc parameters
@@ -110,11 +116,10 @@ toc()
 # save the tree to file
 save(treeNJ, fitJC, fitGTR, file=file.path(files_intermediate_dada, phylo.file)) 
 
-# TODO: Visualize tree
 
 
 
-############### ML tree with RAxML: ML tree for species >1000 with fast heuristics
+############### OPTION2 :  ML tree with RAxML: ML tree for species >1000 with fast heuristics
 ####  NOTE: need to install raxml on local MAC first
 #exec.path.mac <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 #exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
@@ -137,7 +142,11 @@ save(msa.dnabin.as, file=file.path(files_intermediate_dada, msa.file))
 
 # 5.5h
 tic()
-tree.raxml <- ips::raxml(msa.dnabin.as, f = "d", N = 2, p = 1234, exec = raxm.exec.path, threads=6) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
+tree.raxml <- ips::raxml(
+  msa.dnabin.as, f = "d", N = 3, p = 1234, 
+  exec = raxm.exec.path, threads=6
+) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
+
 toc() # 3045.909 sec = 0.8 h om 6 core server - very fast
 
 

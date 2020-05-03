@@ -39,10 +39,11 @@ for(seqname in rownames(seqtab)){
     print(paste("missed metadata for :", seqname, " sample"))
   }
 }
-
+rowSums(seqtab) # check for non-zero
 
 # build phyloseq object
 # canonical OTU mast be taxa x samples?  Here samples x taxa, so we set taxa_are_rows = FALSE
+
 feature.table <- otu_table(seqtab, taxa_are_rows = FALSE)  # seqtab = ERR128(row) x TCGA(cols, taxa)
 metadata.table <- sample_data(df.metadata)
 tree.final <-  tree.raxml$bestTree   # raxml is rooted / GTP is unrooted
@@ -60,7 +61,7 @@ colnames(feature.table)
 taxa_names(tree.final)
 
 # Create an object 
-ps.tweens <- phyloseq::phyloseq(
+ps <- phyloseq::phyloseq(
               tax_table(taxtab), 
               metadata.table,
               feature.table,
@@ -69,19 +70,19 @@ ps.tweens <- phyloseq::phyloseq(
 
 
 # Sanity: Check if there are ASVs with no counts
-any(taxa_sums(ps.tweens) == 0)
-is.rooted(phy_tree(ps.tweens))
-any(is.na(ps.tweens@otu_table@.Data))
+any(taxa_sums(ps) == 0)
+is.rooted(phy_tree(ps))
+any(is.na(ps@otu_table@.Data))
 
 ## CHECK UP: phyloseq-class experiment-level object
 # https://joey711.github.io/phyloseq/import-data.html
-dim( otu_table(ps.tweens) )   # OTU Table:      [ 8299 taxa and 3288 samples ] - You must also specify if the species are rows or columns
-dim( sample_data(ps.tweens) ) # Sample Data:    [ 3288 samples by 8 features ] - rownames must match the sample names in the otu_table
-dim( tax_table(ps.tweens) )   # Taxonomy Table: [ 8299 taxa by 6 taxonomic ranks ] - The rownames must match the OTU names (taxa_names) 
-phy_tree(ps.tweens)     # Phylogenetic Tree: [ 8299 tips, ??? internal nodes ] - need to re run the whole workflow
+dim( otu_table(ps) )   # OTU Table:      [ 8299 taxa and 3288 samples ] - You must also specify if the species are rows or columns
+dim( sample_data(ps) ) # Sample Data:    [ 3288 samples by 8 features ] - rownames must match the sample names in the otu_table
+dim( tax_table(ps) )   # Taxonomy Table: [ 8299 taxa by 6 taxonomic ranks ] - The rownames must match the OTU names (taxa_names) 
+phy_tree(ps)     # Phylogenetic Tree: [ 8299 tips, ??? internal nodes ] - need to re run the whole workflow
 
 
-save(ps.tweens, file=file.path(files_intermediate_dada, phyloseq.file)) 
+save(ps, file=file.path(files_intermediate_dada, phyloseq.file)) 
 
 
 

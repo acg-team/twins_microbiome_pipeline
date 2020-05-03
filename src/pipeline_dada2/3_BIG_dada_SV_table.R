@@ -33,8 +33,12 @@ for(i in ii) {
 ### FILTERING  ##########################
 # trim and put into filtered folder
 # https://github.com/benjjneb/dada2/tree/master/R
-QUALITY_THRESHOLD <- 18  # Phred
+print(paste("--------   Filtering parameters : ", dada_param, " ---------" ))
 
+QUALITY_THRESHOLD <- dada_param$QUALITY_THRESHOLD #18  # Phred
+maxEE <- dada_param$maxEE   # c(5,5)
+
+  
 filtFs <- file.path(filt_path, basename(fnFs))  # names for filtered forwards reads
 filtRs <- file.path(filt_path, basename(fnRs))  # names for filtered reverse reads
 
@@ -58,7 +62,7 @@ for(i in seq_along(fnFs)) {
   out <- dada2::filterAndTrim( fwd=fnFs[[i]], filt=filtFs[[i]],
                         rev=fnRs[[i]], filt.rev=filtRs[[i]],
                         #trimLeft=c(3,3), truncLen=c(247,235), # warning: No reads passed the filter ?!
-                        maxEE=c(5,5), maxN=0, truncQ=QUALITY_THRESHOLD,  rm.phix=TRUE,
+                        maxEE=maxEE, maxN=0, truncQ=QUALITY_THRESHOLD,  rm.phix=TRUE,
                         compress=TRUE, verbose=TRUE, multithread=TRUE
   )
   print(out)

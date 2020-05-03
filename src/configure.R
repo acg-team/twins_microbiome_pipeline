@@ -1,14 +1,4 @@
-# datasets are switched here
 
-#################### 0: CONFIGURATION : PLEASE SET!  ##############
-conf <- vector(mode="list", length=3)
-names(conf) <- c("location", "dataset", "pipeline")
-
-### now we set it as calculare on local macbook and use 34 new dataset
-conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
-conf$dataset <- "BODYFL"    #   TWIN / "BODYFL" /
-conf$pipeline <- "DADA2"   # QIIME / DADA2
-##################################################################
 
 print(paste("########   Configuration set for : ", conf, " ###############" ))
 
@@ -74,17 +64,22 @@ green_genes_path <- file.path(project_path, "tax_green_genes")
 
 ##### 3: Set file names (same for any dataset but in different folders) ###########################
 
+file.suffix <- paste0(
+  conf$dataset, "_", conf$pipeline, "_Q", 
+  dada_param$QUALITY_THRESHOLD, "_maxEE", dada_param$maxEE[1], dada_param$maxEE[2], ".RData"
+)
+
 # file names for intermediate results
 metadata.file <- "metadata.RData"
 dada.err.file <- "dada_err_data.RData"
 mergers.file <- "mergers.RData"
-seqtab.file <- "seqtab.RData"
-seqtab.snames.file <- "seqtab_snames.RData"
+seqtab.file <- paste0("seqtab_", file.suffix)
+seqtab.snames.file <- paste0("seqtab_snames_", file.suffix)
 
 taxtab.file <- "taxtab.RData"
 
 msa.file <- "msa.RData"
 phylo.file <- "phylo_trees.RData"
 
-phyloseq.file <- "phyloseq_object.RData"
-phyloseq_analysis.file <- "phyloseq_analysis.RData"
+phyloseq.file <- paste0("phyloseq_", file.suffix)
+
