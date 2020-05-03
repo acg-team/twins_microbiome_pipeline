@@ -3,7 +3,6 @@
 .RData
 .Ruserdata
 
-
 tax_green_genes/gg_13_8_otus/otus/*
 tax_green_genes/gg_13_8_otus/rep-set/*
 tax_green_genes/gg_13_8_otus/rep-set_aligned/*
@@ -16,3 +15,5 @@ data_set_twin/reports_generated/*
 
 data_set_bodyfl/raw/*
 data_set_bodyfl/reports_generated/*
+
+Docs/*
