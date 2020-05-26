@@ -10,8 +10,10 @@ conf$pipeline <- "DADA2"   # QIIME / DADA2
 ################# FILTERING parameters 
 dada_param <- vector(mode="list", length=2)
 names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE")
-dada_param$QUALITY_THRESHOLD <- 13
-dada_param$maxEE <- c(5,7)
+dada_param$QUALITY_THRESHOLD <- 2
+dada_param$maxEE <- c(2,4)
+dada_param$MSA_aligner <- "MUSCLE"   # DECIPHER  MUSCLE  clustalw 
+dada_param$tree_method <- "RAXML" 
 ##################################################################
 
 

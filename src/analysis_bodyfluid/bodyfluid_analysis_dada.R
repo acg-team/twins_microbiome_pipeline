@@ -29,12 +29,11 @@ library("RColorBrewer")
 library(randomcoloR)
 theme_set((theme_bw()))
 
-print(phyloseq.file)
 
 
 ############ LOAD Budy Fluid PhyloSeq file + metadata
 load(file=file.path(metadata_path, "metadata.RData"))
-load(file=file.path(files_intermediate_dada, "phyloseq_BODYFL_DADA2_Q15_maxEE46.RData"))
+load(file=file.path(files_intermediate_dada, "phyloseq_BODYFL_DADA2_Q2_maxEE24.RData"))
 head(df.metadata) # check metadata
 
 # rename the phyloseq object
@@ -49,7 +48,7 @@ if(!taxa_are_rows(ps.bfluid)){
 
 
 
-#### SANITY
+############ SANITY
 # check if every sample has at least one taxa and no NA
 sample_sums(ps.bfluid)
 get_taxa_unique(ps.bfluid, "Phylum") #("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
@@ -59,6 +58,8 @@ get_taxa_unique(ps.bfluid, "Class")
 # visually check that we hava a community matrix: rows are samples (46) and colums are taxa (spesies)
 OTU = as(otu_table(ps.bfluid), "matrix")
 colnames(OTU) <- c()
+dim(OTU)
+View(OTU)
 
 # check the tree, thi sis ape package
 tree <- phy_tree(ps.bfluid)
@@ -67,8 +68,12 @@ is.rooted(tree)
 #plot(phy_tree(tree), show.node.label = TRUE)
 
 
+# TODO - explore all sequnces names and see NNN, length etc artefacts
+# TODO - plot ggplot in 3D axes
+# TODO - Interactive choice of r  - https://cran.r-project.org/web/packages/adaptiveGPCA/vignettes/adaptive_gpca_vignette.html
 
-##### Get top 30 genera (need to do it before normalization!) otherwise taxa_sum() does not work
+
+######### Get top 30 genera (need to do it before normalization!) otherwise taxa_sum() does not work
 # ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 n <- 30
 
@@ -78,6 +83,9 @@ topGenera = names(sort(genera.sum, TRUE))[1:n]  # names of top30 genera
 
 physeq.top <- prune_taxa((tax_table(ps.bfluid)[, "Genus"] %in% topGenera), ps.bfluid)
 otu.top <- as(otu_table(physeq.top), "matrix")
+colnames(otu.top) <- c()  # clean the long column names
+dim(otu.top)
+View(otu.top)
 
 sample_sums(physeq.top) # sanity again
 #get_taxa_unique(physeq.top, "Genus")
@@ -85,6 +93,7 @@ sample_sums(physeq.top) # sanity again
 # remove taxa with abandancy less then 10
 physeq.top = prune_samples(sample_sums(physeq.top)>=10, physeq.top)
 sample_sums(physeq.top)
+
 
 ########### normalize and log abundancies of community matrix
 # do normalization and log transform
@@ -111,6 +120,7 @@ print(p1)
 
 
 ############# Adaptive gPCA - ordination plot to see distances BTW ALL SAMPLES!
+# good source too - https://www.bioconductor.org/help/course-materials/2017/BioC2017/Day1/Workshops/Microbiome/doc/MicrobiomeWorkshopII.html
 # http://jfukuyama.github.io/adaptiveGPCA/
 # extract nessesary matrices for gPCA
 pp = adaptiveGPCA::processPhyloseq(physeq.top.rel)
@@ -150,12 +160,11 @@ df.tax.reduced %>%
 phyla.colours <- brewer.pal(n = 8, name = "Dark2")
 names(phyla.colours) <- unique(df.tax.reduced$Phylum)
 
-BS <- ggplot(
-  data.frame(out.agpca$U, sample_data(physeq.top.rel))) +
-  geom_point(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +
-  #geom_text( aes(label=sample_data(physeq30.rel)$SampleID), hjust=0, vjust=0) +
-  scale_color_manual(values=bs.colours) +
-  xlab("Axis 1") + ylab("Axis 2")
+BS <- ggplot(data.frame(out.agpca$U, sample_data(physeq.top.rel))) +
+      geom_point(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +
+      #geom_text( aes(label=sample_data(physeq30.rel)$SampleID), hjust=0, vjust=0) +
+      scale_color_manual(values=bs.colours) +
+      xlab("Axis 1") + ylab("Axis 2")
 plot(BS)
 
 

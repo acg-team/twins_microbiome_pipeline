@@ -27,6 +27,7 @@ seq.variant.names <- names(seqs)
 seq.number <- length(seq.variant.names)
 
 # generate short names (RAXML requires names to be less then 256)
+# TODO - a questional... may be use the first 10 letters? with number?
 prefix <- "sv_seq_variant"
 suffix <- seq(1:seq.number)
 seq.variant.short.names <- paste(prefix, suffix, sep='_')
@@ -41,42 +42,53 @@ names(seqs) <- seq.variant.short.names
 # TODO: check for Muscle specific parameters
 
 # option 0:  AlignSeqsfrom the DECIPHER
-microbiome.msa.decipher <- DECIPHER::AlignSeqs( DNAStringSet(seqs) )
-
+if (dada_param$MSA_aligner=="DECIPHER"){
+  print("--> run MSA by DECIPHER")
+  microbiome.msa.decipher <- DECIPHER::AlignSeqs( DNAStringSet(seqs) )
+  Biostrings::writeXStringSet(unmasked(microbiome.msa.decipher), file=file.path(result_path, "msa_decipher.fasta"))
+  save(microbiome.msa.decipher, seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
+  }
 
 
 # option 1: generate MSA with Muscle
 # 5 hours
-tic()
-microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
-print("msa (muscle) took:")
-toc()  # 1972.561sec
-print(microbiome.msa.muscle)
-rownames(microbiome.msa.muscle)
-save(microbiome.msa.muscle, seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
+if (dada_param$MSA_aligner=="MUSCLE"){
+  print("--> run MSA by MUSCLE")
+  tic()
+  microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
+  print("msa (muscle) took:")
+  toc()  # 1972.561sec
+  print(microbiome.msa.muscle)
+  rownames(microbiome.msa.muscle)
+  
+  # save MSA as a fasta file for possible vizualization with UGene browser
+  Biostrings::writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
+  save(microbiome.msa.muscle,seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
+}
 
-# save MSA as a fasta file for possible vizualization with UGene browser
-Biostrings::writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
 
 
 # option 2: generate MSA with clustalW
 # 6 hours
-tic()
-microbiome.msa.clustalw <- msa::msaClustalW(seqs, type="dna", order="input")
-print("msa (clustalw) took:")
-toc() 
-print(microbiome.msa.clustalw)
-#microbiome.msa.clustalw@unmasked@ranges@NAMES[3000:4000]
-#Biostrings::writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
-
-# save objects for reusing late in pipeline 
-#save(microbiome.msa.muscle, microbiome.msa.clustalw, seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
-
+if (dada_param$MSA_aligner=="clustalw"){
+  print("--> run MSA by clustalw")
+  tic()
+  microbiome.msa.clustalw <- msa::msaClustalW(seqs, type="dna", order="input")
+  print("msa (clustalw) took:")
+  toc() 
+  print(microbiome.msa.clustalw)
+  #microbiome.msa.clustalw@unmasked@ranges@NAMES[3000:4000]
+  Biostrings::writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
+  
+  # save objects for reusing late in pipeline 
+  save(microbiome.msa.clustalw, seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
+}
 
               
 
 #################################################
 # use on of this 
+# TODO - add selection
 my.msa <- microbiome.msa.decipher
 my.msa <- microbiome.msa.clustalw
 my.msa <- microbiome.msa.muscle
@@ -84,6 +96,7 @@ my.msa <- microbiome.msa.muscle
 
 ########### OPTION 1:  fast NJ tree, can be used as guide tree as well
 
+# TODO - choose only one methor of tree
 # infer a tree with fast NJ method 
 # 40 min
 tic()
@@ -102,7 +115,7 @@ tic()
 fitJC = phangorn::pml(tree=treeNJ, data=phang.align)   # pmlcomputes  the  likelihood  of  a  phylogenetic  tree 
 fitJC <- optim.pml(fitJC)    # optimize edge length etc parameters
 toc()
-save(treeNJ,fitJC, file=file.path(files_intermediate_dada, phylo.file))
+save(treeNJ, fitJC, file=file.path(files_intermediate_dada, phylo.file))
 
 # futher refine ML tree with GTR+G+I model
 tic()
@@ -132,7 +145,7 @@ msa.dnabin.as <- as.DNAbin(my.msa)
 labels(msa.dnabin.as)
 print(msa.dnabin.as)   # Base composition: acgt = NaN! why?
 
-save(msa.dnabin.as, file=file.path(files_intermediate_dada, msa.file)) 
+save(my.msa, seq.variant.names, msa.dnabin.as, file=file.path(files_intermediate_dada, msa.file)) 
 
 # Parameters:
 # f - RAxML algorithm
@@ -152,7 +165,6 @@ toc() # 3045.909 sec = 0.8 h om 6 core server - very fast
 
 save( tree.raxml, file=file.path(files_intermediate_dada, phylo.file)) 
 
-save(treeNJ, fitJC, fitGTR, tree.raxml, file=file.path(files_intermediate_dada, phylo.file)) 
 
 
 

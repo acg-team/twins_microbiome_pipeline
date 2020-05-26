@@ -15,16 +15,24 @@ print(paste("########   Configuration set for : ", conf, " ###############" ))
 if(conf$location == "LOCAL"){
   project_path <- "~/Projects_R/twins_microbiome_pipeline"
   raxm.exec.path <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
+  #TODO
+  raw_data_path <- file.path(project_path, "data_set_twin/raw")
+  # data_path <- file.path(project_path, "data_set_twin/raw")
 
 } else if(conf$location == "HOMESERVER") {
   project_path <- "/media/alex/db5547c3-1ac1-4ec5-aac9-29a383a87978"
   raxm.exec.path <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
+  
+} else if(conf$location == "NATASHA") {
+  project_path <- "/Users/Natasha/Mac_Documents/Academic_Research/Forensics/Projects/Twin_Microbiome_Data/twins_microbiome_pipeline-master"
+  raxm.exec.path <- "????/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 
 } else {
   stop(" WRONG SERVER CONFIGURATION")
 }
 
 
+filt_path <- file.path(project_path, "data_set_twin/raw/filtered")
 
 
 ######## 2:  set SPECIFIC FOLDERS depending on dataset
