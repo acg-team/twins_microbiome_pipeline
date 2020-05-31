@@ -2,18 +2,23 @@
 # analysis of Body Fluid dataset on dada2 ASV
 
 
-###########################
+#################### 0: CONFIGURATION : PLEASE SET!  ##############
 conf <- vector(mode="list", length=3)
 names(conf) <- c("location", "dataset", "pipeline")
-conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
-conf$dataset <- "BODYFL"   
-conf$pipeline <- "DADA2"  
 
+### now we set it as calculare on local macbook and use 34 new dataset
+conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
+conf$dataset <- "BODYFL"    #   TWIN / "BODYFL" /
+conf$pipeline <- "DADA2"   # QIIME / DADA2
+
+################# FILTERING parameters 
 dada_param <- vector(mode="list", length=2)
 names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE")
-dada_param$QUALITY_THRESHOLD <- 18
-dada_param$maxEE <- c(4,6)
-############################
+dada_param$QUALITY_THRESHOLD <- 2
+dada_param$maxEE <- c(2,4)
+dada_param$MSA_aligner <- "MUSCLE"   # DECIPHER  MUSCLE  clustalw 
+dada_param$tree_method <- "RAXML"    # PHANGORN   
+
 
 #### init: load packages and set path
 # NOTE - swith from TWIN to BDFLUID!!! in configure.R

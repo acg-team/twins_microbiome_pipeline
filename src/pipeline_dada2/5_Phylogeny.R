@@ -88,10 +88,12 @@ if (dada_param$MSA_aligner=="clustalw"){
 
 #################################################
 # use on of this 
-# TODO - add selection
-my.msa <- microbiome.msa.decipher
-my.msa <- microbiome.msa.clustalw
-my.msa <- microbiome.msa.muscle
+if (dada_param$MSA_aligner=="DECIPHER"){ my.msa <- microbiome.msa.decipher }
+if (dada_param$MSA_aligner=="MUSCLE"){ my.msa <- microbiome.msa.muscle }
+if (dada_param$MSA_aligner=="clustalw"){ my.msa <- microbiome.msa.clustalw }
+
+
+
 ####################### Infer a phylogenetic tree 
 
 ########### OPTION 1:  fast NJ tree, can be used as guide tree as well
@@ -99,36 +101,38 @@ my.msa <- microbiome.msa.muscle
 # TODO - choose only one methor of tree
 # infer a tree with fast NJ method 
 # 40 min
-tic()
-phang.align <- phangorn::as.phyDat(my.msa, type="DNA", names=seqtab.samples.names)
-dm <- dist.ml(phang.align)  #distance matrix
-treeNJ <- phangorn::NJ(dm) # "phylo" object (a tree)
-toc()
-save(treeNJ, file=file.path(files_intermediate_dada, phylo.file)) 
-
-####### refine NJ tree with nt substitution model by Felsenstein ML mehod
-## WARNING! Might take a lot of time
-# infer ML tree with Jukes-Cantor model (JC69, default one), usin NJ as a guide tree
-# fitJC is "pml" object, tree can be extracted as fitJC$tree, also has logLik etc parameters
-# 55 min
-tic()
-fitJC = phangorn::pml(tree=treeNJ, data=phang.align)   # pmlcomputes  the  likelihood  of  a  phylogenetic  tree 
-fitJC <- optim.pml(fitJC)    # optimize edge length etc parameters
-toc()
-save(treeNJ, fitJC, file=file.path(files_intermediate_dada, phylo.file))
-
-# futher refine ML tree with GTR+G+I model
-tic()
-# change parameters of pml: k=Number of intervals of the discrete gamma distribution, inv=Proportion of invariable sites
-# What is that parameters?!
-fitGTR <- update(fitJC, k=4, inv=0.2)  
-fitGTR <- phangorn::optim.pml(fitGTR, model="GTR", optInv=TRUE, optGamma=TRUE,
-                    rearrangement = "stochastic", control = pml.control(trace = 0))
-toc()
-
-# save the tree to file
-save(treeNJ, fitJC, fitGTR, file=file.path(files_intermediate_dada, phylo.file)) 
-
+if (dada_param$tree_method=="PHANGORN"){
+  print("---> Tree inference by PHANGORN")
+  tic()
+  phang.align <- phangorn::as.phyDat(my.msa, type="DNA", names=seqtab.samples.names)
+  dm <- dist.ml(phang.align)  #distance matrix
+  treeNJ <- phangorn::NJ(dm) # "phylo" object (a tree)
+  toc()
+  save(treeNJ, file=file.path(files_intermediate_dada, phylo.file)) 
+  
+  ####### refine NJ tree with nt substitution model by Felsenstein ML mehod
+  ## WARNING! Might take a lot of time
+  # infer ML tree with Jukes-Cantor model (JC69, default one), usin NJ as a guide tree
+  # fitJC is "pml" object, tree can be extracted as fitJC$tree, also has logLik etc parameters
+  # 55 min
+  tic()
+  fitJC = phangorn::pml(tree=treeNJ, data=phang.align)   # pmlcomputes  the  likelihood  of  a  phylogenetic  tree 
+  fitJC <- optim.pml(fitJC)    # optimize edge length etc parameters
+  toc()
+  save(treeNJ, fitJC, file=file.path(files_intermediate_dada, phylo.file))
+  
+  # futher refine ML tree with GTR+G+I model
+  tic()
+  # change parameters of pml: k=Number of intervals of the discrete gamma distribution, inv=Proportion of invariable sites
+  # What is that parameters?!
+  fitGTR <- update(fitJC, k=4, inv=0.2)  
+  fitGTR <- phangorn::optim.pml(fitGTR, model="GTR", optInv=TRUE, optGamma=TRUE,
+                      rearrangement = "stochastic", control = pml.control(trace = 0))
+  toc()
+  
+  # save the tree to file
+  save(treeNJ, fitJC, fitGTR, file=file.path(files_intermediate_dada, phylo.file)) 
+}
 
 
 
@@ -147,24 +151,25 @@ print(msa.dnabin.as)   # Base composition: acgt = NaN! why?
 
 save(my.msa, seq.variant.names, msa.dnabin.as, file=file.path(files_intermediate_dada, msa.file)) 
 
-# Parameters:
-# f - RAxML algorithm
-# N - Integers give the number of independent searches on different starting tree or replicates in bootstrapping. 
-# p - Integer, setting a random seed for the parsimony starting trees.
-# return tr is a list of tr[1] - info, tr[2] - best tree (rooted)
-
-# 5.5h
-tic()
-tree.raxml <- ips::raxml(
-  msa.dnabin.as, f = "d", N = 3, p = 1234, 
-  exec = raxm.exec.path, threads=6
-) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
-
-toc() # 3045.909 sec = 0.8 h om 6 core server - very fast
-
-
-save( tree.raxml, file=file.path(files_intermediate_dada, phylo.file)) 
-
+if (dada_param$tree_method=="RAXML"){
+  # Parameters:
+  # f - RAxML algorithm
+  # N - Integers give the number of independent searches on different starting tree or replicates in bootstrapping. 
+  # p - Integer, setting a random seed for the parsimony starting trees.
+  # return tr is a list of tr[1] - info, tr[2] - best tree (rooted)
+  
+  # 5.5h
+  tic()
+  tree.raxml <- ips::raxml(
+    msa.dnabin.as, f = "d", N = 3, p = 1234, 
+    exec = raxm.exec.path, threads=6
+  ) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
+  
+  toc() # 3045.909 sec = 0.8 h om 6 core server - very fast
+  
+  
+  save( tree.raxml, file=file.path(files_intermediate_dada, phylo.file)) 
+}
 
 
 

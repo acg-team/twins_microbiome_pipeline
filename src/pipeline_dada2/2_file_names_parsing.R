@@ -1,4 +1,6 @@
-# get and parse read's file names from raw folde
+# 1. read the RAW data folder
+# 2. filter them if neccesary
+# 3. split then into two lists with forward and reverse reads
 # by the and of this script we have fnFs / fnRs as lists of reads names
 
 source("src/configure.R")
@@ -11,7 +13,7 @@ load(file=file.path(metadata_path, metadata.file))
 ###### create lists of file names of forward reads (fnFs) and reverse reads (fnRs) ######
 
 # get all sample's file names to be processed by scanning the raw data folder
-fns <- sort(list.files(data_path, full.names = TRUE))
+fns <- sort(list.files(raw_data_path, full.names = TRUE))
 print(paste("Samples (reverse and forward) left BEFORE filtering::", length(fns)))
 
 

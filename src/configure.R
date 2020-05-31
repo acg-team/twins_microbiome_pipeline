@@ -15,9 +15,6 @@ print(paste("########   Configuration set for : ", conf, " ###############" ))
 if(conf$location == "LOCAL"){
   project_path <- "~/Projects_R/twins_microbiome_pipeline"
   raxm.exec.path <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
-  #TODO
-  raw_data_path <- file.path(project_path, "data_set_twin/raw")
-  # data_path <- file.path(project_path, "data_set_twin/raw")
 
 } else if(conf$location == "HOMESERVER") {
   project_path <- "/media/alex/db5547c3-1ac1-4ec5-aac9-29a383a87978"
@@ -32,7 +29,8 @@ if(conf$location == "LOCAL"){
 }
 
 
-filt_path <- file.path(project_path, "data_set_twin/raw/filtered")
+silva_path <- file.path(project_path, "tax_silva")
+green_genes_path <- file.path(project_path, "tax_green_genes")
 
 
 ######## 2:  set SPECIFIC FOLDERS depending on dataset
@@ -59,16 +57,16 @@ if(conf$dataset == "TWIN"){
   result_path  <- file.path(project_path, "data_set_bodyfl/reports_generated")
 
   if(conf$location == "LOCAL"){
-    data_path <- file.path(project_path, "data_set_bodyfl/raw")
+    raw_data_path <- file.path(project_path, "data_set_bodyfl/raw/no_primers")
     filt_path <- file.path(project_path, "data_set_bodyfl/raw/filtered")
     qiime_qza_path <- file.path(project_path, "data_set_bodyfl/raw/qza")
   } else if(conf$location == "HOMESERVER"){
-    stop("no such configuration exists")
+    stop("no such configuration exists yet")
   }
 }
 
-silva_path <- file.path(project_path, "tax_silva")
-green_genes_path <- file.path(project_path, "tax_green_genes")
+
+
 
 ##### 3: Set file names (same for any dataset but in different folders) ###########################
 
