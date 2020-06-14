@@ -19,17 +19,6 @@ load(file=file.path(metadata_path, metadata.file))
 
 
 
-
-### QC QUALITY: ##############
-# check FastQC plots for quality 
-# some of them are in bad quality #3
-ii <- seq(from=1,to=3,by=1)  #length(fnFs)
-for(i in ii) {
- print(dada2::plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i])))
- print(dada2::plotQualityProfile(fnRs[i]) + ggtitle(paste("Rev:", sample.names[i])))
-}
-
-
 ### FILTERING  ##########################
 # trim and put into filtered folder
 # https://github.com/benjjneb/dada2/tree/master/R
@@ -37,6 +26,8 @@ print(paste("--------   Filtering parameters : ", dada_param, " ---------" ))
 
 QUALITY_THRESHOLD <- dada_param$QUALITY_THRESHOLD #18  # Phred
 maxEE <- dada_param$maxEE   # c(5,5)
+trimLeft <- dada_param$trimLeft
+trimRight <- dada_param$trimRight
 
   
 filtFs <- file.path(filt_path, basename(fnFs))  # names for filtered forwards reads
@@ -55,17 +46,22 @@ tic()
 # - maxEE - maximum number of “expected errors” allowed in a read
 # - truncQ;
 # https://academic.oup.com/bioinformatics/article/31/21/3476/194979
+
+filter.log<-matrix(ncol = 2)
+
 for(i in seq_along(fnFs)) {
   print(paste("Filering and Trimming sample: ", i))
   print(fnFs[[i]])
   print(fnRs[[i]])
   out <- dada2::filterAndTrim( fwd=fnFs[[i]], filt=filtFs[[i]],
                         rev=fnRs[[i]], filt.rev=filtRs[[i]],
-                        #trimLeft=c(3,3), truncLen=c(247,235), # warning: No reads passed the filter ?!
+                        trimLeft=trimLeft, trimRight=trimRight,
+                        #truncLen=truncLen,  # discard reads smaller then that
                         maxEE=maxEE, maxN=0, truncQ=QUALITY_THRESHOLD,  rm.phix=TRUE,
                         compress=TRUE, verbose=TRUE, multithread=TRUE
   )
   print(out)
+  filter.log <- rbind(filter.log, out)  # log the filtering reads number
 }
 toc()  # 5839sec = 1.5 hours
 

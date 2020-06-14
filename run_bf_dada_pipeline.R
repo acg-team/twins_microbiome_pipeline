@@ -8,48 +8,46 @@ conf$dataset <- "BODYFL"    #   TWIN / "BODYFL" /
 conf$pipeline <- "DADA2"   # QIIME / DADA2
 
 ################# FILTERING parameters 
-dada_param <- vector(mode="list", length=2)
-names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE")
+dada_param <- vector(mode="list", length=6)
+names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE", "trimLeft", "truncLen", "MSA_aligner", "tree_method")
+
 dada_param$QUALITY_THRESHOLD <- 2
-dada_param$maxEE <- c(2,4)
+dada_param$maxEE <- c(2,2)
+dada_param$trimLeft <- c(3,3)
+dada_param$trimRight <- c(3,3)
+
 dada_param$MSA_aligner <- "MUSCLE"   # DECIPHER  MUSCLE  clustalw 
 dada_param$tree_method <- "RAXML"    # PHANGORN   
+
 ##################################################################
 
-
-
 #TODO
-# - remove primers and adapters - done
-# - add removal to QIIME2 
-# - keep track of reads filtered before and after - done
-# - add exception in case merging is failed
+# - add removal to QIIME2 and to TWIN pipeline
+
 
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
 
-#con <- file("last_dada.log")
-#sink(con, append=TRUE)
-#sink(con, append=TRUE, type="message")
 
-# full workflow (1-2 days ona  a server)
+# full workflow (1-2 days on a server)
+# cutadapt shall come here as well
 #source("src/pipeline_dada2/1_metadata.R")
+
 source("src/pipeline_dada2/2_file_names_parsing.R")
 
 print("==================> long dada2 analysis has started...")
-source("src/pipeline_dada2/3_BIG_dada_SV_table.R")
+source("src/pipeline_dada2/4_BIG_dada_SV_table.R")
 
 print("==================> Taxonomy assignment has started...")
-source("src/pipeline_dada2/4_Tax_Assign.R")
+source("src/pipeline_dada2/5_Tax_Assign.R")
 
 print("==================> Phylogeny reconstraction has started...")
-source("src/pipeline_dada2/5_Phylogeny.R")
+source("src/pipeline_dada2/6_Phylogeny.R")
 
-source("src/pipeline_dada2/6_Create_Phyloseq_obj.R")
+source("src/pipeline_dada2/7_Create_Phyloseq_obj.R")
 
 print(" Now PhyloSeq object has been created and you can run your analysis")
 print(" >>>>>>>  END  <<<<<<<<")
-# Restore output to console
-#sink() 
-#sink(type="message")
+
 
 

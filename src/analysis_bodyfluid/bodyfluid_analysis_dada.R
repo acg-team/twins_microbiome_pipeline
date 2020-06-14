@@ -37,8 +37,11 @@ theme_set((theme_bw()))
 
 
 ############ LOAD Budy Fluid PhyloSeq file + metadata
+calculated_ps_file <- "phyloseq_BODYFL_DADA2_Q2_maxEE24.RData"
+###############
+
 load(file=file.path(metadata_path, "metadata.RData"))
-load(file=file.path(files_intermediate_dada, "phyloseq_BODYFL_DADA2_Q2_maxEE24.RData"))
+load(file=file.path(files_intermediate_dada, calculated_ps_file))
 head(df.metadata) # check metadata
 
 # rename the phyloseq object
@@ -60,11 +63,14 @@ get_taxa_unique(ps.bfluid, "Phylum") #("Kingdom", "Phylum", "Class", "Order", "F
 get_taxa_unique(ps.bfluid, "Class")
 
 
-# visually check that we hava a community matrix: rows are samples (46) and colums are taxa (spesies)
+# visually check that we have a community matrix: rows are samples (46) and colums are taxa (spesies)
 OTU = as(otu_table(ps.bfluid), "matrix")
 colnames(OTU) <- c()
 dim(OTU)
-View(OTU)
+#View(OTU)
+
+# check the dictribution of abandamcies 
+hist(OTU[1,],breaks=20)
 
 # check the tree, thi sis ape package
 tree <- phy_tree(ps.bfluid)
@@ -90,7 +96,7 @@ physeq.top <- prune_taxa((tax_table(ps.bfluid)[, "Genus"] %in% topGenera), ps.bf
 otu.top <- as(otu_table(physeq.top), "matrix")
 colnames(otu.top) <- c()  # clean the long column names
 dim(otu.top)
-View(otu.top)
+#View(otu.top)
 
 sample_sums(physeq.top) # sanity again
 #get_taxa_unique(physeq.top, "Genus")
@@ -102,24 +108,32 @@ sample_sums(physeq.top)
 
 ########### normalize and log abundancies of community matrix
 # do normalization and log transform
-# do rel first, only then log
+# do rel first, only then log - why?!
+
+physeq.top.log <- phyloseq::transform_sample_counts(physeq.top, function(x) log(1 + x)) # log transform with pseudocount
+sample_sums(physeq.top.log)
 
 physeq.top.rel <- phyloseq::transform_sample_counts(physeq.top, function(x) x / sum(x) ) # Total Sum Scaling (TSS)
 sample_sums(physeq.top.rel)
 
-#physeq.top.log <- phyloseq::transform_sample_counts(physeq.top, function(x) log(1 + x)) # log transform with pseudocount
+physeq.top.log.rel <- phyloseq::transform_sample_counts(physeq.top.log, function(x) x / sum(x) ) # Total Sum Scaling (TSS)
+sample_sums(physeq.top.log.rel)
+
+physeq.top.rel.log <- phyloseq::transform_sample_counts(physeq.top.rel, function(x) log(1 + x)) # log transform with pseudocount
+sample_sums(physeq.top.log)
 
 
-
+######
+physeq <- physeq.top.rel
 
 ###########  Ordination with phyloseq
 # https://joey711.github.io/phyloseq/plot_ordination-examples
-dst <- phyloseq::distance(physeq.top.rel, method="wunifrac", type="samples")
+dst <- phyloseq::distance(physeq, method="wunifrac", type="samples")
 sum(dst==0)   # check if we have NA distances 
 
 # calculate and plot "PCoA" with "unifrac" distances
-bf.ord <- phyloseq::ordinate(physeq.top.rel, "PCoA", "unifrac", weighted=TRUE)
-p1 <- phyloseq::plot_ordination(physeq.top.rel, bf.ord, type="samples", color='Body_site')
+bf.ord <- phyloseq::ordinate(physeq, "PCoA", "unifrac", weighted=TRUE)
+p1 <- phyloseq::plot_ordination(physeq, bf.ord, type="samples", color='Body_site')
 print(p1)
 
 
@@ -128,7 +142,7 @@ print(p1)
 # good source too - https://www.bioconductor.org/help/course-materials/2017/BioC2017/Day1/Workshops/Microbiome/doc/MicrobiomeWorkshopII.html
 # http://jfukuyama.github.io/adaptiveGPCA/
 # extract nessesary matrices for gPCA
-pp = adaptiveGPCA::processPhyloseq(physeq.top.rel)
+pp = adaptiveGPCA::processPhyloseq(physeq)
 any(is.na(pp$X))  # if any NA, gPCA wont work
 any(is.na(pp$Q))
 
@@ -139,9 +153,9 @@ out.agpca
 
 
 ### PLOT results (black and white)
-plot(out.agpca) # variance explained
-plot(out.agpca, type = "samples", axes = c(1,2))   # all samples in 2D, no colod
-plot(out.agpca, type = "variables", axes = c(1,2))  # ??
+#plot(out.agpca) # variance explained
+#plot(out.agpca, type = "samples", axes = c(1,2))   # all samples in 2D, no colod
+#plot(out.agpca, type = "variables", axes = c(1,2))  # ??
 
 
 #### PLOT with color schemas
@@ -151,7 +165,7 @@ names (bs.colours) <- levels(df.metadata$Body_site)
 names(bs.colours)
 
 # Colour-shape test for phylum - genus
-df.tax <- as.data.frame(tax_table(physeq.top.rel))
+df.tax <- as.data.frame(tax_table(physeq))
 df.tax.reduced <- df.tax[,c("Phylum","Genus")]
 
 # package: ‘dplyr’ is a fairly new (2014) package that tries to provide easy tools for the most common data manipulation tasks.
@@ -165,7 +179,8 @@ df.tax.reduced %>%
 phyla.colours <- brewer.pal(n = 8, name = "Dark2")
 names(phyla.colours) <- unique(df.tax.reduced$Phylum)
 
-BS <- ggplot(data.frame(out.agpca$U, sample_data(physeq.top.rel))) +
+BS <- ggplot(data.frame(out.agpca$U, sample_data(physeq))) +
+      ggtitle(paste("Adap gPCA, sample data ", calculated_ps_file)) +
       geom_point(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +
       #geom_text( aes(label=sample_data(physeq30.rel)$SampleID), hjust=0, vjust=0) +
       scale_color_manual(values=bs.colours) +
@@ -184,15 +199,15 @@ plot(BS)
 palette <- distinctColorPalette(n)
 #pie(rep(1, n), col=palette)
 
-PHYL <- ggplot(
-  data.frame(out.agpca$QV, tax_table(physeq.top.rel))) +
+PHYL <- ggplot(data.frame(out.agpca$QV, tax_table(physeq))) +
+  ggtitle(paste("Adaptive gPCA for ", calculated_ps_file)) +
   geom_point(aes(x = Axis1, y = Axis2, shape=Phylum, colour = Genus)) +
-  xlab("Axis 1") + ylab("Axis 2") + 
+  xlab("Pr Axis 1") + ylab("Pr Axis 2") + 
   scale_color_manual(values=palette) #+
   #theme (legend.position ="none")
 plot(PHYL)
 
-#t = inspectTaxonomy(out.agpca, physeq.top.rel)
+#t = inspectTaxonomy(out.agpca, physeq)
 
 
 

@@ -82,7 +82,8 @@ dim( tax_table(ps) )   # Taxonomy Table: [ 8299 taxa by 6 taxonomic ranks ] - Th
 phy_tree(ps)     # Phylogenetic Tree: [ 8299 tips, ??? internal nodes ] - need to re run the whole workflow
 
 
-save(ps, file=file.path(files_intermediate_dada, phyloseq.file)) 
+# filter.log shall come from 3 file
+save(ps, filter.log, file=file.path(files_intermediate_dada, phyloseq.file)) 
 
 
 

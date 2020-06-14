@@ -71,16 +71,20 @@ if(conf$dataset == "TWIN"){
 ##### 3: Set file names (same for any dataset but in different folders) ###########################
 
 file.suffix <- paste0(
-  conf$dataset, "_", conf$pipeline, "_Q", 
-  dada_param$QUALITY_THRESHOLD, "_maxEE", dada_param$maxEE[1], dada_param$maxEE[2], ".RData"
+  conf$dataset, "_", conf$pipeline, 
+  "_Q", dada_param$QUALITY_THRESHOLD, 
+  "_maxEE", dada_param$maxEE[1], dada_param$maxEE[2], 
+  "_trim", dada_param$trimLeft[1], "_", dada_param$trimLeft[2], "_",
+  dada_param$trimRight[1], "_", dada_param$trimRight[2],
+  ".RData"
 )
 
 # file names for intermediate results
 metadata.file <- "metadata.RData"
 dada.err.file <- "dada_err_data.RData"
 mergers.file <- "mergers.RData"
-seqtab.file <- paste0("seqtab_", file.suffix)
-seqtab.snames.file <- paste0("seqtab_snames_", file.suffix)
+seqtab.file <- "seqtab.RData"   #paste0("seqtab_", file.suffix)
+seqtab.snames.file <- "seqtab_snames.RData"  #paste0("seqtab_snames_", file.suffix)
 
 taxtab.file <- "taxtab.RData"
 
