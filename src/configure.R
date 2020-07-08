@@ -15,6 +15,7 @@ print(paste("########   Configuration set for : ", conf, " ###############" ))
 if(conf$location == "LOCAL"){
   project_path <- "~/Projects_R/twins_microbiome_pipeline"
   raxm.exec.path <- "/Users/alex/bioinf_tools/RAxML/raxmlHPC-PTHREADS-AVX"
+  fastqc.path = "/Applications/BIOINF/FastQC.app/Contents/MacOS/fastqc"
 
 } else if(conf$location == "HOMESERVER") {
   project_path <- "/media/alex/db5547c3-1ac1-4ec5-aac9-29a383a87978"
@@ -41,25 +42,25 @@ if(conf$dataset == "TWIN"){
   result_path  <- file.path(project_path, "data_set_twin/reports_generated")
   
   if(conf$location == "LOCAL"){
-    data_path <- file.path(project_path, "data_set_twin/raw")
-    filt_path <- file.path(project_path, "data_set_twin/raw/filtered")
-    qiime_qza_path <- file.path(project_path, "data_set_twin/raw/qza")
+    data_path <- file.path(project_path, "data_set_twin/fastq")
+    filt_path <- file.path(project_path, "data_set_twin/fastq/filtered")
+    qiime_qza_path <- file.path(project_path, "data_set_twin/fastq/qza")
   } else if(conf$location == "HOMESERVER"){
     data_path    <- file.path(project_path, "BIOINF_DATA/TwinUK_Full")
     filt_path    <- file.path(project_path, "BIOINF_DATA/TwinUK_Full/filtered")
   }
 
   
-} else if (conf$dataset == "BODYFL"){
+} else if (conf$dataset == "BFL"){
   metadata_path   <- file.path(project_path, "data_set_bodyfl/metadata")
   files_intermediate_dada  <- file.path(project_path, "data_set_bodyfl/files_intermediate_dada")
   files_intermediate_qiime <- file.path(project_path, "data_set_bodyfl/files_intermediate_qiime")
   result_path  <- file.path(project_path, "data_set_bodyfl/reports_generated")
 
   if(conf$location == "LOCAL"){
-    raw_data_path <- file.path(project_path, "data_set_bodyfl/raw/no_primers")
-    filt_path <- file.path(project_path, "data_set_bodyfl/raw/filtered")
-    qiime_qza_path <- file.path(project_path, "data_set_bodyfl/raw/qza")
+    raw_data_path <- file.path(project_path, "data_set_bodyfl/fastq/no_primers")
+    filt_path <- file.path(project_path, "data_set_bodyfl/fastq/filtered")
+    qiime_qza_path <- file.path(project_path, "data_set_bodyfl/fastq/qza")
   } else if(conf$location == "HOMESERVER"){
     stop("no such configuration exists yet")
   }
@@ -70,14 +71,15 @@ if(conf$dataset == "TWIN"){
 
 ##### 3: Set file names (same for any dataset but in different folders) ###########################
 
-file.suffix <- paste0(
+folder.suffix <- paste0(
   conf$dataset, "_", conf$pipeline, 
   "_Q", dada_param$QUALITY_THRESHOLD, 
   "_maxEE", dada_param$maxEE[1], dada_param$maxEE[2], 
   "_trim", dada_param$trimLeft[1], "_", dada_param$trimLeft[2], "_",
-  dada_param$trimRight[1], "_", dada_param$trimRight[2],
-  ".RData"
+  dada_param$trimRight[1], "_", dada_param$trimRight[2]
 )
+
+file.suffix <- paste0(folder.suffix, ".RData")
 
 # file names for intermediate results
 metadata.file <- "metadata.RData"
@@ -91,5 +93,5 @@ taxtab.file <- "taxtab.RData"
 msa.file <- "msa.RData"
 phylo.file <- "phylo_trees.RData"
 
-phyloseq.file <- paste0("phyloseq_", file.suffix)
+phyloseq.file <- paste0("phseq_", file.suffix)
 

@@ -24,14 +24,19 @@ load(file=file.path(metadata_path, metadata.file))
 # https://github.com/benjjneb/dada2/tree/master/R
 print(paste("--------   Filtering parameters : ", dada_param, " ---------" ))
 
+# read parameters
 QUALITY_THRESHOLD <- dada_param$QUALITY_THRESHOLD #18  # Phred
 maxEE <- dada_param$maxEE   # c(5,5)
 trimLeft <- dada_param$trimLeft
 trimRight <- dada_param$trimRight
 
+print(folder.suffix)
+
+# form a suffics for filtered reads names
+filt_path.suf <- paste0(filt_path, "/", folder.suffix)
   
-filtFs <- file.path(filt_path, basename(fnFs))  # names for filtered forwards reads
-filtRs <- file.path(filt_path, basename(fnRs))  # names for filtered reverse reads
+filtFs <- file.path(filt_path.suf, basename(fnFs))  # names for filtered forwards reads
+filtRs <- file.path(filt_path.suf, basename(fnRs))  # names for filtered reverse reads
 
 names(filtFs) <- sample.names
 names(filtRs) <- sample.names
@@ -46,8 +51,12 @@ tic()
 # - maxEE - maximum number of “expected errors” allowed in a read
 # - truncQ;
 # https://academic.oup.com/bioinformatics/article/31/21/3476/194979
+# https://github.com/benjjneb/dada2/issues/424
 
-filter.log<-matrix(ncol = 2)
+
+# TODO: change to dataframe
+filter.log <- matrix(ncol = 2)
+
 
 for(i in seq_along(fnFs)) {
   print(paste("Filering and Trimming sample: ", i))
@@ -56,25 +65,35 @@ for(i in seq_along(fnFs)) {
   out <- dada2::filterAndTrim( fwd=fnFs[[i]], filt=filtFs[[i]],
                         rev=fnRs[[i]], filt.rev=filtRs[[i]],
                         trimLeft=trimLeft, trimRight=trimRight,
-                        #truncLen=truncLen,  # discard reads smaller then that
+                        #truncLen=truncLen,  # discard reads smaller then that and cut the rest
                         maxEE=maxEE, maxN=0, truncQ=QUALITY_THRESHOLD,  rm.phix=TRUE,
-                        compress=TRUE, verbose=TRUE, multithread=TRUE
+                        compress=FALSE, verbose=TRUE, multithread=TRUE
   )
   print(out)
-  filter.log <- rbind(filter.log, out)  # log the filtering reads number
+  
+  rownames(out) <- sample.names[i]  # change the name of the sample to a standard name like "34Sat2"
+  filter.log <- rbind(filter.log, out)  # save filtered reads number
 }
 toc()  # 5839sec = 1.5 hours
 
+# add a merger field to keep
+filter.log <- cbind(filter.log, NA)
+colnames(filter.log) <- c("reads.in", "reads.out", "merged")
 
-# check quality afterward - if nessesary
-ii <- seq(from=1,to=3,by=1)  #length(fnFs)
-for(i in ii) { 
-  print(plotQualityProfile(fnFs[i]) + ggtitle(paste("Fwd:", sample.names[i]))) 
-  print(plotQualityProfile(filtFs[i]) + ggtitle(paste("Fwd_After:", sample.names[i]))) 
-  
-  print(plotQualityProfile(fnRs[i]) + ggtitle(paste("Rev:", sample.names[i]))) 
-  print(plotQualityProfile(filtRs[i]) + ggtitle(paste("Rev_After:", sample.names[i]))) 
-}
+########### Quality after filtering
+report.path.filt <- paste0(filt_path.suf, "/fastQC")
+
+# run all FASQC reports and save them to do Multiqc later
+fastqcr::fastqc(fq.dir = filt_path.suf, # FASTQ files directory
+                qc.dir = report.path.filt, # Results direcory
+                threads = 5,                    # Number of threads
+                fastqc.path = fastqc.path
+)
+
+# print the line for generation multi report
+# multiqc /Users/alex/Projects_R/twins_microbiome_pipeline/data_set_bodyfl/fastq/no_primers/fastQC
+print(paste("multiqc", report.path.filt))
+
 
 
 ########################################################################
@@ -86,8 +105,8 @@ if(length(filtFs) != length(filtRs)) stop("Forward and reverse files do not matc
 # https://github.com/benjjneb/dada2/issues/155
 # for large data sets error rates should be estimated on subset of data - change to 40, here it is ok
 tic()
-errF <- learnErrors(filtFs, nreads=2e6, multithread = TRUE, randomize=TRUE)
-errR <- learnErrors(filtRs, nreads=2e6, multithread = TRUE, randomize=TRUE)
+errF <- learnErrors(filtFs, nbases=1e8, multithread = TRUE, randomize=TRUE)
+errR <- learnErrors(filtRs, nbases=1e8, multithread = TRUE, randomize=TRUE)
 print("Error rate calculation time:")
 toc() # 9806.114 sec / 2.7h = now 2509sec
 
@@ -104,7 +123,6 @@ counter <- 0
 
 tic()
 for (sam in sample.names) {
-  tic()
   ### DEREPLICATION 
   derepF <- derepFastq(filtFs[[sam]])
   derepR <- derepFastq(filtRs[[sam]])
@@ -125,10 +143,12 @@ for (sam in sample.names) {
     merger <- dada2::mergePairs(dadaF, derepF, dadaR, derepR, justConcatenate=TRUE)  
     }
   mergers[[sam]] <- merger
-  toc()
+  
+  # add number of merged sequences to a filter.log
+  filter.log[sam,"merged"] <- length(merger$sequence)
   
   counter <- counter+1
-  cat(counter, "...", sam, " ... Done.\n")
+  cat(counter, "...", sam, ",  ", length(merger$sequence),  " merged sequences... Done.\n")
   cat("---------- \n")
 }
 print("Total time of sample inference:")

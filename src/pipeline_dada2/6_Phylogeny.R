@@ -45,7 +45,7 @@ names(seqs) <- seq.variant.short.names
 if (dada_param$MSA_aligner=="DECIPHER"){
   print("--> run MSA by DECIPHER")
   microbiome.msa.decipher <- DECIPHER::AlignSeqs( DNAStringSet(seqs) )
-  Biostrings::writeXStringSet(unmasked(microbiome.msa.decipher), file=file.path(result_path, "msa_decipher.fasta"))
+  Biostrings::writeXStringSet(microbiome.msa.decipher, file=file.path(result_path, "msa_decipher.fasta"))
   save(microbiome.msa.decipher, seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
   }
 
@@ -132,6 +132,8 @@ if (dada_param$tree_method=="PHANGORN"){
   
   # save the tree to file
   save(treeNJ, fitJC, fitGTR, file=file.path(files_intermediate_dada, phylo.file)) 
+  
+  my.tree <- fitGTR
 }
 
 
@@ -142,14 +144,14 @@ if (dada_param$tree_method=="PHANGORN"){
 #exec.path.ubuntu <- "/home/alex/installed/BIOINF_tools/RAxML/raxmlHPC-PTHREADS-AVX"
 
 # convert msa::MsaDNAMultipleAlignment data into ips::DNAbin (ape::DNAbim) format!
-msa.dnabin.as <- as.DNAbin(my.msa)
+msa.dnabin <- ape::as.DNAbin(my.msa, check.names=TRUE)
 
 
 # vizual control of MSA
-labels(msa.dnabin.as)
-print(msa.dnabin.as)   # Base composition: acgt = NaN! why?
+labels(msa.dnabin)
+print(msa.dnabin)   # Base composition: acgt = NaN! why?
 
-save(my.msa, seq.variant.names, msa.dnabin.as, file=file.path(files_intermediate_dada, msa.file)) 
+save(my.msa, seq.variant.names, msa.dnabin, file=file.path(files_intermediate_dada, msa.file)) 
 
 if (dada_param$tree_method=="RAXML"){
   # Parameters:
@@ -158,17 +160,37 @@ if (dada_param$tree_method=="RAXML"){
   # p - Integer, setting a random seed for the parsimony starting trees.
   # return tr is a list of tr[1] - info, tr[2] - best tree (rooted)
   
+
+#  alignment.rax.gtr <- raxml(alignment,
+#                             m="GTRGAMMAIX", # model
+#                             f="a", # best tree and bootstrap
+#                             p=1234, # random number seed
+#                             x=2345, # random seed for rapid bootstrapping
+#                             N=100, # number of bootstrap replicates
+#                             file="alignment", # name of output files
+#                             exec="raxmlHPC-PTHREADS-SSE3", # name of executable
+#                             threads=20
+#  )
+
+  
   # 5.5h
   tic()
   tree.raxml <- ips::raxml(
-    msa.dnabin.as, f = "d", N = 3, p = 1234, 
-    exec = raxm.exec.path, threads=6
+    as.matrix(msa.dnabin), 
+    m = "GTRGAMMA",
+    f = "d",   # d - new rapid hill-climbing / "a", # best tree and bootstrap
+    N = 3, 
+    p = 1234, 
+    exec = raxm.exec.path, 
+    threads=6,
+    file="RAxML_tree"
   ) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
   
   toc() # 3045.909 sec = 0.8 h om 6 core server - very fast
   
+  my.tree <- tree.raxml
+  save( my.tree, file=file.path(files_intermediate_dada, phylo.file)) 
   
-  save( tree.raxml, file=file.path(files_intermediate_dada, phylo.file)) 
 }
 
 

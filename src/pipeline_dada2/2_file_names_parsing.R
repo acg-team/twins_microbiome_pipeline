@@ -34,7 +34,7 @@ if(conf$dataset == 'TWIN'){
   
   save(df.metadata, df.metadata.ordered, df.metadata.4timepoints, sample.names, fnFs, fnRs, file=file.path(metadata_path, metadata.file)) 
 
-} else if(conf$dataset == 'BODYFL'){
+} else if(conf$dataset == 'BFL'){
   # split all filenames into Forward and Reverse reads files
   fnFs <- fns[grepl(".R1.fastq", fns)]
   fnRs <- fns[grepl(".R2.fastq", fns)]

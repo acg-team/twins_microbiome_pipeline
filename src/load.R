@@ -2,6 +2,7 @@
 # Specific Packages used:
 # ips -  Interfaces to Phylogenetic Software in R (to RAXML, Beast, MrBayes etc)
 # dada2, phyloseq
+# fastqcr - assessing FastQC quality in batch
 
 # check environment
 paste0(R.Version()[c("major","minor")], collapse = ".") # was 3.5.1

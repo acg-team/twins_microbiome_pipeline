@@ -2,24 +2,6 @@
 # analysis of Body Fluid dataset on dada2 ASV
 
 
-#################### 0: CONFIGURATION : PLEASE SET!  ##############
-conf <- vector(mode="list", length=3)
-names(conf) <- c("location", "dataset", "pipeline")
-
-### now we set it as calculare on local macbook and use 34 new dataset
-conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
-conf$dataset <- "BODYFL"    #   TWIN / "BODYFL" /
-conf$pipeline <- "DADA2"   # QIIME / DADA2
-
-################# FILTERING parameters 
-dada_param <- vector(mode="list", length=2)
-names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE")
-dada_param$QUALITY_THRESHOLD <- 2
-dada_param$maxEE <- c(2,4)
-dada_param$MSA_aligner <- "MUSCLE"   # DECIPHER  MUSCLE  clustalw 
-dada_param$tree_method <- "RAXML"    # PHANGORN   
-
-
 #### init: load packages and set path
 # NOTE - swith from TWIN to BDFLUID!!! in configure.R
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
@@ -37,7 +19,7 @@ theme_set((theme_bw()))
 
 
 ############ LOAD Budy Fluid PhyloSeq file + metadata
-calculated_ps_file <- "phyloseq_BODYFL_DADA2_Q2_maxEE24.RData"
+calculated_ps_file <- "phseq_BFL_DADA2_Q2_maxEE45_trim3_3_3_5.RData"
 ###############
 
 load(file=file.path(metadata_path, "metadata.RData"))
@@ -47,6 +29,9 @@ head(df.metadata) # check metadata
 # rename the phyloseq object
 ps.bfluid <- ps
 ps.bfluid
+
+filter.log <- filter.log[-1,]  # delete the first NA row (added by mistake)
+colMeans(filter.log)
 
 # transpose OTU matrix if neesesary to make it [taxa x samples] - not neccesary!
 if(!taxa_are_rows(ps.bfluid)){
@@ -76,7 +61,7 @@ hist(OTU[1,],breaks=20)
 tree <- phy_tree(ps.bfluid)
 ape::checkValidPhylo(tree)
 is.rooted(tree)
-#plot(phy_tree(tree), show.node.label = TRUE)
+plot(phy_tree(tree), show.node.label = TRUE)
 
 
 # TODO - explore all sequnces names and see NNN, length etc artefacts
@@ -180,7 +165,7 @@ phyla.colours <- brewer.pal(n = 8, name = "Dark2")
 names(phyla.colours) <- unique(df.tax.reduced$Phylum)
 
 BS <- ggplot(data.frame(out.agpca$U, sample_data(physeq))) +
-      ggtitle(paste("Adap gPCA, sample data ", calculated_ps_file)) +
+      ggtitle(paste("Adapt gPCA, sample data ", calculated_ps_file)) +
       geom_point(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +
       #geom_text( aes(label=sample_data(physeq30.rel)$SampleID), hjust=0, vjust=0) +
       scale_color_manual(values=bs.colours) +
