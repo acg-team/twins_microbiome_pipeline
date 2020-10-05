@@ -29,6 +29,8 @@ QUALITY_THRESHOLD <- dada_param$QUALITY_THRESHOLD #18  # Phred
 maxEE <- dada_param$maxEE   # c(5,5)
 trimLeft <- dada_param$trimLeft
 trimRight <- dada_param$trimRight
+truncLen <- dada_param$truncLen
+
 
 print(folder.suffix)
 
@@ -57,15 +59,18 @@ tic()
 # TODO: change to dataframe
 filter.log <- matrix(ncol = 2)
 
+# TODO: check fastqPairedFilter
+# https://github.com/benjjneb/dada2/issues/311
 
 for(i in seq_along(fnFs)) {
   print(paste("Filering and Trimming sample: ", i))
   print(fnFs[[i]])
   print(fnRs[[i]])
-  out <- dada2::filterAndTrim( fwd=fnFs[[i]], filt=filtFs[[i]],
+  out <- dada2::filterAndTrim( 
+                        fwd=fnFs[[i]], filt=filtFs[[i]],
                         rev=fnRs[[i]], filt.rev=filtRs[[i]],
                         trimLeft=trimLeft, trimRight=trimRight,
-                        #truncLen=truncLen,  # discard reads smaller then that and cut the rest
+                        truncLen=truncLen,  # discard reads smaller then that and cut the rest
                         maxEE=maxEE, maxN=0, truncQ=QUALITY_THRESHOLD,  rm.phix=TRUE,
                         compress=FALSE, verbose=TRUE, multithread=TRUE
   )
@@ -105,8 +110,8 @@ if(length(filtFs) != length(filtRs)) stop("Forward and reverse files do not matc
 # https://github.com/benjjneb/dada2/issues/155
 # for large data sets error rates should be estimated on subset of data - change to 40, here it is ok
 tic()
-errF <- learnErrors(filtFs, nbases=1e8, multithread = TRUE, randomize=TRUE)
-errR <- learnErrors(filtRs, nbases=1e8, multithread = TRUE, randomize=TRUE)
+errF <- learnErrors(filtFs, nbases=1e8, multithread = TRUE, randomize=TRUE, verbose=1, MAX_CONSIST=20)
+errR <- learnErrors(filtRs, nbases=1e8, multithread = TRUE, randomize=TRUE, verbose=1, MAX_CONSIST=20)
 print("Error rate calculation time:")
 toc() # 9806.114 sec / 2.7h = now 2509sec
 
@@ -124,6 +129,8 @@ counter <- 0
 tic()
 for (sam in sample.names) {
   ### DEREPLICATION 
+  # Dereplication is the process where all of the quality-filtered sequences are collapsed 
+  # into a set of unique reads, which are then clustered into OTUs.
   derepF <- derepFastq(filtFs[[sam]])
   derepR <- derepFastq(filtRs[[sam]])
   

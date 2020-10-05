@@ -74,9 +74,11 @@ if(conf$dataset == "TWIN"){
 folder.suffix <- paste0(
   conf$dataset, "_", conf$pipeline, 
   "_Q", dada_param$QUALITY_THRESHOLD, 
-  "_maxEE", dada_param$maxEE[1], dada_param$maxEE[2], 
-  "_trim", dada_param$trimLeft[1], "_", dada_param$trimLeft[2], "_",
-  dada_param$trimRight[1], "_", dada_param$trimRight[2]
+  "_mEE", dada_param$maxEE[1], dada_param$maxEE[2], 
+  "_trL", dada_param$trimLeft[1], "_", dada_param$trimLeft[2],
+  "_trR", dada_param$trimRight[1], "_", dada_param$trimRight[2],
+  "_truncLn", dada_param$truncLen[1], "_", dada_param$truncLen[2],
+  "_msa_", dada_param$MSA_aligner
 )
 
 file.suffix <- paste0(folder.suffix, ".RData")
@@ -93,5 +95,5 @@ taxtab.file <- "taxtab.RData"
 msa.file <- "msa.RData"
 phylo.file <- "phylo_trees.RData"
 
-phyloseq.file <- paste0("phseq_", file.suffix)
+phyloseq.file <- paste0("run_", file.suffix)
 

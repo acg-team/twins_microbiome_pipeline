@@ -19,7 +19,7 @@ theme_set((theme_bw()))
 
 
 ############ LOAD Budy Fluid PhyloSeq file + metadata
-calculated_ps_file <- "phseq_BFL_DADA2_Q2_maxEE45_trim3_3_3_5.RData"
+calculated_ps_file <- "rrun_BFL_DADA2_Q2_mEE45_trL0_0_trR0_0_truncLn210_220_msa_DECIPHER.RData"
 ###############
 
 load(file=file.path(metadata_path, "metadata.RData"))
@@ -45,8 +45,8 @@ if(!taxa_are_rows(ps.bfluid)){
 # check if every sample has at least one taxa and no NA
 sample_sums(ps.bfluid)
 get_taxa_unique(ps.bfluid, "Phylum") #("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
-get_taxa_unique(ps.bfluid, "Class")
-
+get_taxa_unique(ps.bfluid, "Genus")
+# TODO: check NA taxa - they excluded?
 
 # visually check that we have a community matrix: rows are samples (46) and colums are taxa (spesies)
 OTU = as(otu_table(ps.bfluid), "matrix")
@@ -55,13 +55,13 @@ dim(OTU)
 #View(OTU)
 
 # check the dictribution of abandamcies 
-hist(OTU[1,],breaks=20)
+hist(OTU[1,],breaks=40)
 
 # check the tree, thi sis ape package
 tree <- phy_tree(ps.bfluid)
 ape::checkValidPhylo(tree)
 is.rooted(tree)
-plot(phy_tree(tree), show.node.label = TRUE)
+#plot(phy_tree(tree), show.node.label = TRUE)
 
 
 # TODO - explore all sequnces names and see NNN, length etc artefacts
@@ -71,13 +71,17 @@ plot(phy_tree(tree), show.node.label = TRUE)
 
 ######### Get top 30 genera (need to do it before normalization!) otherwise taxa_sum() does not work
 # ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
-n <- 30
+top_num <- 30
 
 # total number of each Genera
 genera.sum = tapply(taxa_sums(ps.bfluid), tax_table(ps.bfluid)[, "Genus"], sum, na.rm=TRUE)
-topGenera = names(sort(genera.sum, TRUE))[1:n]  # names of top30 genera
+n <- length(names(sort(genera.sum, TRUE)))
+#[n-550:n]  / [0:top_num]
+topGenera = names(sort(genera.sum, TRUE))[n-60:n]  # names of top30 genera
 
 physeq.top <- prune_taxa((tax_table(ps.bfluid)[, "Genus"] %in% topGenera), ps.bfluid)
+
+# check OTU
 otu.top <- as(otu_table(physeq.top), "matrix")
 colnames(otu.top) <- c()  # clean the long column names
 dim(otu.top)
@@ -86,9 +90,8 @@ dim(otu.top)
 sample_sums(physeq.top) # sanity again
 #get_taxa_unique(physeq.top, "Genus")
 
-# remove taxa with abandancy less then 10
-physeq.top = prune_samples(sample_sums(physeq.top)>=10, physeq.top)
-sample_sums(physeq.top)
+# use NA as well!
+#physeq.top <- ps.bfluid
 
 
 ########### normalize and log abundancies of community matrix
@@ -109,7 +112,7 @@ sample_sums(physeq.top.log)
 
 
 ######
-physeq <- physeq.top.rel
+physeq <- physeq.top.rel   
 
 ###########  Ordination with phyloseq
 # https://joey711.github.io/phyloseq/plot_ordination-examples
@@ -121,6 +124,7 @@ bf.ord <- phyloseq::ordinate(physeq, "PCoA", "unifrac", weighted=TRUE)
 p1 <- phyloseq::plot_ordination(physeq, bf.ord, type="samples", color='Body_site')
 print(p1)
 
+# TODO: study outliers?
 
 
 ############# Adaptive gPCA - ordination plot to see distances BTW ALL SAMPLES!
@@ -164,6 +168,7 @@ df.tax.reduced %>%
 phyla.colours <- brewer.pal(n = 8, name = "Dark2")
 names(phyla.colours) <- unique(df.tax.reduced$Phylum)
 
+# TODO: plot exposed / non exposed separatelly
 BS <- ggplot(data.frame(out.agpca$U, sample_data(physeq))) +
       ggtitle(paste("Adapt gPCA, sample data ", calculated_ps_file)) +
       geom_point(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +

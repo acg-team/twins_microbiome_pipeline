@@ -8,13 +8,18 @@ conf$dataset <- "BFL"    #   TWIN / "BFL" /
 conf$pipeline <- "DADA2"   # QIIME / DADA2
 
 ################# FILTERING parameters 
-dada_param <- vector(mode="list", length=5)
-names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE", "trimLeft", "MSA_aligner", "tree_method")
+dada_param <- vector(mode="list", length=7)
+names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE", "trimLeft", "trimRight", "truncLen", "MSA_aligner", "tree_method")
 
 dada_param$QUALITY_THRESHOLD <- 2
 dada_param$maxEE <- c(4,5)
-dada_param$trimLeft <- c(3,3)
-dada_param$trimRight <- c(3,5)
+
+# trim If primers are at the start of your reads and are a constant length
+dada_param$trimLeft <- c(0,0)
+dada_param$trimRight <- c(0,0)
+
+# be carefull, reads less then that are discarded!
+dada_param$truncLen <-c(210,220)
 
 dada_param$MSA_aligner <- "DECIPHER"   # DECIPHER  MUSCLE  clustalw 
 dada_param$tree_method <- "RAXML"    # PHANGORN   
