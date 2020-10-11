@@ -1,11 +1,7 @@
-
-
 print(paste("########   Configuration set for : ", conf, " ###############" ))
 
 
-
 ###### 1: Set Paths to folders and files ###############################
-
 # TODO create if they dont exists
 #if(!file_test("-d", filt_path)) dir.create(result_path)
 #if(!file_test("-d", filt_path)) dir.create(filt_path)  # create filetered folder
@@ -29,9 +25,8 @@ if(conf$location == "LOCAL"){
   stop(" WRONG SERVER CONFIGURATION")
 }
 
-
-silva_path <- file.path(project_path, "tax_silva")
-green_genes_path <- file.path(project_path, "tax_green_genes")
+silva_path <- file.path(project_path, "16S_taxonomy/tax_silva")
+green_genes_path <- file.path(project_path, "16S_taxonomy/tax_green_genes")
 
 
 ######## 2:  set SPECIFIC FOLDERS depending on dataset
