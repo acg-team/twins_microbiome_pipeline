@@ -44,7 +44,7 @@ source("src/pipeline_dada2/4_BIG_dada_SV_table.R")
 
 
 print("==================> Taxonomy assignment has started...")
-source("src/pipeline_dada2/5_Tax_Assign.R")
+source("src/pipeline_dada2/5_Tax_Assign_dada2_RDP.R")
 
 print("==================> Phylogeny reconstraction has started...")
 source("src/pipeline_dada2/6_Phylogeny.R")
