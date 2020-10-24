@@ -25,8 +25,8 @@ if(conf$location == "LOCAL"){
   stop(" WRONG SERVER CONFIGURATION")
 }
 
-silva_path <- file.path(project_path, "16S_taxonomy/tax_silva")
-green_genes_path <- file.path(project_path, "16S_taxonomy/tax_green_genes")
+silva_path <- file.path(project_path, "16S_taxonomy_db/tax_silva")
+green_genes_path <- file.path(project_path, "16S_taxonomy_db/tax_green_genes")
 
 
 ######## 2:  set SPECIFIC FOLDERS depending on dataset
