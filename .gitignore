@@ -4,12 +4,8 @@
 .Ruserdata
 twins_microbiome_pipeline.Rproj
 
-16S_taxonomy/tax_green_genes/gg_13_8_otus/taxonomy/*
-16S_taxonomy/tax_green_genes/gg_13_8_otus/otus/*
-16S_taxonomy/tax_green_genes/gg_13_8_otus/rep_set/*
-16S_taxonomy/tax_green_genes/gg_13_8_otus/rep_set_aligned/*
-16S_taxonomy/tax_green_genes/gg_13_8_otus/trees/*
-16S_taxonomy/tax_green_genes/gg_13_8_otus/notes
+16S_taxonomy/*
+16S_taxonomy_db/*
 
 data_set_twin/raw/*
 data_set_twin/files_intermediate_qiime/*
