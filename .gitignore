@@ -11,7 +11,7 @@ data_set_twin/raw/*
 data_set_twin/files_intermediate_qiime/*
 data_set_twin/reports_generated/*
 
-data_set_bodyfl/raw/*
+data_set_bodyfl/fastq/*
 data_set_bodyfl/reports_generated/*
 
 Docs/*
