@@ -15,6 +15,7 @@
 # ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 ###########################################################
 
+print("==================> Taxonomy assignment has started...")
 
 #### init: load packages and set path
 source("src/load.R")
@@ -25,9 +26,9 @@ load(file=file.path(files_intermediate_dada, seqtab.file))
 # get a character vector of sequencess to assign taxonomy
 sequences <- dada2::getSequences(seqtab)
 
-### Choose a reverence database (SILVA, green genes, NCBI)
-#ref_fasta <- file.path(rdp_path, "rdp_train_set_14.fa.gz")
-ref_fasta <- file.path(silva_path, "silva_nr_v132_train_set.fa.gz")
+### Choose a reverence database (SILVA, green genes, RDP)
+ref_fasta <- file.path(taxonomy_db_path, tools_param$tax_db)
+print(paste("Use taxonomy db : ", tools_param$tax_db))
 
 
 # assignTaxonomy implements the RDP Naive Bayesian Classifier algorithm
@@ -46,7 +47,9 @@ unname(taxtab)
 
 # Save to disk
 # TODO: do it as csv? [sequence, phylim, kingdom ...]
-save(taxtab, file=file.path(files_intermediate_dada, taxtab.file)) 
+save(taxtab, file=file.path(files_intermediate_dada, paste0(tools_param$tax_db_name, "_taxtab.RData")) )
+
+
 
 
 

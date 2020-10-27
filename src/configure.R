@@ -25,8 +25,8 @@ if(conf$location == "LOCAL"){
   stop(" WRONG SERVER CONFIGURATION")
 }
 
-silva_path <- file.path(project_path, "16S_taxonomy_db/tax_silva")
-green_genes_path <- file.path(project_path, "16S_taxonomy_db/tax_green_genes")
+
+taxonomy_db_path <- file.path(project_path, "16S_taxonomy_db")
 
 
 ######## 2:  set SPECIFIC FOLDERS depending on dataset
@@ -84,8 +84,6 @@ dada.err.file <- "dada_err_data.RData"
 mergers.file <- "mergers.RData"
 seqtab.file <- "seqtab.RData"   #paste0("seqtab_", file.suffix)
 seqtab.snames.file <- "seqtab_snames.RData"  #paste0("seqtab_snames_", file.suffix)
-
-taxtab.file <- "taxtab.RData"
 
 msa.file <- "msa.RData"
 phylo.file <- "phylo_trees.RData"

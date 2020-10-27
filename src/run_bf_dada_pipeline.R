@@ -7,9 +7,9 @@ conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
 conf$dataset <- "BFL"    #   TWIN / "BFL" /
 conf$pipeline <- "DADA2"   # QIIME / DADA2
 
-################# FILTERING parameters 
-dada_param <- vector(mode="list", length=7)
-names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE", "trimLeft", "trimRight", "truncLen", "MSA_aligner", "tree_method")
+################# DADA FILTERING parameters 
+dada_param <- vector(mode="list", length=5)
+names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE", "trimLeft", "trimRight", "truncLen")
 
 dada_param$QUALITY_THRESHOLD <- 2
 dada_param$maxEE <- c(4,5)
@@ -21,8 +21,14 @@ dada_param$trimRight <- c(0,0)
 # be carefull, reads less then that are discarded!
 dada_param$truncLen <-c(210,220)
 
-dada_param$MSA_aligner <- "DECIPHER"   # DECIPHER  MUSCLE  clustalw 
-dada_param$tree_method <- "RAXML"    # PHANGORN   
+################# MSA, Tree and Taxonomy parameters
+tools_param <- vector(mode="list", length=3)
+names(tools_param) <- c("MSA_aligner", "tree_method", "tax_db")
+
+
+tools_param$MSA_aligner <- "DECIPHER"   # DECIPHER  MUSCLE  clustalw 
+tools_param$tree_method <- "RAXML"    # PHANGORN   
+tools_param$taxonomy_db <- "tax_silva/silva_nr99_v138_train_set.fa.gz" 
 
 ##################################################################
 
@@ -42,8 +48,6 @@ print("==================> long dada2 analysis has started...")
 source("src/pipeline_dada2/4_BIG_dada_SV_table.R")
 
 
-
-print("==================> Taxonomy assignment has started...")
 source("src/pipeline_dada2/5_Tax_Assign_dada2_RDP.R")
 
 print("==================> Phylogeny reconstraction has started...")
