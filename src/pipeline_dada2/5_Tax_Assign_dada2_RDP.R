@@ -28,7 +28,7 @@ sequences <- dada2::getSequences(seqtab)
 
 ### Choose a reverence database (SILVA, green genes, RDP)
 ref_fasta <- file.path(taxonomy_db_path, tools_param$tax_db)
-print(paste("Use taxonomy db : ", tools_param$tax_db))
+print(paste("Start assignment with taxonomy db : ", tools_param$tax_db))
 
 
 # assignTaxonomy implements the RDP Naive Bayesian Classifier algorithm
@@ -37,17 +37,27 @@ tic()
 taxtab <- dada2::assignTaxonomy(
   seqs = sequences, 
   refFasta = ref_fasta,
-  multithread = 3
+  multithread = 3,
+  minBoot=50
   )
 print("Total time of taxonomy assignment:")
 toc() # 1468 sec = 24 min
 
-colnames(taxtab) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
-unname(taxtab)
+
+# modify the output format for Green Genes
+# Green Genes adds a 7th column (species) and also aff f_ in front of all taxa, remove it
+if (tools_param$tax_db_name){
+  taxtab <- taxtab[,-7]
+  taxtab <- apply(taxtab, 1:2, gsub, pattern='^(k|p|c|o|f|g)__', replacement='')
+}
+
+
 
 # Save to disk
 # TODO: do it as csv? [sequence, phylim, kingdom ...]
-save(taxtab, file=file.path(files_intermediate_dada, paste0(tools_param$tax_db_name, "_taxtab.RData")) )
+fname = file.path(files_intermediate_dada, paste0(tools_param$tax_db_name, "_taxtab.RData")) 
+save(taxtab, file=fname)
+print(paste("saved to ", fname))
 
 
 
