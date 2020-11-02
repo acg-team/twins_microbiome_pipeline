@@ -32,17 +32,26 @@ tax.silva <- taxtab
 load(file=file.path(files_intermediate_dada, "gre_taxtab.RData")) 
 tax.green <- taxtab
 
+# run comparison
 mismatch.numbers <- 0
-
 for(seq in rownames(tax.rdp)){
-  rdp <- tax.rdp[seq,]
-  silva <- tax.silva[seq,]
-  green <- tax.green[seq,]
+  # select taxonomy assignment for a given sequence and keep only Family/Genus
+  rdp <- tax.rdp[seq,][c('Family','Genus')]
+  silva <- tax.silva[seq,][c('Family','Genus')]
+  green <- tax.green[seq,][c('Family','Genus')]
   
-  matches <- rdp %in% silva %in% green
-  if(sum(matches) < 6) {
+  rdp[is.na(rdp)] <- 0
+  silva[is.na(silva)] <- 0
+  green[is.na(green)] <- 0
+  green <- replace(green, green=='', 0)
+  
+  # compare all three
+  matches <- rdp == silva & rdp == green & silva == green
+
+  
+  if(!all(matches)) {
     mismatch.numbers <- mismatch.numbers + 1
-    print(paste("a mismatch found for sequence ", seq))
+    print(paste("a mismatch has been found for sequence: ", seq))
     print(rdp)
     print(silva)
     print(green)
@@ -50,4 +59,6 @@ for(seq in rownames(tax.rdp)){
 }
 
 print(paste("Total mismatch number: ", mismatch.numbers))
+
+# TODO: Create a csv file with report
 

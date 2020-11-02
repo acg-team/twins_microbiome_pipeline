@@ -19,7 +19,7 @@ dada_param$trimLeft <- c(0,0)
 dada_param$trimRight <- c(0,0)
 
 # be carefull, reads less then that are discarded!
-dada_param$truncLen <-c(210,220)
+dada_param$truncLen <-c(210,220)   # 230 / 210
 
 ################# MSA, Tree and Taxonomy parameters
 tools_param <- vector(mode="list", length=3)
