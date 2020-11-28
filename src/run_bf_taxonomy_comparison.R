@@ -1,4 +1,5 @@
-# compare different taxonoby training sets on dada2 naive Bayes classifier
+## compare taxonomy assignments done by DADA2 with three  taxomony DB: SILVA< GreenGenes, RDP
+
 
 ################# MSA, Tree and Taxonomy parameters
 tools_param <- vector(mode="list", length=4)

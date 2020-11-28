@@ -28,7 +28,7 @@ names(tools_param) <- c("MSA_aligner", "tree_method", "tax_db")
 
 tools_param$MSA_aligner <- "DECIPHER"   # DECIPHER  MUSCLE  clustalw 
 tools_param$tree_method <- "RAXML"    # PHANGORN   
-tools_param$taxonomy_db <- "tax_silva/silva_nr99_v138_train_set.fa.gz" 
+tools_param$tax_db <- "tax_silva/silva_nr99_v138_train_set.fa.gz" 
 
 ##################################################################
 

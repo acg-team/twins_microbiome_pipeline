@@ -18,9 +18,9 @@ theme_set((theme_bw()))
 
 
 
-############ LOAD Budy Fluid PhyloSeq file + metadata
-calculated_ps_file <- "rrun_BFL_DADA2_Q2_mEE45_trL0_0_trR0_0_truncLn210_220_msa_DECIPHER.RData"
-###############
+############ LOAD DATA and SANITY CHECK
+
+calculated_ps_file <- "run_BFL_DADA2_Q2_mEE45_trL0_0_trR0_0_truncLn210_220_msa_DECIPHER.RData"
 
 load(file=file.path(metadata_path, "metadata.RData"))
 load(file=file.path(files_intermediate_dada, calculated_ps_file))
@@ -40,24 +40,24 @@ if(!taxa_are_rows(ps.bfluid)){
 }
 
 
-
-############ SANITY
+#### SANITY check
 # check if every sample has at least one taxa and no NA
 sample_sums(ps.bfluid)
 get_taxa_unique(ps.bfluid, "Phylum") #("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
+get_taxa_unique(ps.bfluid, "Family")
 get_taxa_unique(ps.bfluid, "Genus")
-# TODO: check NA taxa - they excluded?
+
 
 # visually check that we have a community matrix: rows are samples (46) and colums are taxa (spesies)
 OTU = as(otu_table(ps.bfluid), "matrix")
 colnames(OTU) <- c()
 dim(OTU)
-#View(OTU)
+View(OTU)
 
 # check the dictribution of abandamcies 
 hist(OTU[1,],breaks=40)
 
-# check the tree, thi sis ape package
+# check the validity of tree
 tree <- phy_tree(ps.bfluid)
 ape::checkValidPhylo(tree)
 is.rooted(tree)
@@ -69,12 +69,23 @@ is.rooted(tree)
 # TODO - Interactive choice of r  - https://cran.r-project.org/web/packages/adaptiveGPCA/vignettes/adaptive_gpca_vignette.html
 
 
+
+
+
+
 ######### Get top 30 genera (need to do it before normalization!) otherwise taxa_sum() does not work
 # ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 top_num <- 30
 
 # total number of each Genera
-genera.sum = tapply(taxa_sums(ps.bfluid), tax_table(ps.bfluid)[, "Genus"], sum, na.rm=TRUE)
+genera.sum = tapply(
+  X = taxa_sums(ps.bfluid), 
+  INDEX=tax_table(ps.bfluid)[, "Genus"], 
+  FUN=sum, 
+  na.rm=TRUE
+  )
+
+
 n <- length(names(sort(genera.sum, TRUE)))
 #[n-550:n]  / [0:top_num]
 topGenera = names(sort(genera.sum, TRUE))[n-60:n]  # names of top30 genera
