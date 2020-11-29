@@ -20,7 +20,7 @@ theme_set((theme_bw()))
 
 ############ LOAD DATA and SANITY CHECK
 
-calculated_ps_file <- "run_BFL_DADA2_Q2_mEE45_trL0_0_trR0_0_truncLn210_220_msa_DECIPHER.RData"
+calculated_ps_file <- "run_BFL_DADA2_Q2_mEE24_trL0_0_trR0_0_truncLn210_220_msa_DECIPHER.RData"
 
 load(file=file.path(metadata_path, "metadata.RData"))
 load(file=file.path(files_intermediate_dada, calculated_ps_file))
@@ -73,36 +73,39 @@ is.rooted(tree)
 
 
 
-######### Get top 30 genera (need to do it before normalization!) otherwise taxa_sum() does not work
+### Get either top 5 / low 50 or all  genera
 # ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
-top_num <- 30
 
-# total number of each Genera
+# calculate the total abandance of each genera across all population
 genera.sum = tapply(
-  X = taxa_sums(ps.bfluid), 
-  INDEX=tax_table(ps.bfluid)[, "Genus"], 
+  X = taxa_sums(ps.bfluid), # sum up all abandancies of all taxa
+  INDEX=tax_table(ps.bfluid)[, "Genus"],  # use Genus as an indev to sum: 111122223333
   FUN=sum, 
   na.rm=TRUE
   )
 
+n <- length(genera.sum)
 
-n <- length(names(sort(genera.sum, TRUE)))
-#[n-550:n]  / [0:top_num]
-topGenera = names(sort(genera.sum, TRUE))[n-60:n]  # names of top30 genera
+all.genera.names <- names(sort(genera.sum, TRUE))
+top.genera.names <- all.genera.names[0:100]
+rare.genera.names <- all.genera.names[(n-400):n]
 
-physeq.top <- prune_taxa((tax_table(ps.bfluid)[, "Genus"] %in% topGenera), ps.bfluid)
 
-# check OTU
+################ START ANALYSIS
+# use either all data or for top/ bottom 50
+genera.names.to.use <- all.genera.names
+
+physeq.top <- prune_taxa((tax_table(ps.bfluid)[, "Genus"] %in% genera.names.to.use), ps.bfluid)
+
+# sanity check: OTU dimensions
 otu.top <- as(otu_table(physeq.top), "matrix")
 colnames(otu.top) <- c()  # clean the long column names
 dim(otu.top)
 #View(otu.top)
 
-sample_sums(physeq.top) # sanity again
+sample_sums(physeq.top) # WARNING: some samples are with all zeros of rare50
 #get_taxa_unique(physeq.top, "Genus")
 
-# use NA as well!
-#physeq.top <- ps.bfluid
 
 
 ########### normalize and log abundancies of community matrix
@@ -115,6 +118,8 @@ sample_sums(physeq.top.log)
 physeq.top.rel <- phyloseq::transform_sample_counts(physeq.top, function(x) x / sum(x) ) # Total Sum Scaling (TSS)
 sample_sums(physeq.top.rel)
 
+
+
 physeq.top.log.rel <- phyloseq::transform_sample_counts(physeq.top.log, function(x) x / sum(x) ) # Total Sum Scaling (TSS)
 sample_sums(physeq.top.log.rel)
 
@@ -123,9 +128,10 @@ sample_sums(physeq.top.log)
 
 
 ######
-physeq <- physeq.top.rel   
+physeq <- physeq.top.rel  
 
-###########  Ordination with phyloseq
+
+###########  PCoA with weigthed unifrac
 # https://joey711.github.io/phyloseq/plot_ordination-examples
 dst <- phyloseq::distance(physeq, method="wunifrac", type="samples")
 sum(dst==0)   # check if we have NA distances 
@@ -149,13 +155,10 @@ any(is.na(pp$Q))
 # run agPCA
 out.agpca = adaptiveGPCA::adaptivegpca(pp$X, pp$Q, k = 2)
 out.agpca
-#tax30 <- inspectTaxonomy(out.agpca, physeq30.rel)
 
+# PLOT variance explained
+plot(out.agpca) 
 
-### PLOT results (black and white)
-#plot(out.agpca) # variance explained
-#plot(out.agpca, type = "samples", axes = c(1,2))   # all samples in 2D, no colod
-#plot(out.agpca, type = "variables", axes = c(1,2))  # ??
 
 
 #### PLOT with color schemas
@@ -181,14 +184,15 @@ names(phyla.colours) <- unique(df.tax.reduced$Phylum)
 
 # TODO: plot exposed / non exposed separatelly
 BS <- ggplot(data.frame(out.agpca$U, sample_data(physeq))) +
-      ggtitle(paste("Adapt gPCA, sample data ", calculated_ps_file)) +
       geom_point(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +
+      ggtitle(paste("Adapt gPCA, sample data ", calculated_ps_file)) +
       #geom_text( aes(label=sample_data(physeq30.rel)$SampleID), hjust=0, vjust=0) +
       scale_color_manual(values=bs.colours) +
       xlab("Axis 1") + ylab("Axis 2")
 plot(BS)
 
 
+# TODO: ggplot 3D?
 
 
 ########## PLOT by taxes
