@@ -156,27 +156,14 @@ if (tools_param$tree_method=="RAXML"){
   # p - Integer, setting a random seed for the parsimony starting trees.
   # return tr is a list of tr[1] - info, tr[2] - best tree (rooted)
   
-
-#  alignment.rax.gtr <- raxml(alignment,
-#                             m="GTRGAMMAIX", # model
-#                             f="a", # best tree and bootstrap
-#                             p=1234, # random number seed
-#                             x=2345, # random seed for rapid bootstrapping
-#                             N=100, # number of bootstrap replicates
-#                             file="alignment", # name of output files
-#                             exec="raxmlHPC-PTHREADS-SSE3", # name of executable
-#                             threads=20
-#  )
-
-  
   # 5.5h
   tic()
   tree.raxml <- ips::raxml(
     as.matrix(msa.dnabin), 
     m = "GTRGAMMA",
     f = "d",   # d - new rapid hill-climbing / "a", # best tree and bootstrap
-    N = 3, 
-    p = 1234, 
+    N = 4, # number of bootstrap replicates
+    p = 2234, # random number seed
     exec = raxm.exec.path, 
     threads=6,
     file="RAxML_tree"
