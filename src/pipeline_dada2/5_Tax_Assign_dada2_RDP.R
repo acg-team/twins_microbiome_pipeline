@@ -1,4 +1,4 @@
-# Taxonomy assignment with RDP Naive Bayesian Classifier built-in to dada2
+###### Taxonomy assignment with RDP Naive Bayesian Classifier built-in to dada2
 # http://benjjneb.github.io/dada2/assign.html
 # http://benjjneb.github.io/dada2/tutorial.html
 # Author: @AlexY
@@ -15,12 +15,9 @@
 # ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 ###########################################################
 
-print("==================> Taxonomy assignment has started...")
+print("==================> Taxonomy assignment has been started...")
 
 #### init: load packages and set path
-source("src/load.R")
-source("src/configure.R")
-setwd(project_path)
 load(file=file.path(files_intermediate_dada, seqtab.file)) 
 
 # get a character vector of sequencess to assign taxonomy
@@ -40,13 +37,13 @@ taxtab <- dada2::assignTaxonomy(
   multithread = 3,
   minBoot=50
   )
-print("Total time of taxonomy assignment:")
+cat("=> Total time of taxonomy assignment: ")
 toc() # 1468 sec = 24 min
 
 
 # modify the output format for Green Genes
 # Green Genes adds a 7th column (species) and also aff f_ in front of all taxa, remove it
-if (tools_param$tax_db_name){
+if (tools_param$tax_db == "green_genes/gg_13_8_train_set_97.fa.gz"){
   taxtab <- taxtab[,-7]
   taxtab <- apply(taxtab, 1:2, gsub, pattern='^(k|p|c|o|f|g)__', replacement='')
 }
@@ -55,7 +52,8 @@ if (tools_param$tax_db_name){
 
 # Save to disk
 # TODO: do it as csv? [sequence, phylim, kingdom ...]
-fname = file.path(files_intermediate_dada, paste0(tools_param$tax_db_name, "_taxtab.RData")) 
+
+fname = file.path(files_intermediate_dada, tax.fname) 
 save(taxtab, file=fname)
 print(paste("saved to ", fname))
 

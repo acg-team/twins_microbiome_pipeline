@@ -78,12 +78,15 @@ folder.suffix <- paste0(
 
 file.suffix <- paste0(folder.suffix, ".RData")
 
-# file names for intermediate results
+### configuration shall be set before!
+# form file names for intermediate results
 metadata.file <- "metadata.RData"
 dada.err.file <- "dada_err_data.RData"
 mergers.file <- "mergers.RData"
 seqtab.file <- "seqtab.RData"   #paste0("seqtab_", file.suffix)
 seqtab.snames.file <- "seqtab_snames.RData"  #paste0("seqtab_snames_", file.suffix)
+
+tax.fname <- paste0(substring(tools_param$tax_db, 1, 3), "_taxtab.RData")
 
 msa.file <- "msa.RData"
 phylo.file <- "phylo_trees.RData"

@@ -8,13 +8,9 @@
 
 
 #### init: load packages and set path
-source("src/load.R")
-source("src/configure.R")
-setwd(project_path)
-
 load(file=file.path(files_intermediate_dada, seqtab.file)) 
 load(file=file.path(files_intermediate_dada, seqtab.snames.file)) 
-load(file=file.path(files_intermediate_dada, taxtab.file))
+load(file=file.path(files_intermediate_dada, taxtab.fname))
 
 
 ##############  MSA Construction ##############
@@ -186,6 +182,7 @@ if (dada_param$tree_method=="RAXML"){
     file="RAxML_tree"
   ) # , file="RAxMLtwin_tree",  m = "GTRGAMMA",
   
+  cat("RAXML elapsed time: ")
   toc() # 3045.909 sec = 0.8 h om 6 core server - very fast
   
   my.tree <- tree.raxml
