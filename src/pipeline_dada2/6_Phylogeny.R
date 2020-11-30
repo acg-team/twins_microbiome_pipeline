@@ -10,7 +10,7 @@
 #### init: load packages and set path
 load(file=file.path(files_intermediate_dada, seqtab.file)) 
 load(file=file.path(files_intermediate_dada, seqtab.snames.file)) 
-load(file=file.path(files_intermediate_dada, taxtab.fname))
+load(file=file.path(files_intermediate_dada, tax.fname))
 
 
 ##############  MSA Construction ##############
@@ -38,7 +38,7 @@ names(seqs) <- seq.variant.short.names
 # TODO: check for Muscle specific parameters
 
 # option 0:  AlignSeqsfrom the DECIPHER
-if (dada_param$MSA_aligner=="DECIPHER"){
+if (tools_param$MSA_aligner=="DECIPHER"){
   print("--> run MSA by DECIPHER")
   microbiome.msa.decipher <- DECIPHER::AlignSeqs( DNAStringSet(seqs) )
   Biostrings::writeXStringSet(microbiome.msa.decipher, file=file.path(result_path, "msa_decipher.fasta"))
@@ -48,7 +48,7 @@ if (dada_param$MSA_aligner=="DECIPHER"){
 
 # option 1: generate MSA with Muscle
 # 5 hours
-if (dada_param$MSA_aligner=="MUSCLE"){
+if (tools_param$MSA_aligner=="MUSCLE"){
   print("--> run MSA by MUSCLE")
   tic()
   microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
@@ -66,7 +66,7 @@ if (dada_param$MSA_aligner=="MUSCLE"){
 
 # option 2: generate MSA with clustalW
 # 6 hours
-if (dada_param$MSA_aligner=="clustalw"){
+if (tools_param$MSA_aligner=="clustalw"){
   print("--> run MSA by clustalw")
   tic()
   microbiome.msa.clustalw <- msa::msaClustalW(seqs, type="dna", order="input")
@@ -84,9 +84,9 @@ if (dada_param$MSA_aligner=="clustalw"){
 
 #################################################
 # use on of this 
-if (dada_param$MSA_aligner=="DECIPHER"){ my.msa <- microbiome.msa.decipher }
-if (dada_param$MSA_aligner=="MUSCLE"){ my.msa <- microbiome.msa.muscle }
-if (dada_param$MSA_aligner=="clustalw"){ my.msa <- microbiome.msa.clustalw }
+if (tools_param$MSA_aligner=="DECIPHER"){ my.msa <- microbiome.msa.decipher }
+if (tools_param$MSA_aligner=="MUSCLE"){ my.msa <- microbiome.msa.muscle }
+if (tools_param$MSA_aligner=="clustalw"){ my.msa <- microbiome.msa.clustalw }
 
 
 
@@ -97,7 +97,7 @@ if (dada_param$MSA_aligner=="clustalw"){ my.msa <- microbiome.msa.clustalw }
 # TODO - choose only one methor of tree
 # infer a tree with fast NJ method 
 # 40 min
-if (dada_param$tree_method=="PHANGORN"){
+if (tools_param$tree_method=="PHANGORN"){
   print("---> Tree inference by PHANGORN")
   tic()
   phang.align <- phangorn::as.phyDat(my.msa, type="DNA", names=seqtab.samples.names)
@@ -149,7 +149,7 @@ print(msa.dnabin)   # Base composition: acgt = NaN! why?
 
 save(my.msa, seq.variant.names, msa.dnabin, file=file.path(files_intermediate_dada, msa.file)) 
 
-if (dada_param$tree_method=="RAXML"){
+if (tools_param$tree_method=="RAXML"){
   # Parameters:
   # f - RAxML algorithm
   # N - Integers give the number of independent searches on different starting tree or replicates in bootstrapping. 
