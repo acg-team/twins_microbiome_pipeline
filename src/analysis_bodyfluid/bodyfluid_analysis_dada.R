@@ -20,7 +20,7 @@ theme_set((theme_bw()))
 
 ############ LOAD DATA and SANITY CHECK
 
-calculated_ps_file <- "run_BFL_DADA2_Q2_mEE24_trL0_0_trR0_0_truncLn210_220_msa_DECIPHER.RData"
+calculated_ps_file <- "run_BFL_DADA2_Q2_mEE24_trL0_0_trR0_0_truncLn220_210_msa_DECIPHER.RData"
 
 load(file=file.path(metadata_path, "metadata.RData"))
 load(file=file.path(files_intermediate_dada, calculated_ps_file))
@@ -37,6 +37,7 @@ colMeans(filter.log)
 if(!taxa_are_rows(ps.bfluid)){
   otu_table(ps.bfluid) <- t(otu_table(ps.bfluid))
   otu_table(ps.bfluid) <- otu_table(ps.bfluid, taxa_are_rows = TRUE)
+  print('OTU transposed')
 }
 
 
@@ -52,7 +53,7 @@ get_taxa_unique(ps.bfluid, "Genus")
 OTU = as(otu_table(ps.bfluid), "matrix")
 colnames(OTU) <- c()
 dim(OTU)
-View(OTU)
+#View(OTU)
 
 # check the dictribution of abandamcies 
 hist(OTU[1,],breaks=40)
@@ -87,8 +88,8 @@ genera.sum = tapply(
 n <- length(genera.sum)
 
 all.genera.names <- names(sort(genera.sum, TRUE))
-top.genera.names <- all.genera.names[0:100]
-rare.genera.names <- all.genera.names[(n-400):n]
+top.genera.names <- all.genera.names[0:30]
+no_top.genera.names <- all.genera.names[30:n]
 
 
 ################ START ANALYSIS

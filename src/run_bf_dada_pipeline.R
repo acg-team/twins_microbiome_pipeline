@@ -31,13 +31,17 @@ tools_param$tax_db <- "silva/silva_nr99_v138_train_set.fa.gz"  # "green_genes/gg
 
 ################## run configuration ################################################
 # it sets all paths accorting to parameters above
+# TODO: use make instead?
 source("src/load.R")
 source("src/configure.R")
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
 
-########### Start pipeline
 
+
+
+
+########### Start pipeline
 #TODO
 # - add removal to QIIME2 and to TWIN pipeline
 
@@ -53,6 +57,7 @@ source("src/pipeline_dada2/4_BIG_dada_SV_table.R")
 
 
 source("src/pipeline_dada2/5_Tax_Assign_dada2_RDP.R")
+
 
 print("==================> Phylogeny reconstraction has started...")
 source("src/pipeline_dada2/6_Phylogeny.R")

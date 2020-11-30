@@ -73,7 +73,7 @@ folder.suffix <- paste0(
   "_trL", dada_param$trimLeft[1], "_", dada_param$trimLeft[2],
   "_trR", dada_param$trimRight[1], "_", dada_param$trimRight[2],
   "_truncLn", dada_param$truncLen[1], "_", dada_param$truncLen[2],
-  "_msa_", dada_param$MSA_aligner
+  "_msa_", tools_param$MSA_aligner
 )
 
 file.suffix <- paste0(folder.suffix, ".RData")

@@ -12,7 +12,7 @@ setwd(project_path)
 load(file=file.path(metadata_path, metadata.file))
 load(file=file.path(files_intermediate_dada, seqtab.file)) 
 load(file=file.path(files_intermediate_dada, seqtab.snames.file)) 
-load(file=file.path(files_intermediate_dada, taxtab.file))
+load(file=file.path(files_intermediate_dada, tax.fname))
 load(file=file.path(files_intermediate_dada, phylo.file)) 
 
 

@@ -18,7 +18,6 @@ packageVersion("dada2")
 load(file=file.path(metadata_path, metadata.file)) 
 
 
-
 ### FILTERING  ##########################
 # trim and put into filtered folder
 # https://github.com/benjjneb/dada2/tree/master/R
@@ -45,7 +44,6 @@ names(filtRs) <- sample.names
 
 if(length(fnFs) != length(fnRs)) stop("BEFORE: Forward and reverse files do not match!")
 
-tic()
 # quality filtering and trimming
 # TODO: need an expert advice! Or experiment with eliminating bad quality reads !
 # need to deside on: 
@@ -62,6 +60,7 @@ filter.log <- matrix(ncol = 2)
 # TODO: check fastqPairedFilter
 # https://github.com/benjjneb/dada2/issues/311
 
+tic()
 for(i in seq_along(fnFs)) {
   print(paste("Filering and Trimming sample: ", i))
   print(fnFs[[i]])
@@ -79,6 +78,7 @@ for(i in seq_along(fnFs)) {
   rownames(out) <- sample.names[i]  # change the name of the sample to a standard name like "34Sat2"
   filter.log <- rbind(filter.log, out)  # save filtered reads number
 }
+cat('Quality Filterin time:')
 toc()  # 5839sec = 1.5 hours
 
 # add a merger field to keep
@@ -112,7 +112,7 @@ if(length(filtFs) != length(filtRs)) stop("Forward and reverse files do not matc
 tic()
 errF <- learnErrors(filtFs, nbases=1e8, multithread = TRUE, randomize=TRUE, verbose=1, MAX_CONSIST=20)
 errR <- learnErrors(filtRs, nbases=1e8, multithread = TRUE, randomize=TRUE, verbose=1, MAX_CONSIST=20)
-print("Error rate calculation time:")
+cat("Error rate calculation time: ")
 toc() # 9806.114 sec / 2.7h = now 2509sec
 
 ## plot error rates for control
@@ -156,22 +156,20 @@ for (sam in sample.names) {
   
   counter <- counter+1
   cat(counter, "...", sam, ",  ", length(merger$sequence),  " merged sequences... Done.\n")
-  cat("---------- \n")
+  print("----------")
 }
-print("Total time of sample inference:")
+cat("Total time of sample inference: ")
 toc() # 8669sec=2.5h
 save(mergers, file=file.path(files_intermediate_dada, mergers.file))
 
 
 ### SEQTAB: constructs a sequence table (analogous to an OTU table) from the list of samples.
-tic()
 seqtab.all <- dada2::makeSequenceTable(mergers, orderBy = "abundance")
-print("Total time of makeSequenceTable:")
-toc() # 5sec
 
-### remove chimeras ----
+
+### remove chimeras and save results
 seqtab <- dada2::removeBimeraDenovo(seqtab.all, verbose = TRUE)
-save(seqtab, file=file.path(files_intermediate_dada, seqtab.file)) 
+save(seqtab, filter.log, file=file.path(files_intermediate_dada, seqtab.file)) 
 
 
 ### Extract sample names and save them separatelly (for futher Python data analysis)
