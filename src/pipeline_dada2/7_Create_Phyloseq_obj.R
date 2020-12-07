@@ -83,7 +83,7 @@ phy_tree(ps)     # Phylogenetic Tree: [ 8299 tips, ??? internal nodes ] - need t
 
 
 # filter.log shall come from 3 file
-save(ps, filter.log, conf, dada_param, my.msa, my.tree, file=file.path(files_intermediate_dada, phyloseq.file)) 
+save(ps, filter.log, conf, dada_param, tools_param , my.msa, my.tree, file=file.path(files_intermediate_dada, phyloseq.file)) 
 
 
 

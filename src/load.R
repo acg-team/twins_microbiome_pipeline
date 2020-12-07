@@ -11,7 +11,7 @@ sessionInfo()
 
 ##### 0: load the necessary packages #####   
 .cran_packages <- c("ggplot2", "gridExtra", "XML", "tictoc", "MASS", "ape", "phangorn",
-                    "ips","tools","rphast","BiocManager","ggpubr", "tidyverse", "fastqcr")
+                    "ips","tools","rphast","BiocManager","ggpubr", "tidyverse", "fastqcr", "plotly")
 
 .bioc_packages <- c("ShortRead", "devtools", "dada2", "phyloseq", "msa", "DECIPHER")
 

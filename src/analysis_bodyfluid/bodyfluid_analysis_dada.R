@@ -1,12 +1,24 @@
 # @AlexY, created Jan 2020
 # analysis of Body Fluid dataset on dada2 ASV
 
-
-#### init: load packages and set path
-# NOTE - swith from TWIN to BDFLUID!!! in configure.R
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
 
+files_intermediate_dada <- "~/Projects_R/twins_microbiome_pipeline/data_set_bodyfl/files_intermediate_dada"
+calculated_ps_file <- "run_BFL_DADA2_Q2_mEE24_trL0_0_trR0_0_truncLn220_230_msa_DECIPHER.RData"
+load(file=file.path(files_intermediate_dada, calculated_ps_file))
+
+
+# Remove
+tools_param <- vector(mode="list", length=3)
+names(tools_param) <- c("MSA_aligner", "tree_method", "tax_db")
+
+tools_param$MSA_aligner <- "DECIPHER"   # DECIPHER  MUSCLE  clustalw 
+tools_param$tree_method <- "RAXML"    # PHANGORN   
+tools_param$tax_db <- "silva/silva_nr99_v138_train_set.fa.gz"  # "green_genes/gg_13_8_train_set_97.fa.gz"
+
+
+#### init: load packages and set path
 source("src/load.R")
 source("src/configure.R")
 
@@ -15,15 +27,11 @@ library(dplyr)
 library("RColorBrewer")
 library(randomcoloR)
 theme_set((theme_bw()))
-
+library(plotly)
 
 
 ############ LOAD DATA and SANITY CHECK
-
-calculated_ps_file <- "run_BFL_DADA2_Q2_mEE24_trL0_0_trR0_0_truncLn220_210_msa_DECIPHER.RData"
-
 load(file=file.path(metadata_path, "metadata.RData"))
-load(file=file.path(files_intermediate_dada, calculated_ps_file))
 head(df.metadata) # check metadata
 
 # rename the phyloseq object
@@ -37,12 +45,13 @@ colMeans(filter.log)
 if(!taxa_are_rows(ps.bfluid)){
   otu_table(ps.bfluid) <- t(otu_table(ps.bfluid))
   otu_table(ps.bfluid) <- otu_table(ps.bfluid, taxa_are_rows = TRUE)
-  print('OTU transposed')
+  print('OTU has been transposed')
 }
 
 
 #### SANITY check
 # check if every sample has at least one taxa and no NA
+# TODO: substitute NA with " Not Detected"
 sample_sums(ps.bfluid)
 get_taxa_unique(ps.bfluid, "Phylum") #("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 get_taxa_unique(ps.bfluid, "Family")
@@ -61,7 +70,7 @@ hist(OTU[1,],breaks=40)
 # check the validity of tree
 tree <- phy_tree(ps.bfluid)
 ape::checkValidPhylo(tree)
-is.rooted(tree)
+ape::is.rooted(tree)
 #plot(phy_tree(tree), show.node.label = TRUE)
 
 
@@ -74,13 +83,13 @@ is.rooted(tree)
 
 
 
-### Get either top 5 / low 50 or all  genera
+### use all_genera , top30 or all except of top 30 i the analysis
 # ("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
 
 # calculate the total abandance of each genera across all population
 genera.sum = tapply(
   X = taxa_sums(ps.bfluid), # sum up all abandancies of all taxa
-  INDEX=tax_table(ps.bfluid)[, "Genus"],  # use Genus as an indev to sum: 111122223333
+  INDEX=tax_table(ps.bfluid)[, "Genus"],  # use Genus as an index to sum: 111122223333
   FUN=sum, 
   na.rm=TRUE
   )
@@ -93,10 +102,17 @@ no_top.genera.names <- all.genera.names[30:n]
 
 
 ################ START ANALYSIS
-# use either all data or for top/ bottom 50
-genera.names.to.use <- all.genera.names
+# use either all data or for top/ bottom 30
+#genera.names.to.use <- all.genera.names
 
-physeq.top <- prune_taxa((tax_table(ps.bfluid)[, "Genus"] %in% genera.names.to.use), ps.bfluid)
+# TODO: why if I prune for all names I still have less variants? 3209 intead of 4381
+#physeq.top <- prune_taxa((tax_table(ps.bfluid)[, "Genus"] %in% genera.names.to.use), ps.bfluid)
+physeq.top <- ps.bfluid
+
+# check: the number of taxa should be the same   
+ps.bfluid
+physeq.top
+get_taxa_unique(ps.bfluid, "Genus")
 
 # sanity check: OTU dimensions
 otu.top <- as(otu_table(physeq.top), "matrix")
@@ -104,6 +120,7 @@ colnames(otu.top) <- c()  # clean the long column names
 dim(otu.top)
 #View(otu.top)
 
+# each sample has to have non zero varients
 sample_sums(physeq.top) # WARNING: some samples are with all zeros of rare50
 #get_taxa_unique(physeq.top, "Genus")
 
@@ -132,20 +149,23 @@ sample_sums(physeq.top.log)
 physeq <- physeq.top.rel  
 
 
-###########  PCoA with weigthed unifrac
+###################  PCoA with weigthed unifrac
 # https://joey711.github.io/phyloseq/plot_ordination-examples
 dst <- phyloseq::distance(physeq, method="wunifrac", type="samples")
 sum(dst==0)   # check if we have NA distances 
 
 # calculate and plot "PCoA" with "unifrac" distances
 bf.ord <- phyloseq::ordinate(physeq, "PCoA", "unifrac", weighted=TRUE)
-p1 <- phyloseq::plot_ordination(physeq, bf.ord, type="samples", color='Body_site')
+p1 <- phyloseq::plot_ordination(physeq, bf.ord, type="samples", color='Body_site') + geom_density_2d()
 print(p1)
 
 # TODO: study outliers?
 
 
-############# Adaptive gPCA - ordination plot to see distances BTW ALL SAMPLES!
+
+
+
+################## Adaptive gPCA - ordination plot to see distances BTW ALL SAMPLES!
 # good source too - https://www.bioconductor.org/help/course-materials/2017/BioC2017/Day1/Workshops/Microbiome/doc/MicrobiomeWorkshopII.html
 # http://jfukuyama.github.io/adaptiveGPCA/
 # extract nessesary matrices for gPCA
@@ -159,7 +179,6 @@ out.agpca
 
 # PLOT variance explained
 plot(out.agpca) 
-
 
 
 #### PLOT with color schemas
@@ -186,6 +205,7 @@ names(phyla.colours) <- unique(df.tax.reduced$Phylum)
 # TODO: plot exposed / non exposed separatelly
 BS <- ggplot(data.frame(out.agpca$U, sample_data(physeq))) +
       geom_point(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +
+      #geom_density_2d(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +  
       ggtitle(paste("Adapt gPCA, sample data ", calculated_ps_file)) +
       #geom_text( aes(label=sample_data(physeq30.rel)$SampleID), hjust=0, vjust=0) +
       scale_color_manual(values=bs.colours) +
@@ -193,7 +213,6 @@ BS <- ggplot(data.frame(out.agpca$U, sample_data(physeq))) +
 plot(BS)
 
 
-# TODO: ggplot 3D?
 
 
 ########## PLOT by taxes

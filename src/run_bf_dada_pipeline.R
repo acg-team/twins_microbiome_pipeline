@@ -19,7 +19,7 @@ dada_param$trimLeft <- c(0,0)
 dada_param$trimRight <- c(0,0)
 
 # be carefull, reads less then that are discarded!
-dada_param$truncLen <-c(220,210)   # 230 / 210
+dada_param$truncLen <-c(225,210)   # 230 / 210
 
 ################# MSA, Tree and Taxonomy parameters
 tools_param <- vector(mode="list", length=3)
@@ -33,9 +33,10 @@ tools_param$tax_db <- "silva/silva_nr99_v138_train_set.fa.gz"  # "green_genes/gg
 # it sets all paths accorting to parameters above
 # TODO: use make instead?
 source("src/load.R")
-source("src/configure.R")
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
+source("src/configure.R")
+
 
 
 
