@@ -23,8 +23,8 @@ load(file=file.path(files_intermediate_dada, seqtab.file))
 
 # get a character vector of sequencess to assign taxonomy
 seq <- dada2::getSequences(seqtab)
-names(seq) <- seq(1, length(seq), by=1)
-sequences <- Biostrings::DNAStringSet(seq)
+names(seq) <- seq
+sequences <- Biostrings::DNAStringSet(seq)  #convert to DNAStringSet
 
 # save sequences as a fasta file on disk, so MapSeq can use it
 Biostrings::writeXStringSet(sequences, file=file.path(files_intermediate_dada, "sequences.fasta"))
@@ -41,7 +41,13 @@ cat(x)
 # run bash command
 system(x)
 
-# extract taxonomic classification from mseq file
+# extract taxonomic classification from mseq file, convert to taxtab
+mapseq.df <- read.table(x3, sep="\t", header=T, comment.char="", skip = 1)
+rownames(mapseq.df) <- mapseq.df[,1]
 
+taxtab <- mapseq.df[names(mapseq.df) %in% c("Phylum","Class","Order","Family","Genus")]
+
+# save 
+tax.fname <- paste0(substring(tools_param$tax_db, 1, 3), "_taxtab_mapseq.RData")
 
 

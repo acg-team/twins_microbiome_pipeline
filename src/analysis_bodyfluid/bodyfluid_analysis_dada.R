@@ -10,13 +10,13 @@ load(file=file.path(files_intermediate_dada, calculated_ps_file))
 
 
 # Remove
-tools_param <- vector(mode="list", length=3)
-names(tools_param) <- c("MSA_aligner", "tree_method", "tax_db")
+tools_param <- vector(mode="list", length=4)
+names(tools_param) <- c("MSA_aligner", "tree_method", "tax_db", "tax_tool")
 
 tools_param$MSA_aligner <- "DECIPHER"   # DECIPHER  MUSCLE  clustalw 
 tools_param$tree_method <- "RAXML"    # PHANGORN   
 tools_param$tax_db <- "silva/silva_nr99_v138_train_set.fa.gz"  # "green_genes/gg_13_8_train_set_97.fa.gz"
-
+tools_param$tax_tool <- "dadardp"  # mapseq
 
 #### init: load packages and set path
 source("src/load.R")
@@ -158,6 +158,11 @@ sum(dst==0)   # check if we have NA distances
 bf.ord <- phyloseq::ordinate(physeq, "PCoA", "unifrac", weighted=TRUE)
 p1 <- phyloseq::plot_ordination(physeq, bf.ord, type="samples", color='Body_site') + geom_density_2d()
 print(p1)
+
+# plot in 3D : bf.ord$vectors[,1:3]
+plot_ly(x=bf.ord$vectors[,1], y=bf.ord$vectors[,2], z=bf.ord$vectors[,3], 
+        type="scatter3d", mode="markers", 
+        color=sample_data(physeq)$Body_site, symbol=sample_data(physeq)$State)
 
 # TODO: study outliers?
 

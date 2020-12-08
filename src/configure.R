@@ -63,20 +63,7 @@ if(conf$dataset == "TWIN"){
 
 
 
-
 ##### 3: Set file names (same for any dataset but in different folders) ###########################
-
-folder.suffix <- paste0(
-  conf$dataset, "_", conf$pipeline, 
-  "_Q", dada_param$QUALITY_THRESHOLD, 
-  "_mEE", dada_param$maxEE[1], dada_param$maxEE[2], 
-  "_trL", dada_param$trimLeft[1], dada_param$trimLeft[2],
-  "_trR", dada_param$trimRight[1], dada_param$trimRight[2],
-  "_truncLn", dada_param$truncLen[1], "_", dada_param$truncLen[2],
-  "_msa_", tools_param$MSA_aligner
-)
-
-file.suffix <- paste0(folder.suffix, ".RData")
 
 ### configuration shall be set before!
 # form file names for intermediate results
@@ -86,10 +73,18 @@ mergers.file <- "mergers.RData"
 seqtab.file <- "seqtab.RData"   #paste0("seqtab_", file.suffix)
 seqtab.snames.file <- "seqtab_snames.RData"  #paste0("seqtab_snames_", file.suffix)
 
-tax.fname <- paste0(substring(tools_param$tax_db, 1, 3), "_taxtab.RData")
-
 msa.file <- "msa.RData"
 phylo.file <- "phylo_trees.RData"
 
-phyloseq.file <- paste0("run_", file.suffix)
+
+#### 4: initialize configurarion data structure
+conf <- vector(mode="list", length=3)
+names(conf) <- c("location", "dataset", "pipeline")
+
+dada_param <- vector(mode="list", length=5)
+names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE", "trimLeft", "trimRight", "truncLen")
+
+tools_param <- vector(mode="list", length=3)
+names(tools_param) <- c("MSA_aligner", "tree_method", "tax_db")
+
 

@@ -52,7 +52,7 @@ if (tools_param$tax_db == "green_genes/gg_13_8_train_set_97.fa.gz"){
 
 # Save to disk
 # TODO: do it as csv? [sequence, phylim, kingdom ...]
-
+tax.fname <- paste0(substring(tools_param$tax_db, 1, 3), "_taxtab_rdp.RData")
 fname = file.path(files_intermediate_dada, tax.fname) 
 save(taxtab, file=fname)
 print(paste("saved to ", fname))

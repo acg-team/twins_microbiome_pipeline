@@ -82,6 +82,23 @@ dim( tax_table(ps) )   # Taxonomy Table: [ 8299 taxa by 6 taxonomic ranks ] - Th
 phy_tree(ps)     # Phylogenetic Tree: [ 8299 tips, ??? internal nodes ] - need to re run the whole workflow
 
 
+# form a file name depending on tools and parameter used
+folder.suffix <- paste0(
+  conf$dataset, "_", conf$pipeline, 
+  "_Q", dada_param$QUALITY_THRESHOLD, 
+  "_mEE", dada_param$maxEE[1], dada_param$maxEE[2], 
+  "_trL", dada_param$trimLeft[1], dada_param$trimLeft[2],
+  "_trR", dada_param$trimRight[1], dada_param$trimRight[2],
+  "_truncLn", dada_param$truncLen[1], "_", dada_param$truncLen[2],
+  "_msa_", tools_param$MSA_aligner,
+  "tax", tools_param$tax_tool
+)
+
+file.suffix <- paste0(folder.suffix, ".RData")
+phyloseq.file <- paste0("run_", file.suffix)
+
+
+
 # filter.log shall come from 3 file
 save(ps, filter.log, conf, dada_param, tools_param , my.msa, my.tree, file=file.path(files_intermediate_dada, phyloseq.file)) 
 

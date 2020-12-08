@@ -10,7 +10,7 @@
 #### init: load packages and set path
 load(file=file.path(files_intermediate_dada, seqtab.file)) 
 load(file=file.path(files_intermediate_dada, seqtab.snames.file)) 
-load(file=file.path(files_intermediate_dada, tax.fname))
+#load(file=file.path(files_intermediate_dada, tax.fname))
 
 
 ##############  MSA Construction ##############
@@ -52,7 +52,7 @@ if (tools_param$MSA_aligner=="MUSCLE"){
   print("--> run MSA by MUSCLE")
   tic()
   microbiome.msa.muscle <- msa::msaMuscle(seqs, type="dna", order="input")
-  print("msa (muscle) took:")
+  cat("msa (muscle) took: ")
   toc()  # 1972.561sec
   print(microbiome.msa.muscle)
   rownames(microbiome.msa.muscle)
@@ -70,7 +70,7 @@ if (tools_param$MSA_aligner=="clustalw"){
   print("--> run MSA by clustalw")
   tic()
   microbiome.msa.clustalw <- msa::msaClustalW(seqs, type="dna", order="input")
-  print("msa (clustalw) took:")
+  cat("msa (clustalw) took: ")
   toc() 
   print(microbiome.msa.clustalw)
   #microbiome.msa.clustalw@unmasked@ranges@NAMES[3000:4000]
@@ -87,7 +87,6 @@ if (tools_param$MSA_aligner=="clustalw"){
 if (tools_param$MSA_aligner=="DECIPHER"){ my.msa <- microbiome.msa.decipher }
 if (tools_param$MSA_aligner=="MUSCLE"){ my.msa <- microbiome.msa.muscle }
 if (tools_param$MSA_aligner=="clustalw"){ my.msa <- microbiome.msa.clustalw }
-
 
 
 ####################### Infer a phylogenetic tree 
@@ -112,7 +111,7 @@ if (tools_param$tree_method=="PHANGORN"){
   # fitJC is "pml" object, tree can be extracted as fitJC$tree, also has logLik etc parameters
   # 55 min
   tic()
-  fitJC = phangorn::pml(tree=treeNJ, data=phang.align)   # pmlcomputes  the  likelihood  of  a  phylogenetic  tree 
+  fitJC <- phangorn::pml(tree=treeNJ, data=phang.align)   # pmlcomputes  the  likelihood  of  a  phylogenetic  tree 
   fitJC <- optim.pml(fitJC)    # optimize edge length etc parameters
   toc()
   save(treeNJ, fitJC, file=file.path(files_intermediate_dada, phylo.file))
@@ -173,7 +172,7 @@ if (tools_param$tree_method=="RAXML"){
   toc() # 3045.909 sec = 0.8 h om 6 core server - very fast
   
   my.tree <- tree.raxml
-  save( my.tree, file=file.path(files_intermediate_dada, phylo.file)) 
+  save(my.tree, file=file.path(files_intermediate_dada, phylo.file)) 
   
 }
 
