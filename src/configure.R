@@ -77,14 +77,6 @@ msa.file <- "msa.RData"
 phylo.file <- "phylo_trees.RData"
 
 
-#### 4: initialize configurarion data structure
-conf <- vector(mode="list", length=3)
-names(conf) <- c("location", "dataset", "pipeline")
 
-dada_param <- vector(mode="list", length=5)
-names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE", "trimLeft", "trimRight", "truncLen")
-
-tools_param <- vector(mode="list", length=3)
-names(tools_param) <- c("MSA_aligner", "tree_method", "tax_db")
 
 

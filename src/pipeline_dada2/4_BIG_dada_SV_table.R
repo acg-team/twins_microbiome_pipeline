@@ -7,11 +7,6 @@
 
 
 ##### init: load packages and set path  
-source("src/load.R")
-source("src/configure.R")
-setwd(project_path)
-
-getwd()
 packageVersion("dada2")
 
 ### LOAD PREVIOUS DATA
@@ -30,6 +25,14 @@ trimLeft <- dada_param$trimLeft
 trimRight <- dada_param$trimRight
 truncLen <- dada_param$truncLen
 
+folder.suffix <- paste0(
+  conf$dataset, "_", conf$pipeline, 
+  "_Q", dada_param$QUALITY_THRESHOLD, 
+  "_mEE", dada_param$maxEE[1], dada_param$maxEE[2], 
+  "_trL", dada_param$trimLeft[1], dada_param$trimLeft[2],
+  "_trR", dada_param$trimRight[1], dada_param$trimRight[2],
+  "_truncLn", dada_param$truncLen[1], "_", dada_param$truncLen[2]
+)
 
 print(folder.suffix)
 
@@ -154,8 +157,8 @@ for (sam in sample.names) {
   # add number of merged sequences to a filter.log
   filter.log[sam,"merged"] <- length(merger$sequence)
   
-  counter <- counter+1
-  cat(counter, "...", sam, ",  ", length(merger$sequence),  " merged sequences... Done.\n")
+  counter <- counter + 1
+  print("SAMPLE #", counter, "...", sam, ",  ", length(merger$sequence),  " merged sequences... Done.")
   print("----------")
 }
 cat("Total time of sample inference: ")
@@ -175,6 +178,8 @@ save(seqtab, filter.log, file=file.path(files_intermediate_dada, seqtab.file))
 ### Extract sample names and save them separatelly (for futher Python data analysis)
 seqtab.samples.names = rownames(seqtab)
 save(seqtab.samples.names, file=file.path(files_intermediate_dada, seqtab.snames.file)) 
+
+print(" >>>  Big Dada finished!")
 
 
 ### TODO:

@@ -3,10 +3,6 @@
 ## http://rpubs.com/lgschaerer/515637
 ##########################################################################
 
-#### init: load packages and set path
-source("src/load.R")
-source("src/configure.R")
-setwd(project_path)
 
 ### LOAD PREVIOUS DATA
 load(file=file.path(metadata_path, metadata.file))

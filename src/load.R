@@ -38,4 +38,14 @@ if(any(!.inst)) {
 # Load packages into session, and print package version
 sapply(c(.cran_packages, .bioc_packages), require, character.only = TRUE)
 
+#### 4: initialize configurarion data structure
+conf <- vector(mode="list", length=3)
+names(conf) <- c("location", "dataset", "pipeline")
+
+dada_param <- vector(mode="list", length=5)
+names(dada_param) <- c("QUALITY_THRESHOLD", "maxEE", "trimLeft", "trimRight", "truncLen")
+
+tools_param <- vector(mode="list", length=4)
+names(tools_param) <- c("MSA_aligner", "tree_method", "tax_db", "tax_method")
+
 

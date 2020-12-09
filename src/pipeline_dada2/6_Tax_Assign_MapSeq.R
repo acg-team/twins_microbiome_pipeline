@@ -16,9 +16,6 @@
 ###########################################################
 
 #### init: load packages and set path
-source("src/load.R")
-source("src/configure.R")
-setwd(project_path)
 load(file=file.path(files_intermediate_dada, seqtab.file)) 
 
 # get a character vector of sequencess to assign taxonomy
@@ -28,6 +25,8 @@ sequences <- Biostrings::DNAStringSet(seq)  #convert to DNAStringSet
 
 # save sequences as a fasta file on disk, so MapSeq can use it
 Biostrings::writeXStringSet(sequences, file=file.path(files_intermediate_dada, "sequences.fasta"))
+# TODO: it seems like the saving is not correct?
+
 
 # run MapSeq
 # https://stackoverflow.com/questions/11395217/run-a-bash-script-from-an-r-script
@@ -47,7 +46,16 @@ rownames(mapseq.df) <- mapseq.df[,1]
 
 taxtab <- mapseq.df[names(mapseq.df) %in% c("Phylum","Class","Order","Family","Genus")]
 
-# save 
-tax.fname <- paste0(substring(tools_param$tax_db, 1, 3), "_taxtab_mapseq.RData")
 
+# TODO: here we need to compare rownames(mapseq.df) and names(seq)
+setdiff(names(seq), rownames(mapseq.df))
+# ??? we lost two ASVs?
+
+
+
+# save 
+tax.fname <- paste0("taxtab_", tools_param$tax_db, "_mapseq.RData")
+fname = file.path(files_intermediate_dada, tax.fname) 
+save(taxtab, file=fname)
+print(paste("saved to ", fname))
 
