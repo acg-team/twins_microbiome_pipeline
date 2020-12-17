@@ -45,6 +45,7 @@ source("src/pipeline_dada2/5_Phylogeny.R")
 # OUTPUT:
 
 
+print("==================> Taxonomy assignment has started...")
 # INPUT:
 #tools_param$tax_db <- "silva/silva_nr99_v138_train_set.fa.gz"  # "green_genes/gg_13_8_train_set_97.fa.gz"
 tools_param$tax_db <- "ncbi"

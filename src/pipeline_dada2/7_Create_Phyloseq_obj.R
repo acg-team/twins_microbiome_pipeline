@@ -12,12 +12,11 @@ load(file=file.path(files_intermediate_dada, tax.fname))
 load(file=file.path(files_intermediate_dada, phylo.file)) 
 
 
-############    BUILD a Phyloseq object
-# Phyloseq obgect is a  typical amplicon sequencing experiment in one single data object 
 
-if(conf$dataset == "TWIN"){
+###### sanity check and format adjustment
   # we need all sampleID to be the same in rownames(seqtab) and samples metadata (df.metadata$SampleID)
   # we need a SampleID in order to Phyloseq object be valid (change the name of /file/ column to SampleID)
+if(conf$dataset == "TWIN"){
   names(df.metadata)[names(df.metadata)=="file"] <- "SampleID"
 } else if(conf$dataset == "BODYFL"){
   # already have SampleID as a column name
@@ -27,24 +26,35 @@ if(conf$dataset == "TWIN"){
 # assign the names of samples (ERR138...) to metadata rows instead of 1,2,3...
 rownames(df.metadata) <- df.metadata$SampleID
 
-# must be TRUE (sanity check)
-all(rownames(seqtab) %in% df.metadata$SampleID) 
+# must be TRUE : sample ID shall be the same
+if( !all(rownames(seqtab) %in% df.metadata$SampleID)){
+  stop(" Sample names must coinside!")
+}
+
+# metadate shall be presented for every sample
 for(seqname in rownames(seqtab)){
   if(seqname %in% df.metadata$SampleID){
   } else{
-    print(paste("missed metadata for :", seqname, " sample"))
+    stop(paste("missed metadata for :", seqname, " sample"))
   }
 }
+
 rowSums(seqtab) # check for non-zero
 
-# build phyloseq object
+
+
+
+############    BUILD a Phyloseq object
+# Phyloseq obgect is a  typical amplicon sequencing experiment in one single data object 
 # canonical OTU mast be taxa x samples?  Here samples x taxa, so we set taxa_are_rows = FALSE
 
+taxonomy.table <- tax_table(taxtab)
 feature.table <- otu_table(seqtab, taxa_are_rows = FALSE)  # seqtab = ERR128(row) x TCGA(cols, taxa)
 metadata.table <- sample_data(df.metadata)
 tree.final <-  tree.raxml$bestTree   # raxml is rooted / GTP is unrooted
 
 # assign long sequence names back (we made it short after RAxML)
+# TODO: is the order preserved? 
 taxa_names(tree.final) <- colnames(feature.table)
 
 # control for TWIN
@@ -58,7 +68,7 @@ taxa_names(tree.final)
 
 # Create an object 
 ps <- phyloseq::phyloseq(
-              tax_table(taxtab), 
+              taxonomy.table, 
               metadata.table,
               feature.table,
               tree.final

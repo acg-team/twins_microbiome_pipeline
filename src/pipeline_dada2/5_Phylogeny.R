@@ -10,7 +10,6 @@
 #### init: load packages and set path
 load(file=file.path(files_intermediate_dada, seqtab.file)) 
 load(file=file.path(files_intermediate_dada, seqtab.snames.file)) 
-#load(file=file.path(files_intermediate_dada, tax.fname))
 
 
 ##############  MSA Construction ##############
