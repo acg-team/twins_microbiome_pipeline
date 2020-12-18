@@ -172,15 +172,19 @@ seqtab.all <- dada2::makeSequenceTable(mergers, orderBy = "abundance")
 
 ### remove chimeras and save results
 seqtab <- dada2::removeBimeraDenovo(seqtab.all, verbose = TRUE)
-save(seqtab, filter.log, file=file.path(files_intermediate_dada, seqtab.file)) 
+samples.names = rownames(seqtab)  # need it for futher Python data analysis
+
+# named vector of all sequences
+asv_sequences <- dada2::getSequences(seqtab)
+prefix <- "asv_number"
+suffix <- seq(1:length(asv_sequences))
+asv.short.names <- paste(prefix, suffix, sep='_')  
+names(asv_sequences) <- asv.short.names
+
+save(seqtab, samples.names, asv_sequences, filter.log, file=file.path(files_intermediate_dada, seqtab.file)) 
+
+print(" >>>  DADA2 ASV inference has been finished!")
 
 
-### Extract sample names and save them separatelly (for futher Python data analysis)
-seqtab.samples.names = rownames(seqtab)
-save(seqtab.samples.names, file=file.path(files_intermediate_dada, seqtab.snames.file)) 
 
-print(" >>>  Big Dada finished!")
-
-
-### TODO:
-# sequence variants have very long names, so substitute them with short ones (Seq1, Seq2 ...) and create mathing table
+# TODO: save seq tav as a CSV? OTU? any other format?

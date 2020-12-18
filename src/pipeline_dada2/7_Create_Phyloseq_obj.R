@@ -1,6 +1,7 @@
 ## Combining a S4 Phyloseq object for further manipulation
 ## phyloseq object is an experiment level data structure
 ## http://rpubs.com/lgschaerer/515637
+## https://vaulot.github.io/tutorials/Phyloseq_tutorial.html
 ##########################################################################
 
 
@@ -47,15 +48,31 @@ rowSums(seqtab) # check for non-zero
 ############    BUILD a Phyloseq object
 # Phyloseq obgect is a  typical amplicon sequencing experiment in one single data object 
 # canonical OTU mast be taxa x samples?  Here samples x taxa, so we set taxa_are_rows = FALSE
+# https://vaulot.github.io/tutorials/Phyloseq_tutorial.html
 
-taxonomy.table <- tax_table(taxtab)
-feature.table <- otu_table(seqtab, taxa_are_rows = FALSE)  # seqtab = ERR128(row) x TCGA(cols, taxa)
+head(asv_sequences)  # here should be short_name -> asv sequences correcpondence
+shortname_to_asv <- names(asv_sequences)
+names(shortname_to_asv) <- asv_sequences
+
 metadata.table <- sample_data(df.metadata)
+
+# make sure the row.names are the same for asll tables (shall be otu/asv)
+# we will use short name, like names(asv_sequences)
+taxonomy.table <- phyloseq::tax_table(as.matrix(taxtab))
+feature.table <- otu_table(as.matrix(seqtab), taxa_are_rows = FALSE)  # seqtab = ERR128(row) x TCGA(cols, taxa)
 tree.final <-  tree.raxml$bestTree   # raxml is rooted / GTP is unrooted
 
-# assign long sequence names back (we made it short after RAxML)
-# TODO: is the order preserved? 
-taxa_names(tree.final) <- colnames(feature.table)
+namesasv <-taxa_names(feature.table)
+newnames <- c()
+for(nm in namesasv){
+  newnames <- rbind(newnames, shortname_to_asv[nm])
+}
+ 
+
+taxa_names(taxonomy.table)
+taxa_names(feature.table)
+taxa_names(tree.final)
+
 
 # control for TWIN
 # Sample Data:       [ samples x sample variables ]

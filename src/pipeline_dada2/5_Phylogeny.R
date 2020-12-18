@@ -14,19 +14,7 @@ load(file=file.path(files_intermediate_dada, seqtab.snames.file))
 
 ##############  MSA Construction ##############
 # extract DNA seq from seqtab object
-seqs <- dada2::getSequences(seqtab)   # 8299
-names(seqs) <- seqs    # This propagates to the tip labels of the tree
-
-# define variables
-seq.variant.names <- names(seqs)
-seq.number <- length(seq.variant.names)
-
-# generate short names (RAXML requires names to be less then 256)
-# TODO - a questional... may be use the first 10 letters? with number?
-prefix <- "sv_seq_variant"
-suffix <- seq(1:seq.number)
-seq.variant.short.names <- paste(prefix, suffix, sep='_')
-names(seqs) <- seq.variant.short.names
+seqs <- asv_sequences  # NOTE: names of this vector will propagate to the tip labels of the tree
 
 
 # note: msa package provides a unified R/Bioconductor interface to MSA (ClustalW, ClustalOmega, Muscle)
@@ -41,7 +29,7 @@ if (tools_param$MSA_aligner=="DECIPHER"){
   print("--> run MSA by DECIPHER")
   microbiome.msa.decipher <- DECIPHER::AlignSeqs( DNAStringSet(seqs) )
   Biostrings::writeXStringSet(microbiome.msa.decipher, file=file.path(result_path, "msa_decipher.fasta"))
-  save(microbiome.msa.decipher, seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
+  save(microbiome.msa.decipher, file=file.path(files_intermediate_dada, msa.file)) 
   }
 
 
@@ -58,7 +46,7 @@ if (tools_param$MSA_aligner=="MUSCLE"){
   
   # save MSA as a fasta file for possible vizualization with UGene browser
   Biostrings::writeXStringSet(unmasked(microbiome.msa.muscle), file=file.path(result_path, "msa_muscle.fasta"))
-  save(microbiome.msa.muscle,seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
+  save(microbiome.msa.muscle, file=file.path(files_intermediate_dada, msa.file)) 
 }
 
 
@@ -72,33 +60,34 @@ if (tools_param$MSA_aligner=="clustalw"){
   cat("msa (clustalw) took: ")
   toc() 
   print(microbiome.msa.clustalw)
-  #microbiome.msa.clustalw@unmasked@ranges@NAMES[3000:4000]
   Biostrings::writeXStringSet(unmasked(microbiome.msa.clustalw), file=file.path(result_path, "msa_clustalw.fasta"))
   
   # save objects for reusing late in pipeline 
-  save(microbiome.msa.clustalw, seq.variant.names, file=file.path(files_intermediate_dada, msa.file)) 
+  save(microbiome.msa.clustalw,  file=file.path(files_intermediate_dada, msa.file)) 
 }
 
               
 
 #################################################
-# use on of this 
+# use one of this 
 if (tools_param$MSA_aligner=="DECIPHER"){ my.msa <- microbiome.msa.decipher }
 if (tools_param$MSA_aligner=="MUSCLE"){ my.msa <- microbiome.msa.muscle }
 if (tools_param$MSA_aligner=="clustalw"){ my.msa <- microbiome.msa.clustalw }
 
 
+
+
 ####################### Infer a phylogenetic tree 
+# TODO: use a separate file for each method (like taxonomy)
 
 ########### OPTION 1:  fast NJ tree, can be used as guide tree as well
 
-# TODO - choose only one methor of tree
 # infer a tree with fast NJ method 
 # 40 min
 if (tools_param$tree_method=="PHANGORN"){
-  print("---> Tree inference by PHANGORN")
+  print("-------> Tree inference by PHANGORN")
   tic()
-  phang.align <- phangorn::as.phyDat(my.msa, type="DNA", names=seqtab.samples.names)
+  phang.align <- phangorn::as.phyDat(my.msa, type="DNA", names=samples.names)
   dm <- dist.ml(phang.align)  #distance matrix
   treeNJ <- phangorn::NJ(dm) # "phylo" object (a tree)
   toc()
@@ -145,9 +134,10 @@ msa.dnabin <- ape::as.DNAbin(my.msa, check.names=TRUE)
 labels(msa.dnabin)
 print(msa.dnabin)   # Base composition: acgt = NaN! why?
 
-save(my.msa, seq.variant.names, msa.dnabin, file=file.path(files_intermediate_dada, msa.file)) 
+save(my.msa, msa.dnabin, file=file.path(files_intermediate_dada, msa.file)) 
 
 if (tools_param$tree_method=="RAXML"){
+  print("-------> Tree inference by RAXML")
   # Parameters:
   # f - RAxML algorithm
   # N - Integers give the number of independent searches on different starting tree or replicates in bootstrapping. 

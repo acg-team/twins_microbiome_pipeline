@@ -21,7 +21,7 @@ print("==================> Taxonomy assignment has been started...")
 load(file=file.path(files_intermediate_dada, seqtab.file)) 
 
 # get a character vector of sequencess to assign taxonomy
-sequences <- dada2::getSequences(seqtab)
+sequences <- asv_sequences #dada2::getSequences(seqtab)
 
 ### Choose a reverence database (SILVA, green genes, RDP)
 ref_fasta <- file.path(taxonomy_db_path, tools_param$tax_db)
