@@ -1,33 +1,28 @@
 # @AlexY, created Jan 2020
 # analysis of Body Fluid dataset on dada2 ASV
-
-project_path <- "~/Projects_R/twins_microbiome_pipeline"
-setwd(project_path)
-
-files_intermediate_dada <- "~/Projects_R/twins_microbiome_pipeline/data_set_bodyfl/files_intermediate_dada"
-calculated_ps_file <- "run_BFL_DADA2_Q2_mEE24_trL0_0_trR0_0_truncLn220_230_msa_DECIPHER.RData"
-load(file=file.path(files_intermediate_dada, calculated_ps_file))
-
-
-# Remove
-tools_param <- vector(mode="list", length=4)
-names(tools_param) <- c("MSA_aligner", "tree_method", "tax_db", "tax_tool")
-
-tools_param$MSA_aligner <- "DECIPHER"   # DECIPHER  MUSCLE  clustalw 
-tools_param$tree_method <- "RAXML"    # PHANGORN   
-tools_param$tax_db <- "silva/silva_nr99_v138_train_set.fa.gz"  # "green_genes/gg_13_8_train_set_97.fa.gz"
-tools_param$tax_tool <- "dadardp"  # mapseq
-
-#### init: load packages and set path
-source("src/load.R")
-source("src/configure.R")
-
 library(adaptiveGPCA)
 library(dplyr)
 library("RColorBrewer")
 library(randomcoloR)
 theme_set((theme_bw()))
 library(plotly)
+
+source("src/load.R")
+
+
+project_path <- "~/Projects_R/twins_microbiome_pipeline"
+setwd(project_path)
+
+# Load the resulting pipeline file
+files_intermediate_dada <- "~/Projects_R/twins_microbiome_pipeline/data_set_bodyfl/files_intermediate_dada"
+calculated_ps_file <- "run_BFL_DADA2_Q2_mEE24_trL00_trR00_truncLn210_220_msa_DECIPHERtax.RData"
+load(file=file.path(files_intermediate_dada, calculated_ps_file))
+
+
+#### init: load packages and set path
+source("src/configure.R")
+
+
 
 
 ############ LOAD DATA and SANITY CHECK

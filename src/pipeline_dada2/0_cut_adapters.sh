@@ -1,5 +1,9 @@
 #  chmod +x 0_cut_adapters.sh
+
+# INPUT: 
+# folder with RAW reads
 BF_RAW_FOLDER=~/Projects_R/twins_microbiome_pipeline/data_set_bodyfl/raw/raw/
+# adapters
 
 
 #cutadapt -a ADAPTER_FWD -A ADAPTER_REV -o out.1.fastq -p out.2.fastq reads.1.fastq reads.2.fastq

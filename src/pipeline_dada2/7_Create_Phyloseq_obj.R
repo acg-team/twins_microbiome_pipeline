@@ -11,12 +11,14 @@ load(file=file.path(files_intermediate_dada, seqtab.file))
 load(file=file.path(files_intermediate_dada, seqtab.snames.file)) 
 load(file=file.path(files_intermediate_dada, tax.fname))
 load(file=file.path(files_intermediate_dada, phylo.file)) 
+load(file=file.path(files_intermediate_dada, msa.file)) 
 
 
 
 ###### sanity check and format adjustment
   # we need all sampleID to be the same in rownames(seqtab) and samples metadata (df.metadata$SampleID)
   # we need a SampleID in order to Phyloseq object be valid (change the name of /file/ column to SampleID)
+
 if(conf$dataset == "TWIN"){
   names(df.metadata)[names(df.metadata)=="file"] <- "SampleID"
 } else if(conf$dataset == "BODYFL"){
@@ -53,25 +55,28 @@ rowSums(seqtab) # check for non-zero
 head(asv_sequences)  # here should be short_name -> asv sequences correcpondence
 shortname_to_asv <- names(asv_sequences)
 names(shortname_to_asv) <- asv_sequences
+head(shortname_to_asv)
 
 metadata.table <- sample_data(df.metadata)
 
 # make sure the row.names are the same for asll tables (shall be otu/asv)
 # we will use short name, like names(asv_sequences)
 taxonomy.table <- phyloseq::tax_table(as.matrix(taxtab))
-feature.table <- otu_table(as.matrix(seqtab), taxa_are_rows = FALSE)  # seqtab = ERR128(row) x TCGA(cols, taxa)
-tree.final <-  tree.raxml$bestTree   # raxml is rooted / GTP is unrooted
-
-namesasv <-taxa_names(feature.table)
-newnames <- c()
-for(nm in namesasv){
-  newnames <- rbind(newnames, shortname_to_asv[nm])
-}
- 
-
 taxa_names(taxonomy.table)
+
+
+feature.table <- otu_table(as.matrix(seqtab), taxa_are_rows = FALSE)  # seqtab = ERR128(row) x TCGA(cols, taxa)
+# substitute the long names with the short names
+namesasv <- taxa_names(feature.table)
+new_names <- lapply(namesasv, function(x) {shortname_to_asv[x]})
+taxa_names(feature.table) <- new_names
 taxa_names(feature.table)
+
+
+tree.final <-  my.tree$bestTree   # raxml is rooted / GTP is unrooted
 taxa_names(tree.final)
+
+
 
 
 # control for TWIN
@@ -79,9 +84,6 @@ taxa_names(tree.final)
 # Taxonomy Table:    [ taxa x taxonomic ranks ]
 # OTU Table:         [ taxa x samples ]
 
-rownames(metadata.table)
-colnames(feature.table)
-taxa_names(tree.final)
 
 # Create an object 
 ps <- phyloseq::phyloseq(
@@ -96,6 +98,7 @@ ps <- phyloseq::phyloseq(
 any(taxa_sums(ps) == 0)
 is.rooted(phy_tree(ps))
 any(is.na(ps@otu_table@.Data))
+
 
 ## CHECK UP: phyloseq-class experiment-level object
 # https://joey711.github.io/phyloseq/import-data.html
