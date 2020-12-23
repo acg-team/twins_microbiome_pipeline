@@ -78,14 +78,7 @@ taxa_names(tree.final)
 
 
 
-
-# control for TWIN
-# Sample Data:       [ samples x sample variables ]
-# Taxonomy Table:    [ taxa x taxonomic ranks ]
-# OTU Table:         [ taxa x samples ]
-
-
-# Create an object 
+# Create a ps object 
 ps <- phyloseq::phyloseq(
               taxonomy.table, 
               metadata.table,
@@ -117,7 +110,7 @@ folder.suffix <- paste0(
   "_trR", dada_param$trimRight[1], dada_param$trimRight[2],
   "_truncLn", dada_param$truncLen[1], "_", dada_param$truncLen[2],
   "_msa_", tools_param$MSA_aligner,
-  "tax", tools_param$tax_tool
+  "_tax_", tools_param$tax_method
 )
 
 file.suffix <- paste0(folder.suffix, ".RData")

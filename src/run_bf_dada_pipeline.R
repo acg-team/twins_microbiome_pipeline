@@ -3,13 +3,16 @@
 # TODO: use make instead?
 project_path <- "~/Projects_R/twins_microbiome_pipeline"
 setwd(project_path)
+
+# load packages and initialize config variables
 source("src/load.R")
 
+
+# configure paths depending on server / datasets etc 
 conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
 conf$dataset <- "BFL"    #   TWIN / "BFL" /
 conf$pipeline <- "DADA2"   # QIIME / DADA2
 source("src/configure.R")
-
 
 
 ########### Start pipeline #############
