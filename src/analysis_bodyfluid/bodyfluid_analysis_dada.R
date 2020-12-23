@@ -15,7 +15,7 @@ setwd(project_path)
 
 # Load the resulting pipeline file
 files_intermediate_dada <- "~/Projects_R/twins_microbiome_pipeline/data_set_bodyfl/files_intermediate_dada"
-calculated_ps_file <- "run_BFL_DADA2_Q2_mEE24_trL00_trR00_truncLn210_220_msa_DECIPHERtax.RData"
+calculated_ps_file <- "run_BFL_DADA2_Q2_mEE24_trL00_trR00_truncLn210_220_msa_DECIPHER_tax_mapseq.RData"
 load(file=file.path(files_intermediate_dada, calculated_ps_file))
 
 
@@ -44,38 +44,44 @@ if(!taxa_are_rows(ps.bfluid)){
 }
 
 
-#### SANITY check
+#### SANITY checks
 # check if every sample has at least one taxa and no NA
 # TODO: substitute NA with " Not Detected"
 sample_sums(ps.bfluid)
-get_taxa_unique(ps.bfluid, "Phylum") #("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
-get_taxa_unique(ps.bfluid, "Family")
 get_taxa_unique(ps.bfluid, "Genus")
 
 
-# visually check that we have a community matrix: rows are samples (46) and colums are taxa (spesies)
+# OTU: visually check that we have a community matrix: rows are samples (46) and colums are taxa (spesies)
 OTU = as(otu_table(ps.bfluid), "matrix")
 colnames(OTU) <- c()
 dim(OTU)
 #View(OTU)
 
-# check the dictribution of abandamcies 
-hist(OTU[1,],breaks=40)
+# check the distribution of abandamcies 
+hist(OTU[1,],breaks=30)
 
-# check the validity of tree
-tree <- phy_tree(ps.bfluid)
+# TREE: check the validity of tree
+tree <- phyloseq::phy_tree(ps.bfluid)
 ape::checkValidPhylo(tree)
 ape::is.rooted(tree)
+
+# check validity of tree, there should be only 2 children!
+edges = tree$edge
+mycounts = table(edges[,1]) 
+length(mycounts[mycounts == 2]) # Number of nodes with exactly 2 children
+length(mycounts[mycounts != 2]) # Number of nodes with more or fewer children
+mycounts[mycounts != 2]
+#https://github.com/joey711/phyloseq/issues/1215
+if(length(mycounts[mycounts != 2])>0){
+  print('Your tree has several nodes with more then 2 children! Fixing...')
+  # TODO: not sure if that is right approach.. it produces a tree with internal nodes != tips-2
+  phy_tree(ps.bfluid) <- ape::multi2di(tree)
+}
+
 #plot(phy_tree(tree), show.node.label = TRUE)
 
 
-# TODO - explore all sequnces names and see NNN, length etc artefacts
-# TODO - plot ggplot in 3D axes
 # TODO - Interactive choice of r  - https://cran.r-project.org/web/packages/adaptiveGPCA/vignettes/adaptive_gpca_vignette.html
-
-
-
-
 
 
 ### use all_genera , top30 or all except of top 30 i the analysis
@@ -93,16 +99,18 @@ n <- length(genera.sum)
 
 all.genera.names <- names(sort(genera.sum, TRUE))
 top.genera.names <- all.genera.names[0:30]
-no_top.genera.names <- all.genera.names[30:n]
+no_top.genera.names <- all.genera.names[10:n]
 
 
 ################ START ANALYSIS
 # use either all data or for top/ bottom 30
-#genera.names.to.use <- all.genera.names
+genera.names.to.use <- no_top.genera.names
 
 # TODO: why if I prune for all names I still have less variants? 3209 intead of 4381
-#physeq.top <- prune_taxa((tax_table(ps.bfluid)[, "Genus"] %in% genera.names.to.use), ps.bfluid)
-physeq.top <- ps.bfluid
+physeq.top <- prune_taxa((tax_table(ps.bfluid)[, "Genus"] %in% genera.names.to.use), ps.bfluid)
+
+#physeq.top <- ps.bfluid
+
 
 # check: the number of taxa should be the same   
 ps.bfluid
@@ -115,11 +123,16 @@ colnames(otu.top) <- c()  # clean the long column names
 dim(otu.top)
 #View(otu.top)
 
-# each sample has to have non zero varients
-sample_sums(physeq.top) # WARNING: some samples are with all zeros of rare50
+# each sample has to have non zero variants
+sample_sums(physeq.top)
+if(any(sample_sums(physeq.top)==0)){
+  stop(" one of the samples has zero abandancy for all variants, please check ")
+}  
+
 #get_taxa_unique(physeq.top, "Genus")
-
-
+sample_data(physeq.top)
+tax_table(physeq.top)
+phy_tree(physeq.top)
 
 ########### normalize and log abundancies of community matrix
 # do normalization and log transform
@@ -141,13 +154,15 @@ sample_sums(physeq.top.log)
 
 
 ######
-physeq <- physeq.top.rel  
+physeq <- physeq.top.rel 
 
 
 ###################  PCoA with weigthed unifrac
 # https://joey711.github.io/phyloseq/plot_ordination-examples
 dst <- phyloseq::distance(physeq, method="wunifrac", type="samples")
 sum(dst==0)   # check if we have NA distances 
+# possible warning: https://github.com/joey711/phyloseq/issues/936
+
 
 # calculate and plot "PCoA" with "unifrac" distances
 bf.ord <- phyloseq::ordinate(physeq, "PCoA", "unifrac", weighted=TRUE)
@@ -199,15 +214,13 @@ df.tax.reduced %>%
   summarize(n_unique = n_distinct(Genus))
 
 
-phyla.colours <- brewer.pal(n = 8, name = "Dark2")
-names(phyla.colours) <- unique(df.tax.reduced$Phylum)
 
 # TODO: plot exposed / non exposed separatelly
 BS <- ggplot(data.frame(out.agpca$U, sample_data(physeq))) +
       geom_point(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +
       #geom_density_2d(aes(x = Axis1, y = Axis2, color = Body_site, shape = State)) +  
       ggtitle(paste("Adapt gPCA, sample data ", calculated_ps_file)) +
-      #geom_text( aes(label=sample_data(physeq30.rel)$SampleID), hjust=0, vjust=0) +
+      #geom_text( aes(label=sample_data(physeq)$SampleID), hjust=0, vjust=0) +
       scale_color_manual(values=bs.colours) +
       xlab("Axis 1") + ylab("Axis 2")
 plot(BS)
@@ -220,6 +233,9 @@ plot(BS)
 # i) their quality on the factor map (cos2) or 
 # ii) their contribution values to the principal components (contrib). 
 # colour = Genus
+
+phyla.colours <- brewer.pal(n = 8, name = "Dark2")
+names(phyla.colours) <- unique(df.tax.reduced$Phylum)
 
 palette <- distinctColorPalette(n)
 #pie(rep(1, n), col=palette)
