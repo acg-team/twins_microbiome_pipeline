@@ -12,15 +12,19 @@ source("src/load.R")
 conf$location <- "LOCAL"  # LOCAL / HOMESERVER  / ETHSERVER
 conf$dataset <- "BFL"    #   TWIN / "BFL" /
 conf$pipeline <- "DADA2"   # QIIME / DADA2
+
+# set up all variables using conf$
 source("src/configure.R")
 
 
 ########### Start pipeline #############
-# - add removal to QIIME2 and to TWIN pipeline
+# TODO: add adupt removal to QIIME2 and to TWIN pipeline as well
 
+# load metadata
+df.metadata <- read.table(file.path(metadata_path,"metadata.txt"))
 
 # cutadapt shall come here as well
-#source("src/pipeline_dada2/1_metadata.R")
+
 
 source("src/pipeline_dada2/2_file_names_parsing.R")
 
